@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String?
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  soldTickets   Ticket[] @relation("TicketSeller")
+  boughtTickets Ticket[] @relation("TicketBuyer")
+  bids          Bid[]
+  purchases     Purchase[]
+  listings      TicketListing[]
+
+  @@map("users")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  venue       String
+  date        DateTime
+  image       String?
+  category    String
+  capacity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tickets Ticket[]
+
+  @@map("events")
+}
+
+model Ticket {
+  id          String        @id @default(cuid())
+  eventId     String
+  sellerId    String
+  buyerId     String?
+  price       Float
+  section     String?
+  row         String?
+  seat        String?
+  status      TicketStatus  @default(AVAILABLE)
+  listingType ListingType   @default(DIRECT_SALE)
+  endTime     DateTime?     // For bidding
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  seller  User    @relation("TicketSeller", fields: [sellerId], references: [id])
+  buyer   User?   @relation("TicketBuyer", fields: [buyerId], references: [id])
+  bids    Bid[]
+  purchase Purchase?
+
+  @@map("tickets")
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  ticketId  String
+  bidderId  String
+  amount    Float
+  createdAt DateTime @default(now())
+
+  // Relations
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  bidder User   @relation(fields: [bidderId], references: [id])
+
+  @@map("bids")
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  ticketId  String   @unique
+  buyerId   String
+  amount    Float
+  status    PurchaseStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  buyer  User   @relation(fields: [buyerId], references: [id])
+
+  @@map("purchases")
+}
+
+model TicketListing {
+  id        String   @id @default(cuid())
+  sellerId  String
+  eventId   String
+  price     Float
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  seller User  @relation(fields: [sellerId], references: [id])
+  event  Event @relation(fields: [eventId], references: [id])
+
+  @@map("ticket_listings")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TicketStatus {
+  AVAILABLE
+  SOLD
+  RESERVED
+  EXPIRED
+}
+
+enum ListingType {
+  DIRECT_SALE
+  AUCTION
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+} 
