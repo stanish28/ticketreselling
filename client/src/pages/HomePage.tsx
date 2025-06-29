@@ -1,141 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { eventsAPI } from '../services/api.ts';
-import { Event } from '../types';
-import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
-import { CalendarIcon, MapPinIcon, TicketIcon } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
-import { ArrowRightIcon, SparklesIcon } from '@heroicons/react/24/solid';
 
-const trendingEvents = [
+const events = [
   {
-    id: '1',
-    title: 'Sunburn Goa 2025',
-    image: '/assets/sunburn.jpg',
-    date: 'Dec 27, 2025',
-    venue: 'Goa Beach',
-    category: 'EDM',
+    name: 'Ultra Music Festival',
+    date: 'July 12, 2025',
+    price: '$120',
+    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
   },
   {
-    id: '2',
-    title: 'Arijit Singh Live',
-    image: '/assets/arijit.jpg',
-    date: 'Nov 15, 2025',
-    venue: 'Mumbai Arena',
-    category: 'Bollywood',
+    name: 'Aogisthe Night',
+    date: 'August 2, 2025',
+    price: '$85',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
   },
   {
-    id: '3',
-    title: 'NH7 Weekender',
-    image: '/assets/nh7.jpg',
-    date: 'Oct 10, 2025',
-    venue: 'Pune',
-    category: 'Indie',
+    name: 'EDM Blast',
+    date: 'September 19, 2025',
+    price: '$150',
+    image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
   },
 ];
 
 const HomePage: React.FC = () => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await eventsAPI.getAll({ limit: 6 });
-        console.log('HomePage API response:', response); // Debug log
-        
-        if (response.success && response.data && Array.isArray(response.data.tickets)) {
-          setEvents(response.data.tickets);
-        } else {
-          setEvents([]);
-        }
-      } catch (error) {
-        console.error('HomePage fetch events error:', error);
-        setEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-neon-blue flex flex-col">
-      {/* Hero Banner */}
-      <section className="flex-1 flex flex-col justify-center items-center text-center px-4 pt-24 pb-12">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white drop-shadow-neon mb-4 font-urbanist">
-          <span className="text-neon-green">
-            Your Ticket to the Hottest Concerts
-          </span>
-        </h1>
-        <p className="text-lg md:text-2xl text-neon-pink mb-8 font-semibold">
-          Buy, sell, and bid on tickets with total trust.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <Link
-            to="/events"
-            className="btn-neon flex items-center justify-center gap-2"
-          >
-            <SparklesIcon className="w-5 h-5" />
-            Browse Events
-          </Link>
-          <Link
-            to="/sell-ticket"
-            className="btn-neon-outline flex items-center justify-center gap-2"
-          >
-            Sell a Ticket
-            <ArrowRightIcon className="w-5 h-5" />
-          </Link>
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#18122B] to-[#231651] font-sans flex flex-col items-center">
+      {/* Navbar */}
+      <nav className="w-full max-w-5xl bg-black rounded-2xl px-8 py-4 mt-6 mb-8 flex items-center justify-between shadow-2xl">
+        <div className="flex items-center gap-3">
+          {/* Neon pink ticket icon SVG */}
+          <svg className="w-8 h-8 text-neon-pink" fill="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="7" width="18" height="10" rx="3"/>
+            <circle cx="8" cy="12" r="1.5" fill="#18122B"/>
+            <circle cx="16" cy="12" r="1.5" fill="#18122B"/>
+          </svg>
+          <span className="text-white font-extrabold text-xl tracking-widest font-sans uppercase">CONCERT TICKET RESALE</span>
         </div>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          <span className="bg-neon-pink text-dark px-3 py-1 rounded-full text-xs font-bold shadow-neon animate-pulse">
-            Escrow Protected
-          </span>
-          <span className="bg-neon-green text-dark px-3 py-1 rounded-full text-xs font-bold shadow-neon animate-pulse">
-            Verified Sellers
-          </span>
+        <div className="flex gap-8">
+          <Link to="/register" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign Up</Link>
+          <Link to="/login" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign In</Link>
         </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center text-center py-14 w-full">
+        <h1 className="text-neon-pink font-extrabold uppercase text-5xl md:text-7xl font-sans mb-6 tracking-tight" style={{lineHeight: 1.05}}>BUY & SELL CONCERT TICKETS</h1>
+        <p className="text-white text-xl md:text-2xl mb-10 font-medium">Find great deals on resale tickets for live shows.</p>
+        <Link to="/events" className="bg-neon-blue text-white font-bold text-xl px-12 py-5 rounded-full shadow-[0_0_24px_4px_#1E90FF] transition-all hover:bg-neon-pink hover:shadow-[0_0_32px_8px_#FF1EC6] hover:scale-105 uppercase">GET STARTED</Link>
       </section>
 
-      {/* Trending Events Carousel (placeholder) */}
-      <section className="w-full max-w-4xl mx-auto mb-12">
-        <h2 className="text-2xl font-bold text-white mb-4 font-urbanist">🔥 Trending Events</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {trendingEvents.map(event => (
-            <div
-              key={event.id}
-              className="bg-dark rounded-xl shadow-neon p-4 flex flex-col gap-2 hover:scale-105 transition-transform duration-200"
-            >
-              <img
-                src={event.image}
-                alt={event.title}
-                className="rounded-lg h-40 w-full object-cover mb-2"
-              />
-              <div className="flex justify-between items-center">
-                <span className="text-neon-green font-bold">{event.category}</span>
-                <span className="bg-neon-pink text-dark px-2 py-1 rounded-full text-xs font-bold">Trending</span>
-              </div>
-              <h3 className="text-white font-extrabold text-lg">{event.title}</h3>
-              <p className="text-neon-blue">{event.venue}</p>
-              <p className="text-gray-400">{event.date}</p>
-              <Link
-                to={`/events/${event.id}`}
-                className="btn-neon mt-2 text-center"
+      {/* Popular Events Section */}
+      <section className="w-full max-w-5xl mx-auto mt-12 px-4">
+        <div className="bg-black rounded-3xl p-10 shadow-2xl">
+          <h2 className="text-white font-extrabold text-3xl mb-10 uppercase tracking-wide">POPULAR EVENTS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {events.map((event) => (
+              <div
+                key={event.name}
+                className="bg-black rounded-2xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-[0_0_24px_4px_#1E90FF,0_0_32px_8px_#FF1EC6] flex flex-col border-2 border-transparent hover:border-neon-pink"
               >
-                View Event
-              </Link>
-            </div>
-          ))}
+                <img src={event.image} alt={event.name} className="w-full h-52 object-cover" />
+                <div className="p-6 flex flex-col gap-2 flex-1">
+                  <span className="text-white font-bold text-2xl mt-2">{event.name}</span>
+                  <span className="text-neon-blue font-bold text-lg">{event.date}</span>
+                  <span className="text-neon-pink font-bold text-lg">{event.price}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="w-full bg-dark py-10 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 font-urbanist">
-          Ready to join the party?
-        </h2>
-        <p className="text-neon-green mb-6">Sign up and never miss a show again.</p>
-        <Link to="/register" className="btn-neon text-lg">Sign Up Now</Link>
       </section>
     </div>
   );
