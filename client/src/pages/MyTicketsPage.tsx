@@ -188,7 +188,7 @@ const MyTicketsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18122B] to-[#231651]">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -197,45 +197,43 @@ const MyTicketsPage: React.FC = () => {
   const filteredTickets = getFilteredTickets();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#18122B] to-[#231651] py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Tickets</h1>
-          <p className="mt-2 text-gray-600">
-            View and manage your purchased tickets
-          </p>
+        <div className="mb-10">
+          <h1 className="text-4xl font-extrabold text-neon-pink mb-2 uppercase tracking-tight">My Tickets</h1>
+          <p className="text-lg text-white font-medium">View and manage your purchased tickets</p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex space-x-4">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-lg font-bold transition-all shadow-md border-2 ${
                 filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                  ? 'bg-neon-blue text-white border-neon-blue shadow-[0_0_16px_2px_#1E90FF]'
+                  : 'bg-black text-neon-blue border-neon-blue hover:bg-[#231651] hover:text-white'
               }`}
             >
               All ({tickets.length})
             </button>
             <button
               onClick={() => setFilter('upcoming')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-lg font-bold transition-all shadow-md border-2 ${
                 filter === 'upcoming'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                  ? 'bg-neon-blue text-white border-neon-blue shadow-[0_0_16px_2px_#1E90FF]'
+                  : 'bg-black text-neon-blue border-neon-blue hover:bg-[#231651] hover:text-white'
               }`}
             >
               Upcoming ({tickets.filter(t => new Date(t.event.date) > new Date()).length})
             </button>
             <button
               onClick={() => setFilter('past')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-lg font-bold transition-all shadow-md border-2 ${
                 filter === 'past'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                  ? 'bg-neon-blue text-white border-neon-blue shadow-[0_0_16px_2px_#1E90FF]'
+                  : 'bg-black text-neon-blue border-neon-blue hover:bg-[#231651] hover:text-white'
               }`}
             >
               Past ({tickets.filter(t => new Date(t.event.date) <= new Date()).length})
@@ -245,221 +243,166 @@ const MyTicketsPage: React.FC = () => {
 
         {/* Tickets Grid */}
         {filteredTickets.length === 0 ? (
-          <div className="text-center py-12">
-            <TicketIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No tickets found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="text-center py-20">
+            <TicketIcon className="mx-auto h-12 w-12 text-neon-pink" />
+            <h3 className="mt-4 text-2xl font-bold text-neon-pink">No tickets found</h3>
+            <p className="mt-2 text-lg text-white">
               {filter === 'all' 
                 ? "You haven't purchased any tickets yet."
                 : `You don't have any ${filter} tickets.`
               }
             </p>
-            <div className="mt-6">
+            <div className="mt-8">
               <Link
                 to="/events"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-6 py-3 rounded-full text-lg font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
               >
                 Browse Events
               </Link>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTickets.map((ticket) => {
-              const eventStatus = getEventStatus(ticket.event.date);
-              const isPast = new Date(ticket.event.date) <= new Date();
-              
-              return (
-                <div key={ticket.id} className="bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                  {/* Event Image */}
-                  {ticket.event.image && (
-                    <div className="h-48 bg-gray-200">
-                      <img
-                        src={ticket.event.image}
-                        alt={ticket.event.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Ticket Info */}
-                  <div className="p-6">
-                    {/* Status Badges */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Purchased
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredTickets.map((ticket) => (
+              <div
+                key={ticket.id}
+                className="bg-black rounded-2xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-[0_0_24px_4px_#1E90FF,0_0_32px_8px_#FF1EC6] transition-transform duration-200 flex flex-col"
+              >
+                {ticket.event.image && (
+                  <img
+                    src={ticket.event.image}
+                    alt={ticket.event.title}
+                    className="w-full h-52 object-cover border-b-4 border-transparent hover:border-neon-pink transition-all duration-200"
+                  />
+                )}
+                <div className="p-6 flex flex-col gap-2 flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#1E90FF22] text-neon-blue uppercase tracking-wide">
+                      {ticket.event.category}
+                    </span>
+                    <span className="text-sm text-neon-pink font-bold">
+                      {ticket.status}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-extrabold text-white mb-2 truncate">
+                    {ticket.event.title}
+                  </h3>
+                  <div className="flex items-center gap-2 text-neon-blue font-bold">
+                    <CalendarIcon className="w-5 h-5" />
+                    <span>{format(new Date(ticket.event.date), 'PPP')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white font-semibold">
+                    <MapPinIcon className="w-5 h-5 text-neon-pink" />
+                    <span>{ticket.event.venue}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <TicketIcon className="w-5 h-5 text-neon-pink" />
+                    <span className="text-neon-pink font-bold text-lg">
+                      ₹{ticket.price}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-white text-sm font-semibold">
+                      Purchased: {format(new Date(ticket.purchasedAt), 'PPP p')}
+                    </span>
+                  </div>
+                  {/* QR Code and Resell Button */}
+                  <div className="flex items-center gap-4 mt-4">
+                    {ticket.qrCode && isEventWithin24Hours(ticket.event.date) ? (
+                      <a
+                        href={ticket.qrCode}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
+                      >
+                        <QrCodeIcon className="w-5 h-5 mr-2" /> Show QR
+                      </a>
+                    ) : (
+                      <span className="text-neon-blue text-xs font-semibold">
+                        {getQRCodeMessage(ticket.event.date)}
                       </span>
-                      <span className={`text-xs font-medium ${eventStatus.color}`}>
-                        {eventStatus.status}
-                      </span>
-                    </div>
-
-                    {/* Event Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {ticket.event.title}
-                    </h3>
-
-                    {/* Event Details */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <CalendarIcon className="h-4 w-4 mr-2" />
-                        {format(new Date(ticket.event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPinIcon className="h-4 w-4 mr-2" />
-                        {ticket.event.venue}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <TicketIcon className="h-4 w-4 mr-2" />
-                        {ticket.section && `Section ${ticket.section}`}
-                        {ticket.row && ` • Row ${ticket.row}`}
-                        {ticket.seat && ` • Seat ${ticket.seat}`}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <CurrencyDollarIcon className="h-4 w-4 mr-2" />
-                        Paid ${ticket.price.toFixed(2)}
-                      </div>
-                    </div>
-
-                    {/* Purchase Date */}
-                    <div className="text-xs text-gray-500 mb-4">
-                      Purchased on {format(new Date(ticket.purchasedAt), 'MMM dd, yyyy')}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex space-x-2">
-                      {!isPast && (
-                        <button
-                          onClick={() => {
-                            if (isEventWithin24Hours(ticket.event.date)) {
-                              // Show QR code when event is within 24 hours
-                              alert('QR Code: ' + ticket.qrCode);
-                            } else {
-                              // Show message when event is more than 24 hours away
-                              const message = getQRCodeMessage(ticket.event.date);
-                              alert(message);
-                            }
-                          }}
-                          className={`flex-1 inline-flex items-center justify-center px-3 py-2 border rounded-md text-sm font-medium ${
-                            isEventWithin24Hours(ticket.event.date)
-                              ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
-                              : 'border-gray-200 text-gray-500 bg-gray-50 cursor-not-allowed'
-                          }`}
-                        >
-                          <QrCodeIcon className="h-4 w-4 mr-1" />
-                          {getQRCodeMessage(ticket.event.date)}
-                        </button>
-                      )}
+                    )}
+                    {/* Resell Button */}
+                    {ticket.status === 'SOLD' ? null : (
                       <button
                         onClick={() => openResellModal(ticket)}
-                        className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-yellow-400 text-yellow-700 bg-yellow-100 rounded-md text-sm font-medium hover:bg-yellow-200"
+                        className="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white bg-neon-pink hover:bg-neon-blue hover:shadow-[0_0_16px_2px_#1E90FF] transition-all"
                       >
-                        Sell
+                        Resell
                       </button>
-                      <Link
-                        to={`/events/${ticket.event.id}`}
-                        className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                      >
-                        View Event
-                      </Link>
-                    </div>
+                    )}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
-      </div>
 
-      {/* Resell Modal */}
-      <Transition.Root show={resellModalOpen} as={React.Fragment}>
-        <Dialog as="div" className="relative z-50" onClose={closeResellModal}>
-          <Transition.Child
-            as={React.Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+        {/* Resell Modal */}
+        <Transition show={resellModalOpen} as={React.Fragment}>
+          <Dialog as="div" className="fixed z-50 inset-0 overflow-y-auto" onClose={closeResellModal}>
+            <div className="flex items-center justify-center min-h-screen px-4">
               <Transition.Child
                 as={React.Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
+                enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
+                leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                    Resell Ticket
-                  </Dialog.Title>
-                  {resellTicket && (
-                    <form onSubmit={handleResell} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Event</label>
-                        <div className="mt-1 text-gray-900 font-semibold">{resellTicket.event.title}</div>
-                        <div className="text-xs text-gray-500">{resellTicket.event.venue} • {format(new Date(resellTicket.event.date), 'MMM dd, yyyy')}</div>
-                      </div>
-                      <div className="flex space-x-2">
-                        {resellTicket.section && <div className="text-xs text-gray-600">Section {resellTicket.section}</div>}
-                        {resellTicket.row && <div className="text-xs text-gray-600">Row {resellTicket.row}</div>}
-                        {resellTicket.seat && <div className="text-xs text-gray-600">Seat {resellTicket.seat}</div>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                        <input
-                          type="number"
-                          min={1}
-                          step={0.01}
-                          value={resellPrice}
-                          onChange={e => setResellPrice(e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Listing Type</label>
-                        <select
-                          value={resellType}
-                          onChange={e => setResellType(e.target.value as 'DIRECT_SALE' | 'AUCTION')}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        >
-                          <option value="DIRECT_SALE">Direct Sale</option>
-                          <option value="AUCTION">Auction</option>
-                        </select>
-                      </div>
-                      <div className="flex justify-end space-x-2 mt-6">
-                        <button
-                          type="button"
-                          onClick={closeResellModal}
-                          className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={resellLoading}
-                          className="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-50"
-                        >
-                          {resellLoading ? 'Listing...' : 'List for Sale'}
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </Dialog.Panel>
+                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 transition-opacity" />
+              </Transition.Child>
+              <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+              <Transition.Child
+                as={React.Fragment}
+                enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
+              >
+                <div className="inline-block bg-[#18122B] rounded-2xl p-8 shadow-2xl max-w-md w-full align-middle">
+                  <Dialog.Title className="text-2xl font-extrabold text-neon-pink mb-4">Resell Ticket</Dialog.Title>
+                  <form onSubmit={handleResell} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-white mb-1">Price (₹)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={resellPrice}
+                        onChange={e => setResellPrice(e.target.value)}
+                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-white mb-1">Listing Type</label>
+                      <select
+                        value={resellType}
+                        onChange={e => setResellType(e.target.value as 'DIRECT_SALE' | 'AUCTION')}
+                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold"
+                      >
+                        <option value="DIRECT_SALE">Direct Sale</option>
+                        <option value="AUCTION">Auction</option>
+                      </select>
+                    </div>
+                    <div className="flex justify-end gap-4 mt-6">
+                      <button
+                        type="button"
+                        onClick={closeResellModal}
+                        className="px-6 py-2 rounded-full text-lg font-bold text-neon-pink border border-neon-pink bg-black hover:bg-[#231651] hover:text-white focus:outline-none focus:ring-2 focus:ring-neon-pink transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={resellLoading}
+                        className="px-6 py-2 rounded-full text-lg font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] focus:outline-none focus:ring-2 focus:ring-neon-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        {resellLoading ? 'Listing...' : 'List Ticket'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </Transition.Child>
             </div>
-          </div>
-        </Dialog>
-      </Transition.Root>
+          </Dialog>
+        </Transition>
+      </div>
     </div>
   );
 };

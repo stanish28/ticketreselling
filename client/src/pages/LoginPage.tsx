@@ -47,20 +47,21 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">F</span>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18122B] to-[#231651] font-sans">
+      <div className="max-w-md w-full space-y-8 bg-black rounded-2xl shadow-2xl p-10">
+        <div className="flex flex-col items-center">
+          {/* Neon pink ticket icon SVG */}
+          <svg className="w-10 h-10 text-neon-pink mb-2" fill="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="7" width="18" height="10" rx="3"/>
+            <circle cx="8" cy="12" r="1.5" fill="#18122B"/>
+            <circle cx="16" cy="12" r="1.5" fill="#18122B"/>
+          </svg>
+          <h2 className="text-3xl font-extrabold text-white text-center tracking-tight mb-2">Sign in to your account</h2>
+          <p className="text-center text-sm text-neon-pink font-semibold">
             Or{' '}
             <Link
               to="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-bold text-neon-pink hover:text-neon-blue hover:underline hover:underline-offset-4 transition-all"
             >
               create a new account
             </Link>
@@ -70,7 +71,7 @@ const LoginPage: React.FC = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-bold text-white mb-1">
                 Email address
               </label>
               <input
@@ -84,18 +85,18 @@ const LoginPage: React.FC = () => {
                     message: 'Invalid email address',
                   },
                 })}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
+                  errors.email ? 'border-neon-pink' : 'border-neon-blue'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
                 placeholder="Enter your email"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-neon-pink font-bold">{errors.email.message}</p>
               )}
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-bold text-white mb-1">
                 Password
               </label>
               <input
@@ -109,13 +110,13 @@ const LoginPage: React.FC = () => {
                     message: 'Password must be at least 6 characters',
                   },
                 })}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
+                  errors.password ? 'border-neon-pink' : 'border-neon-blue'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
                 placeholder="Enter your password"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-neon-pink font-bold">{errors.password.message}</p>
               )}
             </div>
           </div>
@@ -124,7 +125,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 rounded-full text-lg font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] focus:outline-none focus:ring-2 focus:ring-neon-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? (
                 <LoadingSpinner size="sm" />
@@ -134,10 +135,10 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center mt-4">
             <Link
               to="/"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-bold text-neon-pink hover:text-neon-blue hover:underline hover:underline-offset-4 transition-all"
             >
               Back to home
             </Link>

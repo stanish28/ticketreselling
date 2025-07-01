@@ -1,29 +1,36 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { 
-  Bars3Icon, 
-  XMarkIcon, 
-  UserIcon,
-  TicketIcon,
-  HomeIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  UsersIcon
-} from '@heroicons/react/24/outline';
-import { Menu, Transition } from '@headlessui/react';
+import { HomeIcon, CalendarIcon, TicketIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [ticketCount, setTicketCount] = useState(0);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user && user.role !== 'ADMIN') {
       fetchTicketCount();
     }
   }, [user]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    if (moreOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [moreOpen]);
 
   const fetchTicketCount = async () => {
     try {
@@ -32,7 +39,6 @@ const Navbar: React.FC = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-
       if (response.ok) {
         const data = await response.json();
         setTicketCount(data.data?.length || 0);
@@ -42,289 +48,99 @@ const Navbar: React.FC = () => {
     }
   };
 
-  // Expose refresh function for external use
-  const refreshTicketCount = () => {
-    fetchTicketCount();
-  };
-
-  // Make refreshTicketCount available globally for other components
-  React.useEffect(() => {
-    (window as any).refreshNavbarTicketCount = refreshTicketCount;
-    return () => {
-      delete (window as any).refreshNavbarTicketCount;
-    };
-  }, []);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
     { name: 'Events', href: '/events', icon: CalendarIcon },
     { name: 'Tickets', href: '/tickets', icon: TicketIcon },
   ];
-
   const userNavigation = [
     { name: 'Profile', href: '/profile' },
-    { name: 'My Tickets', href: '/my-tickets' },
+    { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon },
     { name: 'My Listings', href: '/my-listings' },
     { name: 'My Bids', href: '/my-bids' },
     { name: 'Sell Ticket', href: '/sell-ticket' },
   ];
-
   const adminNavigation = [
     { name: 'Dashboard', href: '/admin', icon: ChartBarIcon },
     { name: 'Users', href: '/admin/users', icon: UsersIcon },
     { name: 'Events', href: '/admin/events', icon: CalendarIcon },
     { name: 'Tickets', href: '/admin/tickets', icon: TicketIcon },
   ];
-
-  // For admin users, show only admin navigation
-  const mainNavigation = user?.role === 'ADMIN' 
+  const mainNavigation = user?.role === 'ADMIN'
     ? adminNavigation
-    : user 
+    : user
       ? [...navigation, { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon }]
       : navigation;
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
-    <nav className="bg-white shadow-lg relative z-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">F</span>
-              </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">FastPass</span>
-              {user?.role === 'ADMIN' && (
-                <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                  Admin
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {mainNavigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors relative"
-              >
-                {item.name}
-                {item.name === 'My Tickets' && ticketCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {ticketCount}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="relative">
-                <Menu as="div" className="relative ml-3">
-                  <div>
-                    <Menu.Button className="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                      <span className="sr-only">Open user menu</span>
-                      <UserIcon className="w-8 h-8 text-gray-700 bg-gray-100 rounded-full p-1" />
-                       <span className="text-sm font-medium text-gray-700">
-                        {user.name}
-                      </span>
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30">
-                      {user.role !== 'ADMIN' && userNavigation.map((item) => (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <Link
-                              to={item.href}
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } block px-4 py-2 text-sm text-gray-700`}
-                            >
-                              {item.name}
-                            </Link>
-                          )}
-                        </Menu.Item>
-                      ))}
-                      {user.role === 'ADMIN' && (
-                        <div>
-                          <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Admin Panel
-                          </div>
-                          {adminNavigation.map((item) => (
-                            <Menu.Item key={item.name}>
-                              {({ active }) => (
-                                <Link
-                                  to={item.href}
-                                  className={`${
-                                    active ? 'bg-gray-100' : ''
-                                  } block px-4 py-2 text-sm text-gray-700`}
-                                >
-                                  {item.name}
-                                </Link>
-                              )}
-                            </Menu.Item>
-                          ))}
-                        </div>
-                      )}
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            onClick={handleLogout}
-                            className={`${
-                              active ? 'bg-gray-100' : ''
-                            } block w-full text-left px-4 py-2 text-sm text-red-600`}
-                          >
-                            Logout
-                          </button>
-                        )}
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
+    <nav className="w-full bg-black rounded-2xl shadow-2xl px-8 py-4 mt-4 mb-8 flex items-center justify-between max-w-6xl mx-auto z-30">
+      <div className="flex items-center gap-3">
+        {/* Neon pink ticket icon SVG */}
+        <svg className="w-8 h-8 text-neon-pink" fill="currentColor" viewBox="0 0 24 24">
+          <rect x="3" y="7" width="18" height="10" rx="3"/>
+          <circle cx="8" cy="12" r="1.5" fill="#18122B"/>
+          <circle cx="16" cy="12" r="1.5" fill="#18122B"/>
+        </svg>
+        <span className="text-white font-extrabold text-xl tracking-widest font-sans uppercase">CONCERT TICKET RESALE</span>
+      </div>
+      {/* Navigation Links */}
+      <div className="flex gap-6 items-center">
+        {mainNavigation.filter(item => item.name !== 'Tickets').map((item) => (
+          <Link
+            key={item.name}
+            to={item.href}
+            className="text-white font-bold text-lg hover:text-neon-pink hover:underline hover:underline-offset-8 hover:decoration-neon-blue transition-all relative"
+          >
+            {item.name}
+            {item.name === 'My Tickets' && ticketCount > 0 && (
+              <span className="absolute -top-2 -right-4 bg-neon-pink text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {ticketCount}
+              </span>
             )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 p-2 rounded-md"
-            >
-              {isMenuOpen ? (
-                <XMarkIcon className="w-6 h-6" />
-              ) : (
-                <Bars3Icon className="w-6 h-6" />
-              )}
-            </button>
-          </div>
+          </Link>
+        ))}
+        {/* More Dropdown (custom, closes on outside click) */}
+        <div className="relative" ref={moreRef}>
+          <button
+            onClick={() => setMoreOpen((open) => !open)}
+            className="px-4 py-2 rounded-full bg-black border-2 border-neon-pink text-neon-pink font-bold text-lg flex items-center gap-2 hover:bg-[#231651] hover:text-white transition-all select-none"
+          >
+            More
+            <svg className={`w-5 h-5 text-neon-pink transition-transform ${moreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {moreOpen && (
+            <div className="absolute right-0 mt-2 w-48 flex flex-col gap-2 bg-[#18122B] rounded-xl shadow-lg p-4 border border-neon-pink z-50">
+              <Link to="/my-bids" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>My Bids</Link>
+              <Link to="/my-listings" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>My Listings</Link>
+              <Link to="/sell-ticket" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>Sell Ticket</Link>
+              <Link to="/profile" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>Profile</Link>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-            {mainNavigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium relative"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-                {item.name === 'My Tickets' && ticketCount > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 inline-flex items-center justify-center">
-                    {ticketCount}
-                  </span>
-                )}
-              </Link>
-            ))}
-            
-            {user && (
-              <>
-                {user.role !== 'ADMIN' && (
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <div className="px-3 py-2 text-sm font-medium text-gray-500">
-                      User Menu
-                    </div>
-                    {userNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                
-                {user.role === 'ADMIN' && (
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <div className="px-3 py-2 text-sm font-medium text-gray-500">
-                      Admin Panel
-                    </div>
-                    {adminNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full text-left text-red-600 hover:text-red-700 block px-3 py-2 rounded-md text-base font-medium"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </>
-            )}
-            
-            {!user && (
-              <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <div className="flex gap-8 items-center">
+        {user ? (
+          <>
+            <span className="text-white font-bold text-lg">{user.name}</span>
+            <button
+              onClick={handleLogout}
+              className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/register" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign Up</Link>
+            <Link to="/login" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign In</Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 };
