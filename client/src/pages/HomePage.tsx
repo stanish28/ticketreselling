@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import './HomePage.css'; // Import custom CSS for flip effect
 
 const events = [
   {
@@ -23,14 +24,16 @@ const events = [
 ];
 
 const whyFastPass = [
-  { icon: '📈', label: 'Dynamic Price' },
-  { icon: '✅', label: 'Verified' },
-  { icon: '⚡', label: 'Instant' },
-  { icon: '₹', label: 'Low Fees' },
-  { icon: '🇮🇳', label: 'India-Ready' }
+  { icon: '📈', label: 'Dynamic Price', desc: 'Get the best resale price based on demand.' },
+  { icon: '✅', label: 'Verified', desc: '100% real tickets, no scams.' },
+  { icon: '⚡', label: 'Instant', desc: 'Get your ticket in seconds.' },
+  { icon: '₹', label: 'Low Fees', desc: 'Lowest transaction fees in the market.' },
+  { icon: '🇮🇳', label: 'India-Ready', desc: 'We support UPI, Paytm, and more.' }
 ];
 
 const HomePage: React.FC = () => {
+  const [hovered, setHovered] = useState<number | null>(null);
+
   return (
     <div className="min-h-screen bg-[#120B2C] font-sans">
       {/* Hero Section */}
@@ -67,13 +70,19 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-5 gap-4 md:gap-8">
             {whyFastPass.map((item, index) => (
-              <div
-                key={index}
-                className="text-center group cursor-pointer"
-              >
-                <div className="bg-gray-50 rounded-2xl p-6 transition-all duration-300 transform group-hover:scale-110 group-hover:shadow-lg">
-                  <div className="text-4xl md:text-5xl mb-3">{item.icon}</div>
-                  <div className="text-sm font-semibold text-gray-700">{item.label}</div>
+              <div key={index} className="flex justify-center">
+                <div className="flip-card w-full">
+                  <div className="flip-card-inner">
+                    {/* Front Side */}
+                    <div className="flip-card-front bg-gray-50 rounded-2xl p-6 min-h-[120px] flex flex-col items-center justify-center shadow transition-all duration-300">
+                      <div className="text-4xl md:text-5xl mb-3">{item.icon}</div>
+                      <div className="text-sm font-semibold text-gray-700 mb-1">{item.label}</div>
+                    </div>
+                    {/* Back Side */}
+                    <div className="flip-card-back bg-[#A259FF] rounded-2xl p-6 min-h-[120px] flex flex-col items-center justify-center shadow transition-all duration-300">
+                      <div className="text-white text-xs text-center font-medium">{item.desc}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
