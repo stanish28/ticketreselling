@@ -275,7 +275,7 @@ const EventDetailPage: React.FC = () => {
                       <div className="flex items-center">
                         <CurrencyDollarIcon className="h-4 w-4 text-gray-400 mr-1" />
                         <span className="text-lg font-bold text-gray-900">
-                          ${ticket.price.toFixed(2)}
+                          ₹{ticket.price.toFixed(2)}
                         </span>
                       </div>
                     </div>

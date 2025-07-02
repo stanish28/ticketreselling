@@ -308,7 +308,7 @@ const TicketDetailPage: React.FC = () => {
                     <div className="flex items-center">
                       <CurrencyDollarIcon className="h-6 w-6 text-gray-400 mr-2" />
                       <span className="text-3xl font-bold text-gray-900">
-                        ${ticket.price.toFixed(2)}
+                        ₹{ticket.price.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -342,7 +342,7 @@ const TicketDetailPage: React.FC = () => {
                           </p>
                         </div>
                         <div className="text-lg font-bold text-gray-900">
-                          ${bid.amount.toFixed(2)}
+                          ₹{bid.amount.toFixed(2)}
                         </div>
                       </div>
                     ))}
@@ -428,7 +428,7 @@ const TicketDetailPage: React.FC = () => {
                       <div className="mb-4">
                         <p className="text-sm text-gray-600 mb-2">Total Price</p>
                         <div className="text-2xl font-bold text-gray-900">
-                          ${ticket.price.toFixed(2)}
+                          ₹{ticket.price.toFixed(2)}
                         </div>
                       </div>
                       

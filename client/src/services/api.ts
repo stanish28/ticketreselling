@@ -57,6 +57,12 @@ export const authAPI = {
 
   getCurrentUser: (): Promise<ApiResponse<User>> =>
     api.get('/auth/me').then(res => res.data),
+
+  verifyEmail: (token: string): Promise<ApiResponse<{ message: string }>> =>
+    api.get(`/auth/verify-email?token=${token}`).then(res => res.data),
+
+  resendVerification: (email: string): Promise<ApiResponse<{ message: string }>> =>
+    api.post('/auth/resend-verification', { email }).then(res => res.data),
 };
 
 // Events API

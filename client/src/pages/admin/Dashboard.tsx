@@ -135,7 +135,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
-                    <dd className="text-lg font-medium text-gray-900">${(stats?.totalRevenue || 0).toFixed(2)}</dd>
+                    <dd className="text-lg font-medium text-gray-900">₹{(stats?.totalRevenue || 0).toFixed(2)}</dd>
                   </dl>
                 </div>
               </div>
@@ -207,7 +207,7 @@ const AdminDashboard: React.FC = () => {
                           {purchase.ticket?.event?.title || 'Unknown Event'}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {purchase.ticket?.buyer?.name || 'Unknown Buyer'} • ${purchase.amount.toFixed(2)}
+                          {purchase.ticket?.buyer?.name || 'Unknown Buyer'} • ₹{purchase.amount.toFixed(2)}
                         </p>
                         <p className="text-xs text-gray-400">
                           {format(new Date(purchase.createdAt), 'MMM dd, yyyy - h:mm a')}

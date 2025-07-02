@@ -18,6 +18,7 @@ const events_1 = __importDefault(require("./routes/events"));
 const tickets_1 = __importDefault(require("./routes/tickets"));
 const bids_1 = __importDefault(require("./routes/bids"));
 const admin_1 = __importDefault(require("./routes/admin"));
+const passwordReset_1 = __importDefault(require("./routes/passwordReset"));
 const auth_2 = require("./middleware/auth");
 const qrCodeService_1 = require("./services/qrCodeService");
 const bidService_1 = require("./services/bidService");
@@ -48,6 +49,7 @@ app.use('/api/events', events_1.default);
 app.use('/api/tickets', tickets_1.default);
 app.use('/api/bids', bids_1.default);
 app.use('/api/admin', auth_2.authenticateToken, admin_1.default);
+app.use('/api/password-reset', passwordReset_1.default);
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });

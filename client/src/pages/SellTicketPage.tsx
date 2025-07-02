@@ -100,7 +100,7 @@ const SellTicketPage: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price ($)</label>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price (₹)</label>
             <input
               type="number"
               id="price"

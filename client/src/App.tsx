@@ -7,6 +7,9 @@ import EventDetailPage from './pages/EventDetailPage.tsx';
 import TicketDetailPage from './pages/TicketDetailPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
+import VerifyEmailPage from './pages/VerifyEmailPage.tsx';
+import ForgotPassword from './pages/ForgotPassword.tsx';
+import ResetPassword from './pages/ResetPassword.tsx';
 import MyTicketsPage from './pages/MyTicketsPage.tsx';
 import MyBidsPage from './pages/MyBidsPage.tsx';
 import MyListingsPage from './pages/MyListingsPage.tsx';
@@ -34,6 +37,9 @@ function App() {
           <Route path="/tickets/:id" element={<TicketDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Private Routes */}
           <Route path="/my-tickets" element={<PrivateRoute><MyTicketsPage /></PrivateRoute>} />

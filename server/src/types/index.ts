@@ -8,12 +8,14 @@ export interface User {
   phone: string | null;
   password: string;
   role: UserRole;
+  emailVerified: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface AuthenticatedRequest extends Request {
   user?: User;
+  userEmailVerified?: boolean;
 }
 
 export interface CreateEventRequest {

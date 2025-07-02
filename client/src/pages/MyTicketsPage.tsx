@@ -365,7 +365,7 @@ const MyTicketsPage: React.FC = () => {
                         min="1"
                         value={resellPrice}
                         onChange={e => setResellPrice(e.target.value)}
-                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
                         required
                       />
                     </div>
@@ -374,7 +374,7 @@ const MyTicketsPage: React.FC = () => {
                       <select
                         value={resellType}
                         onChange={e => setResellType(e.target.value as 'DIRECT_SALE' | 'AUCTION')}
-                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold"
+                        className="block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
                       >
                         <option value="DIRECT_SALE">Direct Sale</option>
                         <option value="AUCTION">Auction</option>

@@ -13,6 +13,7 @@ import eventRoutes from './routes/events';
 import ticketRoutes from './routes/tickets';
 import bidRoutes from './routes/bids';
 import adminRoutes from './routes/admin';
+import passwordResetRoutes from './routes/passwordReset';
 import { authenticateToken } from './middleware/auth';
 import { generateAndSendQRCodes } from './services/qrCodeService';
 import { processExpiredBids } from './services/bidService';
@@ -49,6 +50,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/bids', bidRoutes);
 app.use('/api/admin', authenticateToken, adminRoutes);
+app.use('/api/password-reset', passwordResetRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

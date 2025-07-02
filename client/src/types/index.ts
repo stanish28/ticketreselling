@@ -4,6 +4,7 @@ export interface User {
   name: string;
   phone: string | null;
   role: 'USER' | 'ADMIN';
+  emailVerified: string | null;
   createdAt: string;
   updatedAt: string;
   _count?: {

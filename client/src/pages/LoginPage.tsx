@@ -40,7 +40,11 @@ const LoginPage: React.FC = () => {
       toast.success('Login successful!');
       setLoginSuccess(true);
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      if (error.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
+        toast.error('Please verify your email address before logging in');
+      } else {
+        toast.error(error.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -85,9 +89,7 @@ const LoginPage: React.FC = () => {
                     message: 'Invalid email address',
                   },
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.email ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Enter your email"
               />
               {errors.email && (
@@ -110,14 +112,20 @@ const LoginPage: React.FC = () => {
                     message: 'Password must be at least 6 characters',
                   },
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.password ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Enter your password"
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-neon-pink font-bold">{errors.password.message}</p>
               )}
+              <div className="mt-2 text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-neon-pink hover:text-neon-blue hover:underline transition-all"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
           </div>
 

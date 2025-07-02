@@ -28,29 +28,62 @@ const RegisterPage: React.FC = () => {
 
   const password = watch('password');
 
-  // Redirect after successful registration
+  // Show success message after registration
   useEffect(() => {
-    if (registerSuccess && user) {
-      if (user.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+    if (registerSuccess) {
+      // Don't redirect - user needs to verify email first
+      // The success message will be shown on the same page
     }
-  }, [registerSuccess, user, navigate]);
+  }, [registerSuccess]);
 
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     try {
       await registerUser(data.email, data.name, data.password, data.phone);
-      toast.success('Registration successful!');
+      toast.success('Registration successful! Please check your email to verify your account.');
       setRegisterSuccess(true);
+      // Don't automatically log in - user needs to verify email first
     } catch (error: any) {
       toast.error(error.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
+
+  if (registerSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18122B] to-[#231651] font-sans">
+        <div className="max-w-md w-full space-y-8 bg-black rounded-2xl shadow-2xl p-10">
+          <div className="flex flex-col items-center text-center">
+            {/* Success icon */}
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-extrabold text-white text-center tracking-tight mb-4">Check Your Email!</h2>
+            <p className="text-gray-300 mb-6">
+              We've sent a verification link to your email address. Please check your inbox and click the verification link to activate your account.
+            </p>
+            <div className="space-y-4 w-full">
+              <Link
+                to="/login"
+                className="block w-full text-center bg-gradient-to-r from-neon-pink to-neon-blue text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Go to Login
+              </Link>
+              <Link
+                to="/"
+                className="block w-full text-center bg-transparent border border-[#23223a] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#23223a] transition-colors"
+              >
+                Back to Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18122B] to-[#231651] font-sans">
@@ -91,9 +124,7 @@ const RegisterPage: React.FC = () => {
                     message: 'Name must be at least 2 characters',
                   },
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.name ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Enter your full name"
               />
               {errors.name && (
@@ -116,9 +147,7 @@ const RegisterPage: React.FC = () => {
                     message: 'Invalid email address',
                   },
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.email ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Enter your email"
               />
               {errors.email && (
@@ -135,7 +164,7 @@ const RegisterPage: React.FC = () => {
                 type="tel"
                 autoComplete="tel"
                 {...register('phone')}
-                className="mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+                className="mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
                 placeholder="Enter your phone number"
               />
             </div>
@@ -155,9 +184,7 @@ const RegisterPage: React.FC = () => {
                     message: 'Password must be at least 6 characters',
                   },
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.password ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Enter your password"
               />
               {errors.password && (
@@ -178,9 +205,7 @@ const RegisterPage: React.FC = () => {
                   validate: (value) =>
                     value === password || 'Passwords do not match',
                 })}
-                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border ${
-                  errors.confirmPassword ? 'border-neon-pink' : 'border-neon-blue'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60`}
+                className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Confirm your password"
               />
               {errors.confirmPassword && (

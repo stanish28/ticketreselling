@@ -178,7 +178,7 @@ const MyListingsPage: React.FC = () => {
                       <div className="sm:flex">
                         <p className="flex items-center text-sm text-gray-500">
                           <TagIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                          ${ticket.price.toFixed(2)}
+                          ₹{ticket.price.toFixed(2)}
                         </p>
                         <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                           <CalendarIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
@@ -335,7 +335,7 @@ const MyListingsPage: React.FC = () => {
                               <div className="flex-1">
                                 <div className="flex justify-between">
                                   <p className="text-sm font-medium text-gray-900">{bid.bidder?.name || 'Anonymous'}</p>
-                                  <p className="text-sm text-gray-500">${bid.amount.toFixed(2)}</p>
+                                  <p className="text-sm text-gray-500">₹{bid.amount.toFixed(2)}</p>
                                 </div>
                                 <p className="text-xs text-gray-500">{format(new Date(bid.createdAt), 'MMM dd, yyyy - h:mm a')}</p>
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${getStatusColor(bid.status)}`}>

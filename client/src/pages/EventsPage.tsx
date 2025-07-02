@@ -102,7 +102,7 @@ const EventsPage: React.FC = () => {
                 value={filters.searchTerm}
                 onChange={handleFilterChange}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-10 pr-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+                className="w-full pl-10 pr-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
               />
               <MagnifyingGlassIcon className="absolute left-3 top-2.5 h-5 w-5 text-neon-blue" />
             </div>
@@ -110,7 +110,7 @@ const EventsPage: React.FC = () => {
               name="selectedCategory"
               value={filters.selectedCategory}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold"
+              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
@@ -122,14 +122,14 @@ const EventsPage: React.FC = () => {
               name="startDate"
               value={filters.startDate}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold"
+              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
             />
             <input
               type="date"
               name="endDate"
               value={filters.endDate}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold"
+              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
             />
             <input
               type="number"
@@ -137,7 +137,7 @@ const EventsPage: React.FC = () => {
               placeholder="Min Price"
               value={filters.minPrice}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
             />
             <input
               type="number"
@@ -145,7 +145,7 @@ const EventsPage: React.FC = () => {
               placeholder="Max Price"
               value={filters.maxPrice}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-neon-blue rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue font-semibold placeholder-white/60"
+              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
             />
             <button
               onClick={handleSearch}

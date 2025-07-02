@@ -410,7 +410,7 @@ const AdminEventTicketsPage: React.FC = () => {
                         <div className="flex items-center">
                           <CurrencyDollarIcon className="h-4 w-4 text-gray-400 mr-1" />
                           <span className="text-sm font-medium text-gray-900">
-                            ${ticket.price.toFixed(2)}
+                            ₹{ticket.price.toFixed(2)}
                           </span>
                         </div>
                       </td>

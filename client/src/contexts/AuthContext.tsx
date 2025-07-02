@@ -67,8 +67,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         throw new Error(response.error || 'Login failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      // Re-throw the error to be handled by the calling component
       throw error;
     }
   };
@@ -77,10 +78,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authAPI.register({ email, name, password, phone });
       if (response.success && response.data) {
-        const { user, token } = response.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        setUser(user);
+        // Don't automatically log in the user - they need to verify email first
+        // The user will be logged in only after email verification
+        console.log('Registration successful, email verification required');
       } else {
         throw new Error(response.error || 'Registration failed');
       }
