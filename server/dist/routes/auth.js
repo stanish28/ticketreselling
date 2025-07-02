@@ -37,7 +37,12 @@ router.post('/register', [
             where: { email }
         });
         if (existingUser) {
-            res.status(400).json({ error: 'User already exists' });
+            res.status(400).json({
+                error: 'Account already exists',
+                code: 'USER_ALREADY_EXISTS',
+                message: 'An account with this email already exists. Please sign in or reset your password.',
+                actions: ['signin', 'reset_password']
+            });
             return;
         }
         const hashedPassword = await bcryptjs_1.default.hash(password, 12);
@@ -97,6 +102,14 @@ router.post('/login', [
         });
         if (!user) {
             res.status(401).json({ error: 'Invalid credentials' });
+            return;
+        }
+        if (user.banned) {
+            res.status(403).json({
+                error: 'Your account has been banned',
+                code: 'USER_BANNED',
+                message: 'Your account has been banned. Please contact support if you believe this is a mistake.'
+            });
             return;
         }
         const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);

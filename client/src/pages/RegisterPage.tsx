@@ -18,6 +18,7 @@ const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [showAccountExistsAlert, setShowAccountExistsAlert] = useState(false);
 
   const {
     register,
@@ -38,13 +39,20 @@ const RegisterPage: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
+    setShowAccountExistsAlert(false);
+    
     try {
       await registerUser(data.email, data.name, data.password, data.phone);
       toast.success('Registration successful! Please check your email to verify your account.');
       setRegisterSuccess(true);
       // Don't automatically log in - user needs to verify email first
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      // Check if it's the specific "account already exists" error
+      if (error.response?.data?.code === 'USER_ALREADY_EXISTS') {
+        setShowAccountExistsAlert(true);
+      } else {
+        toast.error(error.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -106,6 +114,45 @@ const RegisterPage: React.FC = () => {
             </Link>
           </p>
         </div>
+
+        {/* Account Already Exists Alert */}
+        {showAccountExistsAlert && (
+          <div className="bg-gradient-to-br from-orange-900/90 to-orange-700/80 border border-orange-400/40 shadow-xl rounded-2xl p-6 mb-8 flex flex-col items-center max-w-md mx-auto">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0 bg-orange-600/20 rounded-full p-2 mr-3">
+                <svg className="h-7 w-7 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-orange-100">Account Already Exists</h3>
+            </div>
+            <p className="text-base text-orange-50 mb-6 text-center">
+              An account with this email already exists.<br />What would you like to do?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+              <Link
+                to="/login"
+                className="flex-1 text-center bg-orange-400 hover:bg-orange-500 text-white font-semibold py-2 rounded-lg shadow transition"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/forgot-password"
+                className="flex-1 text-center bg-white hover:bg-orange-100 text-orange-700 font-semibold py-2 rounded-lg shadow transition border border-orange-300"
+              >
+                Reset Password
+              </Link>
+              <button
+                onClick={() => setShowAccountExistsAlert(false)}
+                className="flex-1 text-center text-orange-200 hover:text-white font-semibold py-2 rounded-lg transition underline underline-offset-2"
+                style={{ minWidth: 120 }}
+              >
+                Try Different Email
+              </button>
+            </div>
+          </div>
+        )}
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
@@ -202,8 +249,7 @@ const RegisterPage: React.FC = () => {
                 autoComplete="new-password"
                 {...register('confirmPassword', {
                   required: 'Please confirm your password',
-                  validate: (value) =>
-                    value === password || 'Passwords do not match',
+                  validate: value => value === password || 'Passwords do not match',
                 })}
                 className={`mt-1 block w-full px-4 py-3 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60`}
                 placeholder="Confirm your password"

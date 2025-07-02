@@ -19,10 +19,12 @@ router.post('/forgot-password', async (req, res) => {
         res.json({
             message: 'If an account with that email exists, a password reset link has been sent.'
         });
+        return;
     }
     catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return;
     }
 });
 router.post('/verify-reset-token', async (req, res) => {
@@ -39,10 +41,12 @@ router.post('/verify-reset-token', async (req, res) => {
             message: 'Token is valid',
             userId: result.userId
         });
+        return;
     }
     catch (error) {
         console.error('Verify token error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return;
     }
 });
 router.post('/reset-password', async (req, res) => {
@@ -63,10 +67,12 @@ router.post('/reset-password', async (req, res) => {
             return res.status(500).json({ error: resetResult.error });
         }
         res.json({ message: 'Password has been reset successfully' });
+        return;
     }
     catch (error) {
         console.error('Reset password error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return;
     }
 });
 exports.default = router;

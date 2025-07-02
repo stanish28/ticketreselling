@@ -72,32 +72,61 @@ router.post('/:ticketId', [
             where: { ticketId },
             orderBy: { amount: 'desc' },
         });
-        const minBidAmount = 1;
-        if (amount < minBidAmount) {
-            return res.status(400).json({
-                error: `Offer must be at least $${minBidAmount.toFixed(2)}`
-            });
-        }
-        const bid = await index_1.prisma.bid.create({
-            data: {
+        const existingUserBid = await index_1.prisma.bid.findFirst({
+            where: {
                 ticketId,
                 bidderId: userId,
-                amount,
-            },
-            include: {
-                bidder: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
+                status: 'PENDING',
             },
         });
+        const currentHighestAmount = highestBid?.amount || 0;
+        const minBidAmount = Math.max(1, currentHighestAmount * 1.1);
+        if (amount < minBidAmount) {
+            return res.status(400).json({
+                error: `Bid must be at least ₹${minBidAmount.toFixed(2)} (10% higher than current highest bid)`
+            });
+        }
+        let bid;
+        let message;
+        if (existingUserBid) {
+            bid = await index_1.prisma.bid.update({
+                where: { id: existingUserBid.id },
+                data: { amount },
+                include: {
+                    bidder: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        },
+                    },
+                },
+            });
+            message = 'Bid updated successfully';
+        }
+        else {
+            bid = await index_1.prisma.bid.create({
+                data: {
+                    ticketId,
+                    bidderId: userId,
+                    amount,
+                },
+                include: {
+                    bidder: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        },
+                    },
+                },
+            });
+            message = 'Bid placed successfully';
+        }
         return res.status(201).json({
             success: true,
             data: bid,
-            message: 'Bid placed successfully',
+            message,
         });
     }
     catch (error) {
@@ -219,15 +248,24 @@ router.put('/:bidId/accept', auth_1.authenticateToken, async (req, res) => {
                     buyerId: bid.bidderId,
                     amount: bid.amount,
                     status: 'COMPLETED',
+                    updatedAt: new Date(),
                 },
                 create: {
                     ticketId: bid.ticketId,
                     buyerId: bid.bidderId,
                     amount: bid.amount,
                     status: 'COMPLETED',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
                 },
             });
             console.log('Transaction completed successfully');
+            console.log('Updated ticket:', {
+                id: updatedTicket.id,
+                status: updatedTicket.status,
+                buyerId: updatedTicket.buyerId,
+                sellerId: updatedTicket.sellerId
+            });
             return { updatedBid, updatedTicket };
         });
         console.log('Sending success response');
@@ -235,6 +273,7 @@ router.put('/:bidId/accept', auth_1.authenticateToken, async (req, res) => {
             success: true,
             data: result,
             message: 'Offer accepted successfully',
+            buyerNotification: `Congratulations! Your offer of ₹${bid.amount} for ${bid.ticket.event.title} has been accepted. Check your "My Tickets" page to view your purchased ticket.`,
         });
     }
     catch (error) {

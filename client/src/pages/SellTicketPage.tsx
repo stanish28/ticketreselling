@@ -64,7 +64,7 @@ const SellTicketPage: React.FC = () => {
 
       if (response.success) {
         toast.success('Ticket listed successfully!');
-        navigate('/my-listings');
+        navigate('/my-tickets');
       } else {
         toast.error(response.message || 'Failed to list ticket.');
       }

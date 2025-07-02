@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import { HomeIcon, CalendarIcon, TicketIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [ticketCount, setTicketCount] = useState(0);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,6 @@ const Navbar: React.FC = () => {
   const userNavigation = [
     { name: 'Profile', href: '/profile' },
     { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon },
-    { name: 'My Listings', href: '/my-listings' },
     { name: 'My Bids', href: '/my-bids' },
     { name: 'Sell Ticket', href: '/sell-ticket' },
   ];
@@ -77,6 +77,14 @@ const Navbar: React.FC = () => {
     navigate('/');
   };
 
+  // Function to check if a link is active
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
   return (
     <nav className="w-full bg-black rounded-2xl shadow-2xl px-8 py-4 mt-4 mb-8 flex items-center justify-between max-w-6xl mx-auto z-30">
       <div className="flex items-center gap-3">
@@ -90,20 +98,27 @@ const Navbar: React.FC = () => {
       </div>
       {/* Navigation Links */}
       <div className="flex gap-6 items-center">
-        {mainNavigation.filter(item => item.name !== 'Tickets').map((item) => (
-          <Link
-            key={item.name}
-            to={item.href}
-            className="text-white font-bold text-lg hover:text-neon-pink hover:underline hover:underline-offset-8 hover:decoration-neon-blue transition-all relative"
-          >
-            {item.name}
-            {item.name === 'My Tickets' && ticketCount > 0 && (
-              <span className="absolute -top-2 -right-4 bg-neon-pink text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                {ticketCount}
-              </span>
-            )}
-          </Link>
-        ))}
+        {mainNavigation.filter(item => item.name !== 'Tickets').map((item) => {
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`font-bold text-lg transition-all relative ${
+                active 
+                  ? 'text-neon-pink underline underline-offset-8 decoration-neon-blue' 
+                  : 'text-white hover:text-neon-pink hover:underline hover:underline-offset-8 hover:decoration-neon-blue'
+              }`}
+            >
+              {item.name}
+              {item.name === 'My Tickets' && ticketCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-neon-pink text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  {ticketCount}
+                </span>
+              )}
+            </Link>
+          );
+        })}
         {/* More Dropdown (custom, closes on outside click) */}
         <div className="relative" ref={moreRef}>
           <button
@@ -115,10 +130,27 @@ const Navbar: React.FC = () => {
           </button>
           {moreOpen && (
             <div className="absolute right-0 mt-2 w-48 flex flex-col gap-2 bg-[#18122B] rounded-xl shadow-lg p-4 border border-neon-pink z-50">
-              <Link to="/my-bids" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>My Bids</Link>
-              <Link to="/my-listings" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>My Listings</Link>
-              <Link to="/sell-ticket" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>Sell Ticket</Link>
-              <Link to="/profile" className="text-neon-blue font-bold text-lg hover:text-neon-pink transition-all" onClick={() => setMoreOpen(false)}>Profile</Link>
+              <Link 
+                to="/my-bids" 
+                className={`font-bold text-lg transition-all ${isActive('/my-bids') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
+                onClick={() => setMoreOpen(false)}
+              >
+                My Bids
+              </Link>
+              <Link 
+                to="/sell-ticket" 
+                className={`font-bold text-lg transition-all ${isActive('/sell-ticket') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
+                onClick={() => setMoreOpen(false)}
+              >
+                Sell Ticket
+              </Link>
+              <Link 
+                to="/profile" 
+                className={`font-bold text-lg transition-all ${isActive('/profile') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
+                onClick={() => setMoreOpen(false)}
+              >
+                Profile
+              </Link>
             </div>
           )}
         </div>

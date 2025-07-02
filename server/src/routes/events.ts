@@ -86,7 +86,7 @@ router.get('/:id', async (req: any, res: Response) => {
           where: { status: 'AVAILABLE' },
           include: {
             seller: {
-              select: { id: true, name: true, email: true }
+              select: { id: true, name: true, email: true, role: true }
             },
             _count: {
               select: { bids: true }

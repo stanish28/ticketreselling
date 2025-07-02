@@ -7,6 +7,7 @@ export interface User {
   emailVerified: string | null;
   createdAt: string;
   updatedAt: string;
+  banned?: boolean;
   _count?: {
     ticketsSold: number;
     purchases: number;

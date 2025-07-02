@@ -57,6 +57,7 @@ const TicketDetailPage: React.FC = () => {
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [placingBid, setPlacingBid] = useState(false);
+  const [minBidAmount, setMinBidAmount] = useState(1);
 
   useEffect(() => {
     if (id) {
@@ -92,6 +93,15 @@ const TicketDetailPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setBids(data.data || []);
+        
+        // Calculate minimum bid amount (10% higher than highest bid)
+        if (data.data && data.data.length > 0) {
+          const highestBid = data.data[0]; // Bids are ordered by amount desc
+          const minAmount = Math.max(1, highestBid.amount * 1.1);
+          setMinBidAmount(minAmount);
+        } else {
+          setMinBidAmount(1);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch bids:', error);
@@ -172,7 +182,8 @@ const TicketDetailPage: React.FC = () => {
         throw new Error(errorData.error || 'Failed to place bid');
       }
 
-      toast.success('Bid placed successfully!');
+      const responseData = await response.json();
+      toast.success(responseData.message || 'Bid placed successfully!');
       setBidAmount('');
       fetchBids(); // Refresh bids
     } catch (error: any) {
@@ -335,15 +346,7 @@ const TicketDetailPage: React.FC = () => {
                   <div className="space-y-3">
                     {bids.map((bid) => (
                       <div key={bid.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{bid.bidder.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {format(new Date(bid.createdAt), 'MMM dd, h:mm a')}
-                          </p>
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          ₹{bid.amount.toFixed(2)}
-                        </div>
+                        <div className="text-lg font-bold text-gray-900">₹{bid.amount.toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
@@ -387,7 +390,7 @@ const TicketDetailPage: React.FC = () => {
                           <input
                             type="number"
                             step="0.01"
-                            min="1"
+                            min={minBidAmount}
                             value={bidAmount}
                             onChange={(e) => setBidAmount(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -396,7 +399,7 @@ const TicketDetailPage: React.FC = () => {
                           />
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          Make an offer - any amount is welcome!
+                          Minimum bid: ₹{minBidAmount.toFixed(2)} (10% higher than current highest bid)
                         </p>
                       </div>
                       <button

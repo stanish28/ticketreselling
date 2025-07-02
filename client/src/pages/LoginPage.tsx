@@ -42,6 +42,10 @@ const LoginPage: React.FC = () => {
     } catch (error: any) {
       if (error.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
         toast.error('Please verify your email address before logging in');
+      } else if (error.response?.data?.code === 'USER_BANNED') {
+        toast.error('Your account has been banned. Please contact support if you believe this is a mistake.');
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
       } else {
         toast.error(error.message || 'Login failed');
       }

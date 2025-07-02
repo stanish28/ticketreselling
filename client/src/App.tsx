@@ -12,7 +12,6 @@ import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
 import MyTicketsPage from './pages/MyTicketsPage.tsx';
 import MyBidsPage from './pages/MyBidsPage.tsx';
-import MyListingsPage from './pages/MyListingsPage.tsx';
 import AdminDashboard from './pages/admin/Dashboard.tsx';
 import AdminEventsPage from './pages/AdminEventsPage.tsx';
 import AdminEventTicketsPage from './pages/AdminEventTicketsPage.tsx';
@@ -44,7 +43,6 @@ function App() {
           {/* Private Routes */}
           <Route path="/my-tickets" element={<PrivateRoute><MyTicketsPage /></PrivateRoute>} />
           <Route path="/my-bids" element={<PrivateRoute><MyBidsPage /></PrivateRoute>} />
-          <Route path="/my-listings" element={<PrivateRoute><MyListingsPage /></PrivateRoute>} />
           <Route path="/sell-ticket" element={<PrivateRoute><SellTicketPage /></PrivateRoute>} />
           
           {/* Admin Routes */}

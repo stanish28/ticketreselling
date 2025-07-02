@@ -21,6 +21,7 @@ const AdminUsers: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [banningUser, setBanningUser] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -37,6 +38,7 @@ const AdminUsers: React.FC = () => {
       
       if (response.success) {
         const data = response.data as PaginatedResponse<User>;
+        console.log('Fetched users:', data.users);
         setUsers(data.users || []);
         setTotalPages(data.pagination.totalPages);
       } else {
@@ -95,6 +97,33 @@ const AdminUsers: React.FC = () => {
       }
     } finally {
       setDeletingUser(null);
+    }
+  };
+
+  const handleBanToggle = async (user: User) => {
+    if (user.role === 'ADMIN') {
+      toast.error('Cannot ban/unban another admin');
+      return;
+    }
+    setBanningUser(user.id);
+    try {
+      console.log('Banning user:', user.id, 'Current banned status:', user.banned);
+      const response = await adminAPI.banUser(user.id, !user.banned);
+      if (response.success) {
+        toast.success(response.message || (user.banned ? 'User unbanned' : 'User banned'));
+        console.log('Ban response:', response);
+        fetchUsers();
+      } else {
+        toast.error(response.message || 'Failed to update ban status');
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.error || 'Failed to update ban status');
+      } else {
+        toast.error('An error occurred while updating ban status');
+      }
+    } finally {
+      setBanningUser(null);
     }
   };
 
@@ -210,6 +239,38 @@ const AdminUsers: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        {/* Ban/Unban Toggle Switch */}
+                        {user.role !== 'ADMIN' && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500 font-medium">
+                              {user.banned ? 'Banned' : 'Active'}
+                            </span>
+                            <button
+                              onClick={() => handleBanToggle(user)}
+                              disabled={banningUser === user.id}
+                              className={`
+                                relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+                                ${user.banned 
+                                  ? 'bg-red-600 hover:bg-red-700' 
+                                  : 'bg-gray-200 hover:bg-gray-300'
+                                }
+                              `}
+                              title={user.banned ? 'Click to unban user' : 'Click to ban user'}
+                            >
+                              <span
+                                className={`
+                                  inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                                  ${user.banned ? 'translate-x-6' : 'translate-x-1'}
+                                `}
+                              />
+                              {banningUser === user.id && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              )}
+                            </button>
+                          </div>
+                        )}
                         <button
                           onClick={() => handleEditUser(user)}
                           className="text-blue-600 hover:text-blue-900 p-1"
