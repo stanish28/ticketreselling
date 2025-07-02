@@ -247,23 +247,23 @@ const TicketDetailPage: React.FC = () => {
   const isExpired = ticket.endTime && new Date(ticket.endTime) < new Date();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#18122B] to-[#231651] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link
             to={`/events/${ticket.event.id}`}
-            className="text-blue-600 hover:text-blue-700 mb-4 inline-flex items-center"
+            className="text-neon-pink hover:text-neon-blue mb-4 inline-flex items-center"
           >
             ← Back to Event
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Ticket Details</h1>
+          <h1 className="text-4xl font-extrabold text-white mb-2">Ticket Details</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Ticket Information */}
           <div className="lg:col-span-2">
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="bg-[#231651] shadow-xl rounded-2xl overflow-hidden border border-[#23223a]">
               {ticket.event.image && (
                 <img
                   src={ticket.event.image}
@@ -271,64 +271,51 @@ const TicketDetailPage: React.FC = () => {
                   className="w-full h-64 object-cover"
                 />
               )}
-              
-              <div className="p-6">
+              <div className="p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(ticket.status)}`}>
-                    {ticket.status}
-                  </span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                   <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getListingTypeColor(ticket.listingType)}`}>
-                      {isAuction ? 'Auction' : 'Direct Sale'}
-                    </span>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getListingTypeColor(ticket.listingType)}`}>{isAuction ? 'Auction' : 'Direct Sale'}</span>
                     {ticket.seller.role !== 'ADMIN' && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
-                        Resell Ticket
-                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">Resell Ticket</span>
                     )}
                   </div>
                 </div>
-
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{ticket.event.title}</h2>
-                
+                <h2 className="text-2xl font-bold text-white mb-2">{ticket.event.title}</h2>
                 <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-300">
                     <CalendarIcon className="h-5 w-5 mr-3" />
                     {format(new Date(ticket.event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-300">
                     <MapPinIcon className="h-5 w-5 mr-3" />
                     {ticket.event.venue}
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-300">
                     <TicketIcon className="h-5 w-5 mr-3" />
                     {ticket.section && `Section ${ticket.section}`}
                     {ticket.row && ` • Row ${ticket.row}`}
                     {ticket.seat && ` • Seat ${ticket.seat}`}
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-300">
                     <UserIcon className="h-5 w-5 mr-3" />
-                    Sold by {ticket.seller.name}
+                    Sold by <span className="ml-1 font-bold text-white">{ticket.seller.name}</span>
                   </div>
                 </div>
-
                 {/* Price Section */}
-                <div className="border-t border-gray-200 pt-6">
+                <div className="border-t border-[#23223a] pt-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium text-gray-900">Price</span>
+                    <span className="text-lg font-bold text-white">Price</span>
                     <div className="flex items-center">
                       <CurrencyDollarIcon className="h-6 w-6 text-gray-400 mr-2" />
-                      <span className="text-3xl font-bold text-gray-900">
-                        ₹{ticket.price.toFixed(2)}
-                      </span>
+                      <span className="text-3xl font-extrabold text-neon-pink">₹{ticket.price.toFixed(2)}</span>
                     </div>
                   </div>
-
                   {isAuction && ticket.endTime && (
-                    <div className="mt-4 flex items-center text-sm text-gray-600">
+                    <div className="mt-4 flex items-center text-sm text-gray-400">
                       <ClockIcon className="h-4 w-4 mr-2" />
                       {isExpired ? (
-                        <span className="text-red-600">Auction ended</span>
+                        <span className="text-red-400">Auction ended</span>
                       ) : (
                         <span>Auction ends {format(new Date(ticket.endTime), 'MMM dd, h:mm a')}</span>
                       )}
@@ -340,18 +327,18 @@ const TicketDetailPage: React.FC = () => {
 
             {/* Auction Bids */}
             {isAuction && (
-              <div className="mt-8 bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Offers</h3>
+              <div className="mt-8 bg-[#231651] shadow-xl rounded-2xl p-8 border border-[#23223a]">
+                <h3 className="text-2xl font-extrabold text-neon-pink mb-4">Offers</h3>
                 {bids.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
                     {bids.map((bid) => (
-                      <div key={bid.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="text-lg font-bold text-gray-900">₹{bid.amount.toFixed(2)}</div>
+                      <div key={bid.id} className="bg-[#18122B] rounded-lg p-4 border border-[#23223a] flex items-center justify-between">
+                        <span className="text-lg font-bold text-neon-pink">₹{bid.amount.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No offers yet. Be the first to make an offer!</p>
+                  <p className="text-gray-300">No offers yet. Be the first to make an offer!</p>
                 )}
               </div>
             )}
@@ -359,22 +346,22 @@ const TicketDetailPage: React.FC = () => {
 
           {/* Purchase/Auction Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-white shadow rounded-lg p-6 sticky top-6">
+            <div className="bg-[#231651] shadow-xl rounded-2xl p-8 sticky top-6 border border-[#23223a]">
               {!isAvailable ? (
                 <div className="text-center">
-                  <div className="text-red-600 text-lg font-medium mb-2">Ticket Not Available</div>
-                  <p className="text-gray-600">This ticket has been sold or is no longer available.</p>
+                  <div className="text-red-400 text-lg font-bold mb-2">Ticket Not Available</div>
+                  <p className="text-gray-300">This ticket has been sold or is no longer available.</p>
                 </div>
               ) : isAuction ? (
                 /* Auction Panel */
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Make Offer</h3>
+                  <h3 className="text-lg font-bold text-white mb-4">Make Offer</h3>
                   {!user ? (
                     <div className="text-center">
-                      <p className="text-gray-600 mb-4">Please login to make an offer</p>
+                      <p className="text-gray-300 mb-4">Please login to make an offer</p>
                       <Link
                         to="/login"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        className="w-full bg-neon-blue text-white px-4 py-2 rounded-full hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
                       >
                         Login
                       </Link>
@@ -382,7 +369,7 @@ const TicketDetailPage: React.FC = () => {
                   ) : (
                     <form onSubmit={handlePlaceBid}>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-bold text-white mb-2">
                           Offer Amount
                         </label>
                         <div className="relative">
@@ -393,19 +380,19 @@ const TicketDetailPage: React.FC = () => {
                             min={minBidAmount}
                             value={bidAmount}
                             onChange={(e) => setBidAmount(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full pl-10 pr-4 py-2 border border-[#23223a] rounded-md bg-[#18122B] text-white focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink"
                             placeholder="Enter your offer amount"
                             required
                           />
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Minimum bid: ₹{minBidAmount.toFixed(2)} (10% higher than current highest bid)
+                        <p className="text-sm text-gray-400 mt-1">
+                          Minimum bid: <span className="text-neon-pink font-bold">₹{minBidAmount.toFixed(2)}</span> (10% higher than current highest bid)
                         </p>
                       </div>
                       <button
                         type="submit"
                         disabled={placingBid || !!isExpired}
-                        className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-neon-blue text-white px-4 py-2 rounded-full font-bold hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {placingBid ? <LoadingSpinner size="sm" /> : 'Make Offer'}
                       </button>
@@ -413,98 +400,16 @@ const TicketDetailPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                /* Direct Sale Panel */
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Purchase Ticket</h3>
-                  {!user ? (
-                    <div className="text-center">
-                      <p className="text-gray-600 mb-4">Please login to purchase this ticket</p>
-                      <Link
-                        to="/login"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        Login
-                      </Link>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="mb-4">
-                        <p className="text-sm text-gray-600 mb-2">Total Price</p>
-                        <div className="text-2xl font-bold text-gray-900">
-                          ₹{ticket.price.toFixed(2)}
-                        </div>
-                      </div>
-                      
-                      {showPurchaseForm ? (
-                        <form onSubmit={handlePurchase}>
-                          <div className="space-y-4 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Card Number
-                              </label>
-                              <input
-                                type="text"
-                                defaultValue="4242424242424242"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="1234 5678 9012 3456"
-                                required
-                              />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Expiry Date
-                                </label>
-                                <input
-                                  type="text"
-                                  defaultValue="12/25"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="MM/YY"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  CVV
-                                </label>
-                                <input
-                                  type="text"
-                                  defaultValue="123"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="123"
-                                  required
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowPurchaseForm(false)}
-                              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              disabled={purchasing}
-                              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {purchasing ? <LoadingSpinner size="sm" /> : 'Complete Purchase'}
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <button
-                          onClick={() => setShowPurchaseForm(true)}
-                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                          Buy Now
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                /* Direct Purchase Panel */
+                <form onSubmit={handlePurchase}>
+                  <button
+                    type="submit"
+                    disabled={purchasing}
+                    className="w-full bg-neon-blue text-white px-4 py-2 rounded-full font-bold hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {purchasing ? <LoadingSpinner size="sm" /> : 'Purchase Ticket'}
+                  </button>
+                </form>
               )}
             </div>
           </div>

@@ -138,12 +138,12 @@ const EventDetailPage: React.FC = () => {
   const availableTickets = filteredTickets.filter(ticket => ticket.status === 'AVAILABLE');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#18122B] to-[#231651] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Event Header */}
-        <div className="bg-white shadow rounded-lg overflow-hidden mb-8">
+        <div className="bg-[#231651] shadow-xl rounded-2xl overflow-hidden mb-8 border border-[#23223a]">
           {event.image && (
-            <div className="h-64 bg-gray-200">
+            <div className="h-64 bg-[#18122B]">
               <img
                 src={event.image}
                 alt={event.title}
@@ -151,47 +151,42 @@ const EventDetailPage: React.FC = () => {
               />
             </div>
           )}
-          
           <div className="p-8">
             <div className="flex items-center justify-between mb-4">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getListingTypeColor(event.category)}`}>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold text-neon-pink bg-[#18122B] border border-neon-pink">
                 {event.category}
               </span>
               {user?.role === 'ADMIN' && (
                 <Link
                   to={`/admin/events/${event.id}/tickets`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 rounded-full shadow-sm text-sm font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
                 >
                   Manage Tickets
                 </Link>
               )}
             </div>
-            
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.title}</h1>
-            <p className="text-lg text-gray-600 mb-6">{event.description}</p>
-            
+            <h1 className="text-4xl font-extrabold text-white mb-4">{event.title}</h1>
+            <p className="text-lg text-gray-300 mb-6">{event.description}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex items-center">
-                <CalendarIcon className="h-5 w-5 text-gray-400 mr-3" />
+                <CalendarIcon className="h-5 w-5 text-neon-pink mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Date & Time</p>
-                  <p className="text-sm text-gray-600">{format(new Date(event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}</p>
+                  <p className="text-sm font-bold text-white">Date & Time</p>
+                  <p className="text-sm text-gray-300">{format(new Date(event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}</p>
                 </div>
               </div>
-              
               <div className="flex items-center">
-                <MapPinIcon className="h-5 w-5 text-gray-400 mr-3" />
+                <MapPinIcon className="h-5 w-5 text-neon-pink mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Venue</p>
-                  <p className="text-sm text-gray-600">{event.venue}</p>
+                  <p className="text-sm font-bold text-white">Venue</p>
+                  <p className="text-sm text-gray-300">{event.venue}</p>
                 </div>
               </div>
-              
               <div className="flex items-center">
-                <UsersIcon className="h-5 w-5 text-gray-400 mr-3" />
+                <UsersIcon className="h-5 w-5 text-neon-pink mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Capacity</p>
-                  <p className="text-sm text-gray-600">{event.capacity} people</p>
+                  <p className="text-sm font-bold text-white">Capacity</p>
+                  <p className="text-sm text-gray-300">{event.capacity} people</p>
                 </div>
               </div>
             </div>
@@ -199,37 +194,37 @@ const EventDetailPage: React.FC = () => {
         </div>
 
         {/* Tickets Section */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-[#231651] shadow-xl rounded-2xl border border-[#23223a]">
+          <div className="px-8 py-6 border-b border-[#23223a]">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Available Tickets</h2>
+              <h2 className="text-2xl font-extrabold text-white">Available Tickets</h2>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setFilter('all')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    filter === 'all' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                    filter === 'all'
+                      ? 'bg-neon-pink text-white shadow-[0_0_16px_2px_#FF1EC6]'
+                      : 'bg-[#18122B] text-gray-300 border border-[#23223a] hover:border-neon-pink'
                   }`}
                 >
                   All ({availableTickets.length})
                 </button>
                 <button
                   onClick={() => setFilter('direct')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    filter === 'direct' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                    filter === 'direct'
+                      ? 'bg-neon-pink text-white shadow-[0_0_16px_2px_#FF1EC6]'
+                      : 'bg-[#18122B] text-gray-300 border border-[#23223a] hover:border-neon-pink'
                   }`}
                 >
                   Direct Sale ({availableTickets.filter(t => t.listingType === 'DIRECT_SALE').length})
                 </button>
                 <button
                   onClick={() => setFilter('auction')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    filter === 'auction' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                    filter === 'auction'
+                      ? 'bg-neon-pink text-white shadow-[0_0_16px_2px_#FF1EC6]'
+                      : 'bg-[#18122B] text-gray-300 border border-[#23223a] hover:border-neon-pink'
                   }`}
                 >
                   Auctions ({availableTickets.filter(t => t.listingType === 'AUCTION').length})
@@ -241,79 +236,65 @@ const EventDetailPage: React.FC = () => {
           {availableTickets.length === 0 ? (
             <div className="text-center py-12">
               <TicketIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No tickets available</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {filter === 'all' 
+              <h3 className="mt-2 text-lg font-bold text-white">No tickets available</h3>
+              <p className="mt-1 text-sm text-gray-300">
+                {filter === 'all'
                   ? 'There are no tickets available for this event at the moment.'
-                  : `There are no ${filter === 'direct' ? 'direct sale' : 'auction'} tickets available.`
-                }
+                  : `There are no ${filter === 'direct' ? 'direct sale' : 'auction'} tickets available.`}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
               {availableTickets.map((ticket) => (
-                <div key={ticket.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div key={ticket.id} className="bg-[#18122B] border border-[#23223a] rounded-2xl p-6 hover:shadow-[0_0_16px_2px_#FF1EC6] transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                      {ticket.status}
-                    </span>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                     <div className="flex items-center space-x-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getListingTypeColor(ticket.listingType)}`}>
-                        {ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}
-                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getListingTypeColor(ticket.listingType)}`}>{ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}</span>
                       {ticket.seller.role !== 'ADMIN' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                          Resell
-                        </span>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Resell</span>
                       )}
                     </div>
                   </div>
-                  
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-900">Price</span>
+                      <span className="text-sm font-bold text-white">Price</span>
                       <div className="flex items-center">
                         <CurrencyDollarIcon className="h-4 w-4 text-gray-400 mr-1" />
-                        <span className="text-lg font-bold text-gray-900">
-                          ₹{ticket.price.toFixed(2)}
-                        </span>
+                        <span className="text-lg font-extrabold text-neon-pink">₹{ticket.price.toFixed(2)}</span>
                       </div>
                     </div>
-                    
                     {ticket.section && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-400">
                         Section {ticket.section}
                         {ticket.row && ` • Row ${ticket.row}`}
                         {ticket.seat && ` • Seat ${ticket.seat}`}
                       </div>
                     )}
-                    
                     {ticket.listingType === 'AUCTION' && ticket.endTime && (
-                      <div className="flex items-center mt-2 text-sm text-gray-600">
+                      <div className="flex items-center mt-2 text-sm text-gray-400">
                         <ClockIcon className="h-4 w-4 mr-1" />
                         Ends {format(new Date(ticket.endTime), 'MMM dd, h:mm a')}
                       </div>
                     )}
-                    
                     {ticket._count.bids > 0 && (
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-400 mt-1">
                         {ticket._count.bids} bid{ticket._count.bids !== 1 ? 's' : ''}
                       </div>
                     )}
                   </div>
-                  
                   <div className="flex space-x-2">
                     {ticket.listingType === 'AUCTION' ? (
                       <Link
                         to={`/tickets/${ticket.id}`}
-                        className="flex-1 text-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        className="flex-1 text-center px-4 py-2 rounded-full text-sm font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
                       >
                         View Auction
                       </Link>
                     ) : (
                       <Link
                         to={`/tickets/${ticket.id}`}
-                        className="flex-1 text-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="flex-1 text-center px-4 py-2 rounded-full text-sm font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all"
                       >
                         Buy Now
                       </Link>
