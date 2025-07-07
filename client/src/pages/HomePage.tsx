@@ -64,7 +64,7 @@ const InfoBadge: React.FC<{ icon: React.ReactNode; title: React.ReactNode; desc:
 const TestimonialCard: React.FC<{ name: string; city: string; rating: number; text: string; img?: string }> = ({
   name, city, rating, text, img
 }) => (
-  <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-start w-full max-w-md">
+  <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-start w-full max-w-md transition-transform transition-shadow duration-200 ease-in-out hover:shadow-lg hover:scale-[1.03] active:scale-95 cursor-pointer">
     <div className="flex items-center mb-3">
       <div className="w-12 h-12 rounded-full bg-[#F5E7D6] flex items-center justify-center text-xl font-bold text-[#D6A77A] mr-3">
         {img ? <img src={img} alt={name} className="w-12 h-12 rounded-full" /> : name[0]}
@@ -150,7 +150,7 @@ function HowItWorks() {
       <h2 className="text-2xl md:text-3xl font-extrabold text-[#222] mb-8">How It Works</h2>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Step 1 Card */}
-        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center">
+        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center transition-transform transition-shadow duration-200 ease-in-out hover:shadow-lg hover:scale-[1.03] active:scale-95 cursor-pointer">
           <div className="w-16 h-16 rounded-full bg-[#F5E7D6] flex items-center justify-center mb-4">
             <FaSearch className="text-[36px] text-[#FF6B35]" />
           </div>
@@ -160,7 +160,7 @@ function HowItWorks() {
           </div>
         </div>
         {/* Step 2 Card */}
-        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center">
+        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center transition-transform transition-shadow duration-200 ease-in-out hover:shadow-lg hover:scale-[1.03] active:scale-95 cursor-pointer">
           <div className="w-16 h-16 rounded-full bg-[#F5E7D6] flex items-center justify-center mb-4">
             <FaLock className="text-[36px] text-[#FF6B35]" />
           </div>
@@ -170,7 +170,7 @@ function HowItWorks() {
           </div>
         </div>
         {/* Step 3 Card */}
-        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center">
+        <div className="flex-1 bg-white rounded-2xl shadow p-6 flex flex-col items-center transition-transform transition-shadow duration-200 ease-in-out hover:shadow-lg hover:scale-[1.03] active:scale-95 cursor-pointer">
           <div className="w-16 h-16 rounded-full bg-[#F5E7D6] flex items-center justify-center mb-4">
             <FaRegSmile className="text-[36px] text-[#FF6B35]" />
           </div>
