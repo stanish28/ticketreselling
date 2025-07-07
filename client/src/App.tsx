@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar.tsx';
+import MobileBottomNav from './components/layout/MobileBottomNav.tsx';
 import HomePage from './pages/HomePage.tsx';
 import EventsPage from './pages/EventsPage.tsx';
 import EventDetailPage from './pages/EventDetailPage.tsx';
@@ -30,7 +31,7 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Navbar />
-      <main>
+      <main className="pb-16 md:pb-0">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/events" element={<EventsPage />} />
@@ -58,6 +59,7 @@ function App() {
           <Route path="/ui-test" element={<UiTestPage />} />
         </Routes>
       </main>
+      <MobileBottomNav />
     </>
   );
 }
