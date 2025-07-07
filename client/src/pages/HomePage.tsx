@@ -299,6 +299,36 @@ const HomePage: React.FC = () => {
           <p className="text-base md:text-lg text-white text-center mb-8 max-w-2xl drop-shadow opacity-90">
             India's most trusted platform for buying and selling event tickets with complete peace of mind.
           </p>
+          <div className="w-full max-w-md flex items-center bg-white rounded-full shadow-md px-4 py-2 mb-4 mt-2">
+            <FaSearch className="text-[#D6A77A] text-lg mr-2" />
+            <input
+              type="text"
+              placeholder="Search events, artists, or venues..."
+              className="flex-1 bg-transparent outline-none text-[#222] placeholder-[#A9A9A9] text-base"
+            />
+          </div>
+          <a href="#events" className="px-8 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition-transform duration-150 hover:scale-105 active:scale-95 text-lg mt-2">Browse Events</a>
+        </div>
+      </section>
+
+      {/* Add a Trending Tickets section after the hero section and before SocialProofStats */}
+      <section id="events" className="w-full max-w-5xl mx-auto py-16 px-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-[#222] mb-8 text-center">Trending Tickets</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {events.map((event, idx) => (
+            <div key={idx} className="bg-white rounded-2xl shadow p-4 flex flex-col items-center transition-transform duration-150 hover:scale-105">
+              <img
+                src={event.image}
+                alt={`Event: ${event.name} in ${event.location}`}
+                loading="lazy"
+                className="w-full h-40 object-cover rounded-xl mb-4"
+              />
+              <div className="font-bold text-lg text-[#222] mb-1 text-center">{event.name}</div>
+              <div className="text-[#6B6B6B] text-sm mb-1">{event.date} • {event.location}</div>
+              <div className="text-[#D6A77A] font-bold text-xl mb-3">₹{(idx+1)*499}</div>
+              <a href="#" className="px-6 py-2 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition-transform duration-150 hover:scale-105 active:scale-95 text-base">Buy Ticket</a>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -387,6 +417,9 @@ const HomePage: React.FC = () => {
           © 2024 Fastpass India. All rights reserved. Your trusted partner for event tickets.
         </div>
       </footer>
+
+      {/* Events Section */}
+      <section id="events" className="w-full max-w-5xl mx-auto py-24 px-4 text-center text-2xl text-[#D6A77A] font-bold">[Events will appear here]</section>
     </div>
   );
 };
