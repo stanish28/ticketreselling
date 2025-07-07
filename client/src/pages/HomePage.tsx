@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
-import { FaSearch, FaLock, FaRegSmile } from "react-icons/fa";
+import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard } from "react-icons/fa";
 
 const events = [
   {
@@ -110,6 +110,38 @@ const journeySteps = [
   }
 ];
 
+// Add social proof data
+const socialProofData = {
+  userCount: "50,000+",
+  ticketsSold: "1,247",
+  trustScore: "99.8%",
+  supportHours: "24/7"
+};
+
+const trustBadges = [
+  { icon: <FaShieldAlt className="text-2xl" />, text: "256-bit SSL Security" },
+  { icon: <FaCreditCard className="text-2xl" />, text: "Secure Payments" },
+  { icon: <FaTicketAlt className="text-2xl" />, text: "100% Verified Tickets" },
+  { icon: <FaUsers className="text-2xl" />, text: "Money-back Guarantee" }
+];
+
+// Add live ticker data
+const liveTickerItems = [
+  "🎫 Priya just bought Taylor Swift tickets in Mumbai",
+  "⚽ IPL final tickets selling fast in Bangalore", 
+  "🎭 Comedy show tickets available in Delhi",
+  "🎸 Ed Sheeran concert tickets released in Chennai",
+  "🏏 Cricket match tickets selling in Kolkata"
+];
+
+// Add featured event categories
+const eventCategories = [
+  { name: 'Music Concerts', icon: '🎵', count: '2,341 tickets' },
+  { name: 'Sports Events', icon: '⚽', count: '1,892 tickets' },
+  { name: 'Comedy Shows', icon: '😂', count: '567 tickets' },
+  { name: 'Cultural Events', icon: '🎭', count: '1,234 tickets' }
+];
+
 // --- Main Home Page ---
 
 function HowItWorks() {
@@ -152,12 +184,103 @@ function HowItWorks() {
   );
 }
 
+// Add Live Ticker Component
+const LiveTicker: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % liveTickerItems.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-[#D6A77A] text-white py-2 px-4 overflow-hidden">
+      <div className="max-w-5xl mx-auto flex items-center justify-center">
+        <span className="text-sm font-medium animate-pulse mr-2">🔴 LIVE</span>
+        <span className="text-sm">{liveTickerItems[currentIndex]}</span>
+      </div>
+    </div>
+  );
+};
+
+// Add Social Proof Stats Component
+const SocialProofStats: React.FC = () => (
+  <section className="w-full py-8 bg-white border-b border-[#E5E5E5]">
+    <div className="max-w-5xl mx-auto px-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="flex flex-col items-center">
+          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
+            {socialProofData.userCount}
+          </div>
+          <div className="text-sm text-[#6B6B6B]">Satisfied Users</div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
+            {socialProofData.ticketsSold}
+          </div>
+          <div className="text-sm text-[#6B6B6B]">Tickets Sold This Week</div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
+            {socialProofData.trustScore}
+          </div>
+          <div className="text-sm text-[#6B6B6B]">Trust Score</div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
+            {socialProofData.supportHours}
+          </div>
+          <div className="text-sm text-[#6B6B6B]">Customer Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// Add Trust Badges Component
+const TrustBadges: React.FC = () => (
+  <section className="w-full py-6 bg-[#FAF8F6]">
+    <div className="max-w-5xl mx-auto px-4">
+      <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
+        {trustBadges.map((badge, index) => (
+          <div key={index} className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+            <div className="text-[#D6A77A]">{badge.icon}</div>
+            <span className="text-sm font-medium text-[#6B6B6B]">{badge.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// Add Press Mentions Component
+const PressMentions: React.FC = () => (
+  <section className="w-full py-6 bg-white border-t border-[#E5E5E5]">
+    <div className="max-w-5xl mx-auto px-4">
+      <div className="text-center">
+        <p className="text-sm text-[#A9A9A9] mb-3">Featured in</p>
+        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 opacity-60">
+          <span className="text-lg font-bold text-[#6B6B6B]">Economic Times</span>
+          <span className="text-lg font-bold text-[#6B6B6B]">YourStory</span>
+          <span className="text-lg font-bold text-[#6B6B6B]">TechCrunch India</span>
+          <span className="text-lg font-bold text-[#6B6B6B]">Inc42</span>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
 const HomePage: React.FC = () => {
   const [hovered, setHovered] = useState<number | null>(null);
   const [tab, setTab] = useState('Buy Tickets');
 
   return (
     <div className="bg-[#FAF8F6] min-h-screen font-sans">
+      {/* Live Ticker */}
+      <LiveTicker />
+      
       {/* Hero Section */}
       <section className="relative w-full h-[420px] md:h-[520px] lg:h-[600px] flex items-center justify-center overflow-hidden">
         <img
@@ -168,17 +291,25 @@ const HomePage: React.FC = () => {
         />
         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-4 pb-12 bg-black/40">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white text-center mb-4 drop-shadow">
-            India's Most Secure Ticket Resale Marketplace
+            Get Sold-Out Tickets at Fair Prices
           </h1>
-          <p className="text-lg md:text-xl text-white text-center mb-8 max-w-2xl drop-shadow">
-            Buy and sell tickets with confidence. Fastpass ensures a safe, modern, and user-friendly experience for all live events.
+          <p className="text-lg md:text-xl text-white text-center mb-4 max-w-2xl drop-shadow">
+            100% Verified & Secure • No Hidden Fees • Instant QR Codes
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/events" className="px-8 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-lg">Browse Events</Link>
-            <Link to="/sell-ticket" className="px-8 py-3 rounded-full font-bold bg-white text-[#222] border border-[#E5E5E5] hover:bg-[#F5E7D6] transition text-lg">List Your Tickets</Link>
-          </div>
+          <p className="text-base md:text-lg text-white text-center mb-8 max-w-2xl drop-shadow opacity-90">
+            India's most trusted platform for buying and selling event tickets with complete peace of mind.
+          </p>
         </div>
       </section>
+
+      {/* Social Proof Stats */}
+      <SocialProofStats />
+
+      {/* Trust Badges */}
+      <TrustBadges />
+
+      {/* Press Mentions */}
+      <PressMentions />
 
       {/* How It Works (Wavy Journey Map) */}
       <HowItWorks />

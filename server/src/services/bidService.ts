@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 
 export const processExpiredBids = async (io: Server) => {
   try {

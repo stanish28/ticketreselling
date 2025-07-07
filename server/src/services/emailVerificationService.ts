@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 
 // Email transporter configuration (reusing existing setup)
 const transporter = nodemailer.createTransport({

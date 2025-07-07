@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 import nodemailer from 'nodemailer';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({

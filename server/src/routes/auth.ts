@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 import { authenticateToken } from '../middleware/auth';
 import { RegisterRequest, LoginRequest, AuthenticatedRequest } from '../types';
 import { generateVerificationToken, sendVerificationEmail, verifyEmailToken, resendVerificationEmail } from '../services/emailVerificationService';
@@ -193,7 +193,7 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Resp
 });
 
 // Verify email
-router.get('/verify-email', async (req: Request, res: Response): Promise<void> => {
+router.get('/verify-email', async (req: Request, res: Response) => {
   try {
     const { token } = req.query;
 
@@ -222,7 +222,7 @@ router.get('/verify-email', async (req: Request, res: Response): Promise<void> =
 // Resend verification email
 router.post('/resend-verification', [
   body('email').isEmail().normalizeEmail()
-], async (req: Request, res: Response): Promise<void> => {
+], async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -299,14 +299,14 @@ router.put('/profile', [
       }
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: { user: updatedUser },
       message: 'Profile updated successfully'
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
+    return res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 
@@ -349,13 +349,13 @@ router.put('/change-password', [
       data: { password: hashedNewPassword }
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Password changed successfully'
     });
   } catch (error) {
     console.error('Change password error:', error);
-    res.status(500).json({ error: 'Failed to change password' });
+    return res.status(500).json({ error: 'Failed to change password' });
   }
 });
 

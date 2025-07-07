@@ -7,7 +7,6 @@ import { Server } from 'socket.io';
 import rateLimit from 'express-rate-limit';
 import cron from 'node-cron';
 
-import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
 import eventRoutes from './routes/events';
 import ticketRoutes from './routes/tickets';
@@ -17,6 +16,7 @@ import passwordResetRoutes from './routes/passwordReset';
 import { authenticateToken } from './middleware/auth';
 import { generateAndSendQRCodes } from './services/qrCodeService';
 import { processExpiredBids } from './services/bidService';
+import { prisma } from './config/database';
 
 const app = express();
 const server = createServer(app);
@@ -27,7 +27,6 @@ const io = new Server(server, {
   }
 });
 
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Rate limiting
@@ -142,4 +141,4 @@ process.on('SIGINT', async () => {
   });
 });
 
-export { prisma, io }; 
+export { io }; 

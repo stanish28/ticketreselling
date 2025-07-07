@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 import { requireAdmin } from '../middleware/auth';
 import { AuthenticatedRequest, DashboardStats } from '../types';
 import { Response } from 'express';
