@@ -85,14 +85,14 @@ const EventsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#18122B] to-[#231651] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-10">
-          <h1 className="text-4xl font-extrabold text-neon-pink mb-2 uppercase tracking-tight">Events</h1>
-          <p className="text-lg text-white font-medium">Discover amazing events happening in your area</p>
+        <div className="mb-8">
+          <h1 className="text-5xl font-bold text-gray-900 mb-3">Events</h1>
+          <p className="text-xl text-gray-600">Discover amazing events happening in your area</p>
         </div>
 
-        <div className="bg-black rounded-2xl shadow-xl p-6 mb-12">
+        <div className="bg-[#F5F5DC] rounded-2xl shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
               <input
@@ -102,15 +102,15 @@ const EventsPage: React.FC = () => {
                 value={filters.searchTerm}
                 onChange={handleFilterChange}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-10 pr-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
+                className="w-full pl-10 pr-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg placeholder-gray-500"
               />
-              <MagnifyingGlassIcon className="absolute left-3 top-2.5 h-5 w-5 text-neon-blue" />
+              <MagnifyingGlassIcon className="absolute left-3 top-3 h-6 w-6 text-gray-400" />
             </div>
             <select
               name="selectedCategory"
               value={filters.selectedCategory}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
+              className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg"
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
@@ -122,14 +122,14 @@ const EventsPage: React.FC = () => {
               name="startDate"
               value={filters.startDate}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
+              className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg"
             />
             <input
               type="date"
               name="endDate"
               value={filters.endDate}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold"
+              className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg"
             />
             <input
               type="number"
@@ -137,7 +137,7 @@ const EventsPage: React.FC = () => {
               placeholder="Min Price"
               value={filters.minPrice}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
+              className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg placeholder-gray-500"
             />
             <input
               type="number"
@@ -145,19 +145,19 @@ const EventsPage: React.FC = () => {
               placeholder="Max Price"
               value={filters.maxPrice}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 bg-[#231651] text-white border border-[#23223a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#23223a] font-semibold placeholder-white/60"
+              className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg placeholder-gray-500"
             />
             <button
               onClick={handleSearch}
-              className="px-4 py-2 rounded-lg shadow-md text-sm font-bold text-white bg-neon-blue hover:bg-neon-pink hover:shadow-[0_0_16px_2px_#FF1EC6] focus:outline-none focus:ring-2 focus:ring-neon-blue transition-all"
+              className="px-6 py-3 rounded-xl shadow-md text-lg font-bold text-white bg-[#FF6B35] hover:bg-[#E55A2B] focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition-all"
             >
               Search
             </button>
             <button
               onClick={clearFilters}
-              className="flex items-center justify-center px-4 py-2 rounded-lg text-sm font-bold text-neon-pink border border-neon-pink bg-black hover:bg-[#231651] hover:text-white focus:outline-none focus:ring-2 focus:ring-neon-pink transition-all"
+              className="flex items-center justify-center px-6 py-3 rounded-xl text-lg font-bold text-[#FF6B35] border-2 border-[#FF6B35] bg-white hover:bg-[#FF6B35] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition-all"
             >
-              <XMarkIcon className="h-5 w-5 mr-2" />
+              <XMarkIcon className="h-6 w-6 mr-2" />
               Clear
             </button>
           </div>
@@ -168,42 +168,42 @@ const EventsPage: React.FC = () => {
             <LoadingSpinner size="lg" />
           </div>
         ) : events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
               <div
                 key={event.id}
-                className="bg-black rounded-2xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-[0_0_24px_4px_#1E90FF,0_0_32px_8px_#FF1EC6] transition-transform duration-200 flex flex-col"
+                className="bg-[#F5F5DC] rounded-2xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-xl transition-transform duration-200 flex flex-col border border-gray-200"
               >
                 {event.image && (
                   <img
                     src={event.image}
                     alt={event.title}
-                    className="w-full h-52 object-cover border-b-4 border-transparent hover:border-neon-pink transition-all duration-200"
+                    className="w-full h-48 object-cover border-b border-gray-200"
                   />
                 )}
-                <div className="p-6 flex flex-col gap-2 flex-1">
+                <div className="p-6 flex flex-col gap-3 flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#1E90FF22] text-neon-blue uppercase tracking-wide">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-[#FF6B35] text-white uppercase tracking-wide">
                       {event.category}
                     </span>
-                    <span className="text-sm text-neon-pink font-bold">
+                    <span className="text-sm text-gray-600 font-semibold">
                       {event._count?.tickets || 0} tickets
                     </span>
                   </div>
-                  <h3 className="text-2xl font-extrabold text-white mb-2 truncate">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 line-clamp-2">
                     {event.title}
                   </h3>
-                  <div className="flex items-center gap-2 text-neon-blue font-bold">
-                    <CalendarIcon className="w-5 h-5" />
-                    <span>{format(new Date(event.date), 'PPP')}</span>
+                  <div className="flex items-center gap-2 text-gray-700 font-semibold">
+                    <CalendarIcon className="w-5 h-5 text-[#FF6B35]" />
+                    <span className="text-lg">{format(new Date(event.date), 'PPP')}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-white font-semibold">
-                    <MapPinIcon className="w-5 h-5 text-neon-pink" />
-                    <span>{event.venue}</span>
+                  <div className="flex items-center gap-2 text-gray-700 font-semibold">
+                    <MapPinIcon className="w-5 h-5 text-[#FF6B35]" />
+                    <span className="text-lg">{event.venue}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
-                    <TicketIcon className="w-5 h-5 text-neon-pink" />
-                    <span className="text-neon-pink font-bold text-lg">
+                    <TicketIcon className="w-5 h-5 text-[#FF6B35]" />
+                    <span className="text-[#FF6B35] font-bold text-xl">
                       {event.tickets && event.tickets.length > 0
                         ? `₹${Math.min(...event.tickets.map(t => t.price))}`
                         : 'See tickets'}
@@ -211,7 +211,7 @@ const EventsPage: React.FC = () => {
                   </div>
                   <Link
                     to={`/events/${event.id}`}
-                    className="mt-4 bg-neon-blue hover:bg-neon-pink text-white font-bold py-2 px-6 rounded-full shadow-md hover:shadow-[0_0_16px_2px_#FF1EC6] transition-all text-center"
+                    className="mt-4 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all text-center text-lg"
                   >
                     View Event
                   </Link>
@@ -220,9 +220,9 @@ const EventsPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-neon-pink mb-4">No events found</h2>
-            <p className="text-white">Try adjusting your filters or check back later.</p>
+          <div className="text-center py-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">No events found</h2>
+            <p className="text-xl text-gray-600">Try adjusting your filters or check back later.</p>
           </div>
         )}
       </div>

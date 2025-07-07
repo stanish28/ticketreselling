@@ -65,6 +65,7 @@ model Ticket {
   endTime     DateTime?     // For bidding
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  ticketType  TicketType?   @default(SEATED)
 
   // Relations
   event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -152,4 +153,9 @@ enum BidStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum TicketType {
+  SEATED
+  STANDING
 } 

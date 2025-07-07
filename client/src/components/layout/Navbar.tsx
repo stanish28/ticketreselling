@@ -1,175 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { HomeIcon, CalendarIcon, TicketIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
+  const location = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [ticketCount, setTicketCount] = useState(0);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
-      fetchTicketCount();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
-        setMoreOpen(false);
-      }
-    }
-    if (moreOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [moreOpen]);
-
-  const fetchTicketCount = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/tickets/my', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setTicketCount(data.data?.length || 0);
-      }
-    } catch (error) {
-      console.error('Failed to fetch ticket count:', error);
-    }
-  };
-
-  const navigation = [
-    { name: 'Home', href: '/', icon: HomeIcon },
-    { name: 'Events', href: '/events', icon: CalendarIcon },
-    { name: 'Tickets', href: '/tickets', icon: TicketIcon },
-  ];
-  const userNavigation = [
-    { name: 'Profile', href: '/profile' },
-    { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon },
-    { name: 'My Bids', href: '/my-bids' },
-    { name: 'Sell Ticket', href: '/sell-ticket' },
-  ];
-  const adminNavigation = [
-    { name: 'Dashboard', href: '/admin', icon: ChartBarIcon },
-    { name: 'Users', href: '/admin/users', icon: UsersIcon },
-    { name: 'Events', href: '/admin/events', icon: CalendarIcon },
-    { name: 'Tickets', href: '/admin/tickets', icon: TicketIcon },
-  ];
-  const mainNavigation = user?.role === 'ADMIN'
-    ? adminNavigation
-    : user
-      ? [...navigation, { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon }]
-      : navigation;
+  const isActive = (href: string) => location.pathname === href;
 
   const handleLogout = () => {
     logout();
-    navigate('/');
-  };
-
-  // Function to check if a link is active
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(href);
+    navigate('/login');
   };
 
   return (
-    <nav className="w-full bg-black rounded-2xl shadow-2xl px-8 py-4 mt-4 mb-8 flex items-center justify-between max-w-6xl mx-auto z-30">
-      <div className="flex items-center gap-3">
-        {/* Neon pink ticket icon SVG */}
-        <svg className="w-8 h-8 text-neon-pink" fill="currentColor" viewBox="0 0 24 24">
-          <rect x="3" y="7" width="18" height="10" rx="3"/>
-          <circle cx="8" cy="12" r="1.5" fill="#18122B"/>
-          <circle cx="16" cy="12" r="1.5" fill="#18122B"/>
-        </svg>
-        <span className="text-white font-extrabold text-xl tracking-widest font-sans uppercase">CONCERT TICKET RESALE</span>
+    <nav className="w-full bg-white shadow-sm py-5 px-4 md:px-10 flex items-center justify-between text-lg" style={{minHeight: '72px'}}>
+      <div className="flex items-center space-x-8">
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="w-9 h-9 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-2xl">L</span>
+          <span className="font-extrabold text-2xl text-[#222] tracking-tight">Fastpass</span>
+        </Link>
+        {user && user.role === 'ADMIN' ? (
+          <div className="hidden md:flex items-center space-x-10 ml-10">
+            <Link to="/admin" className={`text-[#222] font-semibold hover:text-[#D6A77A]${isActive('/admin') ? ' underline' : ''}`}>Dashboard</Link>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center space-x-10 ml-10">
+            <Link to="/" className={`text-[#222] font-semibold hover:text-[#D6A77A]${isActive('/') ? ' underline' : ''}`}>Home</Link>
+            <Link to="/events" className={`text-[#222] font-semibold hover:text-[#D6A77A]${isActive('/events') ? ' underline' : ''}`}>Events</Link>
+            {user && (
+              <Link to="/my-tickets" className={`text-[#222] font-semibold hover:text-[#D6A77A]${isActive('/my-tickets') ? ' underline' : ''}`}>My Tickets</Link>
+            )}
+          </div>
+        )}
       </div>
-      {/* Navigation Links */}
-      <div className="flex gap-6 items-center">
-        {mainNavigation.filter(item => item.name !== 'Tickets').map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`font-bold text-lg transition-all relative ${
-                active 
-                  ? 'text-neon-pink underline underline-offset-8 decoration-neon-blue' 
-                  : 'text-white hover:text-neon-pink hover:underline hover:underline-offset-8 hover:decoration-neon-blue'
-              }`}
-            >
-              {item.name}
-              {item.name === 'My Tickets' && ticketCount > 0 && (
-                <span className="absolute -top-2 -right-4 bg-neon-pink text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {ticketCount}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-        {/* More Dropdown (custom, closes on outside click) */}
-        <div className="relative" ref={moreRef}>
-          <button
-            onClick={() => setMoreOpen((open) => !open)}
-            className="px-4 py-2 rounded-full bg-black border-2 border-neon-pink text-neon-pink font-bold text-lg flex items-center gap-2 hover:bg-[#231651] hover:text-white transition-all select-none"
-          >
-            More
-            <svg className={`w-5 h-5 text-neon-pink transition-transform ${moreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {moreOpen && (
-            <div className="absolute right-0 mt-2 w-48 flex flex-col gap-2 bg-[#18122B] rounded-xl shadow-lg p-4 border border-neon-pink z-50">
-              <Link 
-                to="/my-bids" 
-                className={`font-bold text-lg transition-all ${isActive('/my-bids') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
-                onClick={() => setMoreOpen(false)}
-              >
-                My Bids
-              </Link>
-              <Link 
-                to="/sell-ticket" 
-                className={`font-bold text-lg transition-all ${isActive('/sell-ticket') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
-                onClick={() => setMoreOpen(false)}
-              >
-                Sell Ticket
-              </Link>
-              <Link 
-                to="/profile" 
-                className={`font-bold text-lg transition-all ${isActive('/profile') ? 'text-neon-pink' : 'text-neon-blue hover:text-neon-pink'}`} 
-                onClick={() => setMoreOpen(false)}
-              >
-                Profile
-              </Link>
-            </div>
-          )}
+      {(!user || user.role !== 'ADMIN') && (
+        <div className="flex-1 flex justify-center mx-6">
+          <input
+            type="text"
+            placeholder="Search events…"
+            className="w-full max-w-md px-5 py-3 rounded-full border border-[#E5E5E5] bg-[#FAF8F6] text-[#222] placeholder-[#A9A9A9] focus:outline-none focus:ring-2 focus:ring-[#D6A77A] text-base"
+          />
         </div>
-      </div>
-      <div className="flex gap-8 items-center">
+      )}
+      <div className="flex items-center space-x-4">
         {user ? (
-          <>
-            <span className="text-white font-bold text-lg">{user.name}</span>
+          <div className="flex items-center space-x-4">
+            <Link to="/profile" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
+              <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-lg">
+                {user.name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="hidden md:block text-left">
+                <div className="font-semibold text-[#222] hover:text-[#FF6B35] transition-colors cursor-pointer">
+                  {user.name}
+                </div>
+                <div className="text-sm text-gray-600">{user.email}</div>
+              </div>
+            </Link>
             <button
               onClick={handleLogout}
-              className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all"
+              className="bg-[#FF6B35] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#E55A2B] transition-colors"
             >
               Logout
             </button>
-          </>
+          </div>
         ) : (
           <>
-            <Link to="/register" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign Up</Link>
-            <Link to="/login" className="text-neon-pink font-bold text-lg hover:text-neon-blue hover:underline hover:underline-offset-8 hover:decoration-4 transition-all">Sign In</Link>
+            <Link to="/register" className="px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-base">Sign Up</Link>
+            <Link to="/login" className="px-6 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-base">Log In</Link>
           </>
         )}
       </div>

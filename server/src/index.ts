@@ -40,7 +40,10 @@ const limiter = rateLimit({
 app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
-app.use(limiter);
+// Temporarily disable rate limiting for development
+if (process.env.NODE_ENV === 'production') {
+  app.use(limiter);
+}
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

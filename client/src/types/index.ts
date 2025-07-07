@@ -55,6 +55,7 @@ export interface Ticket {
   _count?: {
     bids: number;
   };
+  ticketType?: 'SEATED' | 'STANDING';
 }
 
 export interface Bid {

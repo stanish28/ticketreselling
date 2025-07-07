@@ -12,6 +12,7 @@ import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
 import MyTicketsPage from './pages/MyTicketsPage.tsx';
 import MyBidsPage from './pages/MyBidsPage.tsx';
+import UserProfilePage from './pages/UserProfilePage.tsx';
 import AdminDashboard from './pages/admin/Dashboard.tsx';
 import AdminEventsPage from './pages/AdminEventsPage.tsx';
 import AdminEventTicketsPage from './pages/AdminEventTicketsPage.tsx';
@@ -22,13 +23,14 @@ import PrivateRoute from './components/auth/ProtectedRoute.tsx';
 import AdminRoute from './components/auth/AdminRoute.tsx';
 import { Toaster } from 'react-hot-toast';
 import SellTicketPage from './pages/SellTicketPage.tsx';
+import UiTestPage from './pages/UiTestPage.tsx';
 
 function App() {
   return (
     <>
       <Toaster position="top-right" />
       <Navbar />
-      <main className="pt-16">
+      <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/events" element={<EventsPage />} />
@@ -44,6 +46,7 @@ function App() {
           <Route path="/my-tickets" element={<PrivateRoute><MyTicketsPage /></PrivateRoute>} />
           <Route path="/my-bids" element={<PrivateRoute><MyBidsPage /></PrivateRoute>} />
           <Route path="/sell-ticket" element={<PrivateRoute><SellTicketPage /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><UserProfilePage /></PrivateRoute>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -52,6 +55,7 @@ function App() {
           <Route path="/admin/events/create" element={<AdminRoute><CreateEventPage /></AdminRoute>} />
           <Route path="/admin/events/:eventId/tickets" element={<AdminRoute><AdminEventTicketsPage /></AdminRoute>} />
           <Route path="/admin/tickets" element={<AdminRoute><AdminTickets /></AdminRoute>} />
+          <Route path="/ui-test" element={<UiTestPage />} />
         </Routes>
       </main>
     </>
