@@ -1,23 +1,205 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 20px;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   body {
     @apply bg-gray-50 text-gray-900;
     font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
+
+  /* Typography Scale - Based on 1.25 ratio (Major Third) */
+  h1, .h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h2, .h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.25rem;
+  }
+
+  h3, .h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+  }
+
+  h4, .h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+    margin-bottom: 0.75rem;
+  }
+
+  h5, .h5 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  h6, .h6 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Body Text Hierarchy */
+  .text-xl {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+  }
+
+  .text-lg {
+    font-size: clamp(1.0625rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+
+  .text-base {
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+
+  /* Display Text for Hero Sections */
+  .display-1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .display-2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Special Text Classes */
+  .text-hero {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .text-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .text-card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .text-body-large {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    line-height: 1.7;
+    letter-spacing: -0.005em;
+  }
+
+  .text-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+
+  .text-caption {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: #6B7280;
+  }
+
+  .text-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  /* Font Weight Utilities */
+  .font-thin { font-weight: 100; }
+  .font-extralight { font-weight: 200; }
+  .font-light { font-weight: 300; }
+  .font-normal { font-weight: 400; }
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+  .font-extrabold { font-weight: 800; }
+  .font-black { font-weight: 900; }
+
+  /* Letter Spacing Utilities */
+  .tracking-tighter { letter-spacing: -0.05em; }
+  .tracking-tight { letter-spacing: -0.025em; }
+  .tracking-normal { letter-spacing: 0em; }
+  .tracking-wide { letter-spacing: 0.025em; }
+  .tracking-wider { letter-spacing: 0.05em; }
+  .tracking-widest { letter-spacing: 0.1em; }
 }
 
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
   
   .btn-primary {
@@ -38,6 +220,8 @@
   
   .input {
     @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm;
+    font-size: 1rem;
+    line-height: 1.5;
   }
   
   .card {
@@ -54,6 +238,8 @@
   
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
   
   .badge-success {
@@ -80,6 +266,31 @@
   
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Typography Utilities */
+  .font-display {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Readability Improvements */
+  .prose {
+    max-width: 65ch;
+    line-height: 1.7;
+  }
+
+  .prose-lg {
+    max-width: 75ch;
+    line-height: 1.8;
+  }
+
+  /* Text Balance for Better Layout */
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
@@ -114,25 +325,4 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-h2 {
-  font-size: 2rem;
-  font-weight: 700;
-}
-h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-h4, h5, h6 {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-p, span, div, a, label, input, button, li, td, th {
-  font-size: 1.1rem;
-  font-weight: 400;
 } 

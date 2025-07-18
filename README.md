@@ -1,4 +1,4 @@
-# FastPass - Ticket Marketplace
+# LayLow-India - Ticket Marketplace
 
 A comprehensive ticket marketplace application similar to Ticketmaster with advanced features including bidding, QR code generation, and admin dashboard.
 
@@ -66,7 +66,7 @@ Create `.env` files in both `server/` and `client/` directories:
 
 ### Server (.env)
 ```
-DATABASE_URL="postgresql://username:password@localhost:5432/fastpass"
+DATABASE_URL="postgresql://username:password@localhost:5432/laylow-india"
 JWT_SECRET="your-jwt-secret"
 EMAIL_USER="your-email@gmail.com"
 EMAIL_PASS="your-email-password"
@@ -82,7 +82,7 @@ REACT_APP_SOCKET_URL=http://localhost:5000
 ## Project Structure
 
 ```
-fastpass/
+laylow-india/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── components/     # Reusable components
@@ -144,4 +144,3 @@ fastpass/
 
 MIT License - see LICENSE file for details 
 
-update

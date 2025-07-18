@@ -1,7 +1,7 @@
 {
-  "name": "fastpass-server",
+  "name": "laylow-india-server",
   "version": "1.0.0",
-  "description": "Backend server for FastPass ticket marketplace",
+  "description": "Backend server for LayLow-India ticket marketplace",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
