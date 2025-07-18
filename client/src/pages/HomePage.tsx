@@ -228,16 +228,12 @@ function HowItWorks() {
                   }}
                 >
                   {/* Floating badge */}
-                  <div className="absolute -top-3 -right-3 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                  <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-bl-3xl rounded-tr-3xl text-sm font-bold shadow-xl transform group-hover:scale-110 transition-transform duration-300 border-2 border-white">
                     Step {index + 1}
                   </div>
 
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="mb-4">
-                      {step.icon}
-                    </div>
-                    <h3 className="text-card-title font-display mb-3">{step.title}</h3>
-                    <p className="text-body opacity-90">{step.description}</p>
+                    <h3 className="text-3xl font-display font-bold">{step.title}</h3>
                   </div>
                 </div>
 
@@ -254,9 +250,9 @@ function HowItWorks() {
                     <h4 className={`text-lg font-bold mb-4 ${step.accentColor}`}>{step.backTitle}</h4>
                     <ul className="space-y-2 text-sm text-gray-600">
                       {step.backItems.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-center justify-center gap-2">
-                          <span className="text-[#D6A77A]">✓</span>
-                          {item}
+                        <li key={itemIndex} className="flex items-start gap-3">
+                          <span className="text-[#D6A77A] mt-0.5 flex-shrink-0">✓</span>
+                          <span className="text-left">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -379,7 +375,7 @@ function SafetyCards() {
           aria-expanded={flippedCards.includes(index)}
         >
           {/* Floating badge */}
-          <div className="absolute -top-3 -right-3 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+          <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-bl-3xl rounded-tr-3xl text-sm font-bold shadow-xl transform group-hover:scale-110 transition-transform duration-300 border-2 border-white">
             {feature.badge}
           </div>
           <div 
@@ -406,10 +402,7 @@ function SafetyCards() {
                 <p className="text-body text-[#6B6B6B] mb-6 prose">
                   {feature.description}
                 </p>
-                <div className="flex items-center justify-center gap-2 text-sm text-[#D6A77A] font-semibold group-hover:text-[#FF6B35] transition-colors duration-300">
-                  <span className="animate-bounce">👆</span>
-                  Hover to learn more
-                </div>
+
               </div>
             </div>
           </div>
@@ -430,7 +423,6 @@ function SafetyCards() {
               {/* Animated background pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-4 right-4 w-8 h-8 border-2 border-white rounded-full animate-ping"></div>
-                <div className="absolute bottom-4 left-4 w-6 h-6 border-2 border-white rounded-full animate-pulse"></div>
               </div>
               
               <div className="relative z-10">
@@ -443,10 +435,7 @@ function SafetyCards() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 text-sm opacity-80 flex items-center justify-center gap-2">
-                  <span className="animate-pulse">👆</span>
-                  Hover to go back
-                </div>
+
               </div>
             </div>
           </div>
