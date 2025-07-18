@@ -4,43 +4,8 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { PlusIcon, TrashIcon, PencilIcon, TicketIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-
-interface Ticket {
-  id: string;
-  price: number;
-  section?: string;
-  row?: string;
-  seat?: string;
-  status: string;
-  listingType: string;
-  endTime?: string;
-  createdAt: string;
-  seller: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-  buyer?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  _count: {
-    bids: number;
-  };
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  venue: string;
-  date: string;
-  category: string;
-  capacity: number;
-  image?: string;
-}
+import { eventsAPI, ticketsAPI } from '../services/api.ts';
+import { Event, Ticket } from '../types';
 
 const AdminEventTicketsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -74,26 +39,16 @@ const AdminEventTicketsPage: React.FC = () => {
   const fetchEventAndTickets = async () => {
     try {
       const [eventResponse, ticketsResponse] = await Promise.all([
-        fetch(`http://localhost:3001/api/events/${eventId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        }),
-        fetch(`http://localhost:3001/api/tickets?eventId=${eventId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
+        eventsAPI.getById(eventId!),
+        ticketsAPI.getAll({ eventId })
       ]);
 
-      if (eventResponse.ok) {
-        const eventData = await eventResponse.json();
-        setEvent(eventData.data);
+      if (eventResponse.success) {
+        setEvent(eventResponse.data || null);
       }
 
-      if (ticketsResponse.ok) {
-        const ticketsData = await ticketsResponse.json();
-        setTickets(ticketsData.data?.tickets || []);
+      if (ticketsResponse.success) {
+        setTickets(ticketsResponse.data?.tickets || []);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch data');
@@ -112,7 +67,7 @@ const AdminEventTicketsPage: React.FC = () => {
 
       for (let i = 0; i < quantity; i++) {
         const ticketData = {
-          eventId,
+          eventId: eventId!,
           price: parseFloat(formData.price),
           section: formData.section || undefined,
           row: formData.ticketType === 'SEATED' ? (formData.row || undefined) : undefined,
@@ -122,20 +77,8 @@ const AdminEventTicketsPage: React.FC = () => {
           ticketType: formData.ticketType,
         };
 
-        const response = await fetch('http://localhost:3001/api/tickets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify(ticketData),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create ticket');
-        }
-
-        ticketsToCreate.push(await response.json());
+        const response = await ticketsAPI.create(ticketData);
+        ticketsToCreate.push(response.data);
       }
 
       toast.success(`Successfully created ${quantity} ticket(s)`);
@@ -166,17 +109,7 @@ const AdminEventTicketsPage: React.FC = () => {
 
     setDeletingTicket(ticketId);
     try {
-      const response = await fetch(`http://localhost:3001/api/tickets/${ticketId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete ticket');
-      }
-
+      await ticketsAPI.delete(ticketId);
       toast.success('Ticket deleted successfully');
       setTickets(tickets.filter(ticket => ticket.id !== ticketId));
     } catch (error: any) {
@@ -415,8 +348,8 @@ const AdminEventTicketsPage: React.FC = () => {
                           </div>
                           <div className="text-sm text-gray-500">
                             {ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}
-                            {ticket._count.bids > 0 && ` • ${ticket._count.bids} bids`}
-                            {ticket.seller.role !== 'ADMIN' && (
+                            {ticket._count?.bids && ticket._count.bids > 0 && ` • ${ticket._count.bids} bids`}
+                            {ticket.seller?.role !== 'ADMIN' && (
                               <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                 Resell
                               </span>
@@ -442,7 +375,7 @@ const AdminEventTicketsPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ticket.seller.name}
+                        {ticket.seller?.name || 'Unknown'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
