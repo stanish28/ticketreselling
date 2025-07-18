@@ -1,5 +1,5 @@
 {
     "deploy": {
-      "runtime": "V1"
+      "runtime": "V2"
     }
   }
