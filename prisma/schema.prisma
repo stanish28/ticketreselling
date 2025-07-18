@@ -43,7 +43,8 @@ model Event {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  tickets Ticket[]
+  tickets        Ticket[]
+  ticketListings TicketListing[]
 
   @@map("events")
 }

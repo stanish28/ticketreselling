@@ -966,20 +966,20 @@ const HomePage: React.FC = () => {
             <span className="text-xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
           </Link>
         </div>
-        
-        {/* Scroll to Top Button */}
-        {showScrollTop && (
-          <button
-            onClick={scrollToTop}
-            className="w-12 h-12 bg-[#D6A77A] text-white rounded-full shadow-lg hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
-            aria-label="Scroll to top"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </button>
-        )}
       </div>
+      
+      {/* Scroll to Top Button - Positioned separately to avoid overlap */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 left-6 z-50 w-12 h-12 bg-[#D6A77A] text-white rounded-full shadow-lg hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Scroll to top"
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };
