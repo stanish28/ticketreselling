@@ -48,6 +48,7 @@ app.use(helmet());
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'https://ticketreselling.vercel.app',
     'https://ticketreselling-d1mb24cys-stanish28s-projects.vercel.app',
     'https://*.vercel.app'
   ],
