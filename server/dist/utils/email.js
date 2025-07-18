@@ -23,7 +23,7 @@ const sendPurchaseConfirmationEmail = async (emailData) => {
     Enjoy the event!
     
     Best regards,
-    FastPass Team
+    LayLow-India Team
   `;
     console.log('Email content:', emailContent);
 };
@@ -44,10 +44,10 @@ const sendSaleNotificationEmail = async (emailData) => {
     
     Payment will be processed and transferred to your account within 3-5 business days.
     
-    Thank you for using FastPass!
+    Thank you for using LayLow-India!
     
     Best regards,
-    FastPass Team
+    LayLow-India Team
   `;
     console.log('Email content:', emailContent);
 };

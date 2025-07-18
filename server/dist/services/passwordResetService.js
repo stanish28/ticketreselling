@@ -24,18 +24,18 @@ const sendPasswordResetEmail = async (email, name, token) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: '🔐 Reset Your FastPass Password',
+        subject: '🔐 Reset Your LayLow-India Password',
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
           <h1 style="margin: 0; font-size: 28px;">🔐 Password Reset Request</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">FastPass Account Security</p>
+          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">LayLow-India Account Security</p>
         </div>
         
         <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-top: 20px;">
           <h2 style="color: #333; margin-top: 0;">Hi ${name}!</h2>
           <p style="color: #666; line-height: 1.6;">
-            We received a request to reset your FastPass account password. If you didn't make this request, 
+            We received a request to reset your LayLow-India account password. If you didn't make this request, 
             you can safely ignore this email.
           </p>
           
@@ -62,7 +62,7 @@ const sendPasswordResetEmail = async (email, name, token) => {
         </div>
         
         <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
-          <p>Thank you for using FastPass!</p>
+          <p>Thank you for using LayLow-India!</p>
           <p>If you have any questions, please contact our support team.</p>
         </div>
       </div>

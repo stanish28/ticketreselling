@@ -23,18 +23,18 @@ const sendVerificationEmail = async (email, name, token) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: '🔐 Verify Your FastPass Account',
+        subject: '🔐 Verify Your LayLow-India Account',
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
-          <h1 style="margin: 0; font-size: 28px;">🔐 FastPass Account Verification</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Welcome to FastPass!</p>
+          <h1 style="margin: 0; font-size: 28px;">🔐 LayLow-India Account Verification</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Welcome to LayLow-India!</p>
         </div>
         
         <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-top: 20px;">
           <h2 style="color: #333; margin-top: 0;">Hi ${name}!</h2>
           <p style="color: #666; line-height: 1.6;">
-            Thank you for creating your FastPass account! To complete your registration and start buying and selling tickets, 
+            Thank you for creating your LayLow-India account! To complete your registration and start buying and selling tickets, 
             please verify your email address by clicking the button below.
           </p>
           
@@ -61,7 +61,7 @@ const sendVerificationEmail = async (email, name, token) => {
         </div>
         
         <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
-          <p>Thank you for choosing FastPass!</p>
+          <p>Thank you for choosing LayLow-India!</p>
           <p>If you have any questions, please contact our support team.</p>
         </div>
       </div>

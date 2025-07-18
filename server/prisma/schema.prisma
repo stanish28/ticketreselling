@@ -11,20 +11,20 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  phone     String?
-  password  String
-  role      UserRole @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  phone         String?
+  password      String
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
-  banned    Boolean  @default(false)
+  banned        Boolean   @default(false)
 
   // Relations
-  ticketsSold   Ticket[]   @relation("TicketSeller")
-  ticketsBought Ticket[]   @relation("TicketBuyer")
+  ticketsSold   Ticket[]        @relation("TicketSeller")
+  ticketsBought Ticket[]        @relation("TicketBuyer")
   bids          Bid[]
   purchases     Purchase[]
   listings      TicketListing[]
@@ -52,7 +52,7 @@ model Event {
 }
 
 model Ticket {
-  id          String        @id @default(cuid())
+  id          String       @id @default(cuid())
   eventId     String
   sellerId    String
   buyerId     String?
@@ -60,31 +60,31 @@ model Ticket {
   section     String?
   row         String?
   seat        String?
-  status      TicketStatus  @default(AVAILABLE)
-  listingType ListingType   @default(DIRECT_SALE)
-  endTime     DateTime?     // For bidding
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  ticketType  TicketType?   @default(SEATED)
+  status      TicketStatus @default(AVAILABLE)
+  listingType ListingType  @default(DIRECT_SALE)
+  endTime     DateTime? // For bidding
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  ticketType  TicketType?  @default(SEATED)
 
   // Relations
-  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  seller  User    @relation("TicketSeller", fields: [sellerId], references: [id])
-  buyer   User?   @relation("TicketBuyer", fields: [buyerId], references: [id])
-  bids    Bid[]
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  seller   User      @relation("TicketSeller", fields: [sellerId], references: [id])
+  buyer    User?     @relation("TicketBuyer", fields: [buyerId], references: [id])
+  bids     Bid[]
   purchase Purchase?
 
-  @@map("tickets")
   @@unique([eventId, section, row, seat])
+  @@map("tickets")
 }
 
 model Bid {
-  id        String      @id @default(cuid())
+  id        String    @id @default(cuid())
   ticketId  String
   bidderId  String
   amount    Float
-  status    BidStatus   @default(PENDING)
-  createdAt DateTime    @default(now())
+  status    BidStatus @default(PENDING)
+  createdAt DateTime  @default(now())
 
   // Relations
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
@@ -94,13 +94,13 @@ model Bid {
 }
 
 model Purchase {
-  id        String   @id @default(cuid())
-  ticketId  String   @unique
+  id        String         @id @default(cuid())
+  ticketId  String         @unique
   buyerId   String
   amount    Float
   status    PurchaseStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   // Relations
   ticket Ticket @relation(fields: [ticketId], references: [id])
@@ -158,4 +158,4 @@ enum BidStatus {
 enum TicketType {
   SEATED
   STANDING
-} 
+}

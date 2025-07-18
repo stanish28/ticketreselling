@@ -176,6 +176,84 @@ router.get('/verify-email', async (req, res) => {
         res.status(500).json({ error: 'Email verification failed' });
     }
 });
+router.post('/create-admin', [
+    (0, express_validator_1.body)('email').isEmail().normalizeEmail(),
+    (0, express_validator_1.body)('name').trim().isLength({ min: 2 }),
+    (0, express_validator_1.body)('password').isLength({ min: 6 })
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errors: errors.array() });
+            return;
+        }
+        const { email, name, password } = req.body;
+        const existingUser = await database_1.prisma.user.findUnique({
+            where: { email }
+        });
+        if (existingUser) {
+            const hashedPassword = await bcryptjs_1.default.hash(password, 12);
+            const updatedUser = await database_1.prisma.user.update({
+                where: { email },
+                data: {
+                    name,
+                    password: hashedPassword,
+                    role: 'ADMIN',
+                    emailVerified: new Date()
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    role: true,
+                    emailVerified: true,
+                    createdAt: true
+                }
+            });
+            const token = jsonwebtoken_1.default.sign({ userId: updatedUser.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            res.json({
+                success: true,
+                data: {
+                    user: updatedUser,
+                    token
+                },
+                message: 'User updated to admin successfully'
+            });
+            return;
+        }
+        const hashedPassword = await bcryptjs_1.default.hash(password, 12);
+        const user = await database_1.prisma.user.create({
+            data: {
+                email,
+                name,
+                password: hashedPassword,
+                role: 'ADMIN',
+                emailVerified: new Date()
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                emailVerified: true,
+                createdAt: true
+            }
+        });
+        const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        res.status(201).json({
+            success: true,
+            data: {
+                user,
+                token
+            },
+            message: 'Admin user created successfully'
+        });
+    }
+    catch (error) {
+        console.error('Create admin error:', error);
+        res.status(500).json({ error: 'Failed to create admin user' });
+    }
+});
 router.post('/resend-verification', [
     (0, express_validator_1.body)('email').isEmail().normalizeEmail()
 ], async (req, res) => {

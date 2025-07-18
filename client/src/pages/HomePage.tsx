@@ -948,23 +948,29 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-        {/* Quick Actions */}
-        <div className="flex flex-col gap-2">
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="flex flex-col gap-3">
           <Link
             to="/sell-ticket"
-            className="w-12 h-12 bg-[#FF6B35] text-white rounded-full shadow-lg hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group"
+            className="w-14 h-14 bg-[#FF6B35] text-white rounded-full shadow-xl hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
             aria-label="Sell your ticket"
           >
-            <span className="text-xl group-hover:rotate-12 transition-transform duration-300">📤</span>
+            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📤</span>
           </Link>
           <Link
             to="/events"
-            className="w-12 h-12 bg-[#D6A77A] text-white rounded-full shadow-lg hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group"
+            className="w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
             aria-label="Browse events"
           >
-            <span className="text-xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
+            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
           </Link>
+          <button
+            onClick={() => window.open('mailto:feedback@laylow-india.com?subject=Feedback for LayLow-India', '_blank')}
+            className="w-14 h-14 bg-[#4A90E2] text-white rounded-full shadow-xl hover:bg-[#357ABD] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
+            aria-label="Send feedback"
+          >
+            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">💬</span>
+          </button>
         </div>
       </div>
       
@@ -972,10 +978,10 @@ const HomePage: React.FC = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 w-12 h-12 bg-[#D6A77A] text-white rounded-full shadow-lg hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          className="fixed bottom-6 left-6 z-50 w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white"
           aria-label="Scroll to top"
         >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
           </svg>
         </button>
