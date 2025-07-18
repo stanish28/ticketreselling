@@ -133,6 +133,11 @@ server.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
 });
 
+
+setInterval(() => {
+  console.log("Server is alive...");
+}, 30000);
+
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
