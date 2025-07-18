@@ -1,4 +1,7 @@
 import 'dotenv/config';
+
+console.log("ALL ENV VARS:", JSON.stringify(process.env, null, 2));
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
