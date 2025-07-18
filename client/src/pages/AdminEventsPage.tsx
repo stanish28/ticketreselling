@@ -5,7 +5,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { CalendarIcon, MapPinIcon, UsersIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { eventsAPI } from '../services/api';
+import { eventsAPI } from '../services/api.ts';
 
 import { Event } from '../types';
 

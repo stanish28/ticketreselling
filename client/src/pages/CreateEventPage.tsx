@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
-import { eventsAPI } from '../services/api';
+import { eventsAPI } from '../services/api.ts';
 
 interface CreateEventFormData {
   title: string;
