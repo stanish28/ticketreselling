@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 */node_modules/
+client/node_modules/
 
 # Production builds
 client/build/
@@ -12,6 +13,7 @@ server/dist/
 *.cache
 client/node_modules/.cache/
 server/node_modules/.cache/
+client/.cache/
 
 # Environment variables
 .env
@@ -102,4 +104,4 @@ ehthumbs.db
 Thumbs.db
 
 # Prisma
-prisma/migrations/ 
+prisma/migrations/

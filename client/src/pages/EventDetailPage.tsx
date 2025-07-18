@@ -5,42 +5,8 @@ import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { CalendarIcon, MapPinIcon, UsersIcon, TicketIcon, CurrencyDollarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-
-interface Ticket {
-  id: string;
-  price: number;
-  section?: string;
-  row?: string;
-  seat?: string;
-  status: string;
-  listingType: string;
-  endTime?: string;
-  createdAt: string;
-  seller: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-  _count: {
-    bids: number;
-  };
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  venue: string;
-  date: string;
-  category: string;
-  capacity: number;
-  image?: string;
-  tickets: Ticket[];
-  _count: {
-    tickets: number;
-  };
-}
+import { eventsAPI } from '../services/api.ts';
+import { Event, Ticket } from '../types';
 
 const EventDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,14 +23,8 @@ const EventDetailPage: React.FC = () => {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${id}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch event');
-      }
-
-      const data = await response.json();
-      setEvent(data.data);
+      const data = await eventsAPI.getById(id!);
+      setEvent(data.data || null);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch event');
     } finally {
@@ -73,7 +33,7 @@ const EventDetailPage: React.FC = () => {
   };
 
   const getFilteredTickets = () => {
-    if (!event) return [];
+    if (!event || !event.tickets) return [];
     
     switch (filter) {
       case 'direct':
@@ -251,7 +211,7 @@ const EventDetailPage: React.FC = () => {
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                     <div className="flex items-center space-x-2">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getListingTypeColor(ticket.listingType)}`}>{ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}</span>
-                      {ticket.seller.role !== 'ADMIN' && (
+                      {ticket.seller?.role !== 'ADMIN' && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Resell</span>
                       )}
                     </div>
@@ -277,7 +237,7 @@ const EventDetailPage: React.FC = () => {
                         Ends {format(new Date(ticket.endTime), 'MMM dd, h:mm a')}
                       </div>
                     )}
-                    {ticket._count.bids > 0 && (
+                    {ticket._count?.bids && ticket._count.bids > 0 && (
                       <div className="text-sm text-gray-600 mt-1">
                         {ticket._count.bids} bid{ticket._count.bids !== 1 ? 's' : ''}
                       </div>

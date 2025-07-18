@@ -1,3 +1,8 @@
+import 'dotenv/config';
+
+console.log('Starting server...');
+console.log('Environment Variables:', JSON.stringify(process.env, null, 2));
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -27,7 +32,10 @@ const io = new Server(server, {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+if (!process.env.PORT) {
+  throw new Error('PORT env not set!');
+}
+const PORT = process.env.PORT;
 
 // Rate limiting
 const limiter = rateLimit({
@@ -37,7 +45,15 @@ const limiter = rateLimit({
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://ticketreselling.vercel.app',
+    'https://ticketreselling-d1mb24cys-stanish28s-projects.vercel.app',
+    'https://*.vercel.app'
+  ],
+  credentials: true
+}));
 app.use(morgan('combined'));
 // Temporarily disable rate limiting for development
 if (process.env.NODE_ENV === 'production') {
@@ -56,8 +72,10 @@ app.use('/api/password-reset', passwordResetRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
+  console.log('Health check requested'); // Add this line
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -117,28 +135,15 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-server.listen(PORT, () => {
+console.log("PORT ENV:", process.env.PORT, "PORT VAR:", PORT);
+server.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  await prisma.$disconnect();
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, shutting down gracefully');
-  await prisma.$disconnect();
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
+setInterval(() => {
+  console.log("Server is alive...");
+}, 30000);
 
 export { io }; 

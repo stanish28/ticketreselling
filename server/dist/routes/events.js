@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 router.get('/', async (req, res) => {
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
             };
         }
         const [events, total] = await Promise.all([
-            index_1.prisma.event.findMany({
+            database_1.prisma.event.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                     },
                 },
             }),
-            index_1.prisma.event.count({ where })
+            database_1.prisma.event.count({ where })
         ]);
         res.json({
             success: true,
@@ -75,7 +75,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const event = await index_1.prisma.event.findUnique({
+        const event = await database_1.prisma.event.findUnique({
             where: { id },
             include: {
                 tickets: {
@@ -132,7 +132,7 @@ router.post('/', [
         console.log('Processed event data:', eventData);
         let event;
         try {
-            event = await index_1.prisma.event.create({
+            event = await database_1.prisma.event.create({
                 data: eventData
             });
             console.log('Created event:', event);
@@ -172,7 +172,7 @@ router.put('/:id', [
         }
         const { id } = req.params;
         const updateData = req.body;
-        const event = await index_1.prisma.event.update({
+        const event = await database_1.prisma.event.update({
             where: { id },
             data: updateData
         });
@@ -190,7 +190,7 @@ router.put('/:id', [
 router.delete('/:id', [auth_1.authenticateToken, auth_1.requireAdmin], async (req, res) => {
     try {
         const { id } = req.params;
-        await index_1.prisma.event.delete({
+        await database_1.prisma.event.delete({
             where: { id }
         });
         res.json({
@@ -205,7 +205,7 @@ router.delete('/:id', [auth_1.authenticateToken, auth_1.requireAdmin], async (re
 });
 router.get('/categories', async (req, res) => {
     try {
-        const categories = await index_1.prisma.event.findMany({
+        const categories = await database_1.prisma.event.findMany({
             select: { category: true },
             distinct: ['category']
         });

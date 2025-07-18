@@ -3,7 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.io = exports.prisma = void 0;
+exports.io = void 0;
+require("dotenv/config");
+console.log('Starting server...');
+console.log('Environment Variables:', JSON.stringify(process.env, null, 2));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -12,7 +15,6 @@ const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const node_cron_1 = __importDefault(require("node-cron"));
-const client_1 = require("@prisma/client");
 const auth_1 = __importDefault(require("./routes/auth"));
 const events_1 = __importDefault(require("./routes/events"));
 const tickets_1 = __importDefault(require("./routes/tickets"));
@@ -31,9 +33,10 @@ const io = new socket_io_1.Server(server, {
     }
 });
 exports.io = io;
-const prisma = new client_1.PrismaClient();
-exports.prisma = prisma;
-const PORT = process.env.PORT || 5000;
+if (!process.env.PORT) {
+    throw new Error('PORT env not set!');
+}
+const PORT = process.env.PORT;
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000,
     max: 100
@@ -41,7 +44,9 @@ const limiter = (0, express_rate_limit_1.default)({
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)());
 app.use((0, morgan_1.default)('combined'));
-app.use(limiter);
+if (process.env.NODE_ENV === 'production') {
+    app.use(limiter);
+}
 app.use(express_1.default.json({ limit: '10mb' }));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/api/auth', auth_1.default);
@@ -51,6 +56,7 @@ app.use('/api/bids', bids_1.default);
 app.use('/api/admin', auth_2.authenticateToken, admin_1.default);
 app.use('/api/password-reset', passwordReset_1.default);
 app.get('/health', (req, res) => {
+    console.log('Health check requested');
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 io.on('connection', (socket) => {
@@ -96,24 +102,12 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
-server.listen(PORT, () => {
+console.log("PORT ENV:", process.env.PORT, "PORT VAR:", PORT);
+server.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
 });
-process.on('SIGTERM', async () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    await prisma.$disconnect();
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
-});
-process.on('SIGINT', async () => {
-    console.log('SIGINT received, shutting down gracefully');
-    await prisma.$disconnect();
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
-});
+setInterval(() => {
+    console.log("Server is alive...");
+}, 30000);
 //# sourceMappingURL=index.js.map

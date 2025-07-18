@@ -7,7 +7,7 @@ const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const auth_1 = require("../middleware/auth");
 const emailVerificationService_1 = require("../services/emailVerificationService");
 const router = (0, express_1.Router)();
@@ -33,7 +33,7 @@ router.post('/register', [
             return;
         }
         const { email, name, password, phone } = req.body;
-        const existingUser = await index_1.prisma.user.findUnique({
+        const existingUser = await database_1.prisma.user.findUnique({
             where: { email }
         });
         if (existingUser) {
@@ -46,7 +46,7 @@ router.post('/register', [
             return;
         }
         const hashedPassword = await bcryptjs_1.default.hash(password, 12);
-        const user = await index_1.prisma.user.create({
+        const user = await database_1.prisma.user.create({
             data: {
                 email,
                 name,
@@ -97,7 +97,7 @@ router.post('/login', [
             return;
         }
         const { email, password } = req.body;
-        const user = await index_1.prisma.user.findUnique({
+        const user = await database_1.prisma.user.findUnique({
             where: { email }
         });
         if (!user) {
@@ -199,6 +199,97 @@ router.post('/resend-verification', [
     catch (error) {
         console.error('Resend verification error:', error);
         res.status(500).json({ error: 'Failed to resend verification email' });
+    }
+});
+router.put('/profile', [
+    auth_1.authenticateToken,
+    (0, express_validator_1.body)('name').optional().trim().isLength({ min: 1, max: 100 }),
+    (0, express_validator_1.body)('email').optional().isEmail().normalizeEmail(),
+    (0, express_validator_1.body)('phone').optional().trim().isLength({ max: 20 })
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { name, email, phone } = req.body;
+        const userId = req.user.id;
+        if (email) {
+            const existingUser = await database_1.prisma.user.findFirst({
+                where: {
+                    email,
+                    id: { not: userId }
+                }
+            });
+            if (existingUser) {
+                return res.status(400).json({ error: 'Email is already taken' });
+            }
+        }
+        const updatedUser = await database_1.prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...(name && { name }),
+                ...(email && { email }),
+                ...(phone !== undefined && { phone: phone || null })
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                emailVerified: true,
+                banned: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        });
+        return res.json({
+            success: true,
+            data: { user: updatedUser },
+            message: 'Profile updated successfully'
+        });
+    }
+    catch (error) {
+        console.error('Update profile error:', error);
+        return res.status(500).json({ error: 'Failed to update profile' });
+    }
+});
+router.put('/change-password', [
+    auth_1.authenticateToken,
+    (0, express_validator_1.body)('currentPassword').notEmpty(),
+    (0, express_validator_1.body)('newPassword').isLength({ min: 6 })
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+        const user = await database_1.prisma.user.findUnique({
+            where: { id: userId }
+        });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const isCurrentPasswordValid = await bcryptjs_1.default.compare(currentPassword, user.password);
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({ error: 'Current password is incorrect' });
+        }
+        const hashedNewPassword = await bcryptjs_1.default.hash(newPassword, 12);
+        await database_1.prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedNewPassword }
+        });
+        return res.json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    }
+    catch (error) {
+        console.error('Change password error:', error);
+        return res.status(500).json({ error: 'Failed to change password' });
     }
 });
 exports.default = router;

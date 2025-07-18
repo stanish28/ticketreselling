@@ -5,23 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const auth_1 = require("../middleware/auth");
 const router = express_1.default.Router();
 router.get('/ticket/:ticketId', async (req, res) => {
     try {
         const { ticketId } = req.params;
-        const bids = await index_1.prisma.bid.findMany({
+        const bids = await database_1.prisma.bid.findMany({
             where: { ticketId },
-            include: {
-                bidder: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
-            },
             orderBy: { amount: 'desc' },
         });
         res.json({
@@ -46,7 +37,7 @@ router.post('/:ticketId', [
         const { ticketId } = req.params;
         const { amount } = req.body;
         const userId = req.user.id;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
                 event: true,
@@ -68,11 +59,11 @@ router.post('/:ticketId', [
         if (ticket.endTime && new Date() > ticket.endTime) {
             return res.status(400).json({ error: 'Auction has ended' });
         }
-        const highestBid = await index_1.prisma.bid.findFirst({
+        const highestBid = await database_1.prisma.bid.findFirst({
             where: { ticketId },
             orderBy: { amount: 'desc' },
         });
-        const existingUserBid = await index_1.prisma.bid.findFirst({
+        const existingUserBid = await database_1.prisma.bid.findFirst({
             where: {
                 ticketId,
                 bidderId: userId,
@@ -89,36 +80,18 @@ router.post('/:ticketId', [
         let bid;
         let message;
         if (existingUserBid) {
-            bid = await index_1.prisma.bid.update({
+            bid = await database_1.prisma.bid.update({
                 where: { id: existingUserBid.id },
                 data: { amount },
-                include: {
-                    bidder: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                        },
-                    },
-                },
             });
             message = 'Bid updated successfully';
         }
         else {
-            bid = await index_1.prisma.bid.create({
+            bid = await database_1.prisma.bid.create({
                 data: {
                     ticketId,
                     bidderId: userId,
                     amount,
-                },
-                include: {
-                    bidder: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                        },
-                    },
                 },
             });
             message = 'Bid placed successfully';
@@ -137,7 +110,7 @@ router.post('/:ticketId', [
 router.get('/user/me', auth_1.authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const bids = await index_1.prisma.bid.findMany({
+        const bids = await database_1.prisma.bid.findMany({
             where: { bidderId: userId },
             include: {
                 ticket: {
@@ -178,7 +151,7 @@ router.put('/:bidId/accept', auth_1.authenticateToken, async (req, res) => {
         const { bidId } = req.params;
         const userId = req.user.id;
         console.log(`Accepting offer ${bidId} for user ${userId}`);
-        const bid = await index_1.prisma.bid.findUnique({
+        const bid = await database_1.prisma.bid.findUnique({
             where: { id: bidId },
             include: {
                 ticket: {
@@ -208,14 +181,11 @@ router.put('/:bidId/accept', auth_1.authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Offer has already been processed' });
         }
         console.log('Starting transaction...');
-        const result = await index_1.prisma.$transaction(async (tx) => {
+        const result = await database_1.prisma.$transaction(async (tx) => {
             console.log('Updating bid status to ACCEPTED...');
             const updatedBid = await tx.bid.update({
                 where: { id: bidId },
                 data: { status: 'ACCEPTED' },
-                include: {
-                    bidder: true,
-                },
             });
             console.log('Updating ticket to SOLD...');
             const updatedTicket = await tx.ticket.update({
@@ -285,7 +255,7 @@ router.put('/:bidId/reject', auth_1.authenticateToken, async (req, res) => {
     try {
         const { bidId } = req.params;
         const userId = req.user.id;
-        const bid = await index_1.prisma.bid.findUnique({
+        const bid = await database_1.prisma.bid.findUnique({
             where: { id: bidId },
             include: {
                 ticket: true,
@@ -300,12 +270,9 @@ router.put('/:bidId/reject', auth_1.authenticateToken, async (req, res) => {
         if (bid.status !== 'PENDING') {
             return res.status(400).json({ error: 'Offer has already been processed' });
         }
-        const updatedBid = await index_1.prisma.bid.update({
+        const updatedBid = await database_1.prisma.bid.update({
             where: { id: bidId },
             data: { status: 'REJECTED' },
-            include: {
-                bidder: true,
-            },
         });
         return res.json({
             success: true,

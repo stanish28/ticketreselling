@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBidHistory = exports.validateBid = exports.getAuctionStatus = exports.processExpiredBids = void 0;
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const processExpiredBids = async (io) => {
     try {
         const now = new Date();
-        const expiredTickets = await index_1.prisma.ticket.findMany({
+        const expiredTickets = await database_1.prisma.ticket.findMany({
             where: {
                 status: 'AVAILABLE',
                 listingType: 'AUCTION',
@@ -41,7 +41,7 @@ const processExpiredBids = async (io) => {
             try {
                 if (ticket.bids.length > 0) {
                     const winningBid = ticket.bids[0];
-                    await index_1.prisma.purchase.create({
+                    await database_1.prisma.purchase.create({
                         data: {
                             ticketId: ticket.id,
                             buyerId: winningBid.bidderId,
@@ -49,7 +49,7 @@ const processExpiredBids = async (io) => {
                             status: 'COMPLETED'
                         }
                     });
-                    await index_1.prisma.ticket.update({
+                    await database_1.prisma.ticket.update({
                         where: { id: ticket.id },
                         data: {
                             buyerId: winningBid.bidderId,
@@ -65,7 +65,7 @@ const processExpiredBids = async (io) => {
                     console.log(`Auction ended for ticket ${ticket.id} - sold to ${winningBid.bidder.name} for $${winningBid.amount}`);
                 }
                 else {
-                    await index_1.prisma.ticket.update({
+                    await database_1.prisma.ticket.update({
                         where: { id: ticket.id },
                         data: {
                             status: 'EXPIRED'
@@ -87,7 +87,7 @@ const processExpiredBids = async (io) => {
 exports.processExpiredBids = processExpiredBids;
 const getAuctionStatus = async (ticketId) => {
     try {
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
                 bids: {
@@ -124,7 +124,7 @@ const getAuctionStatus = async (ticketId) => {
 exports.getAuctionStatus = getAuctionStatus;
 const validateBid = async (ticketId, bidderId, amount) => {
     try {
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
                 bids: {
@@ -169,7 +169,7 @@ const getBidHistory = async (ticketId, page = 1, limit = 20) => {
     try {
         const skip = (page - 1) * limit;
         const [bids, total] = await Promise.all([
-            index_1.prisma.bid.findMany({
+            database_1.prisma.bid.findMany({
                 where: { ticketId },
                 skip,
                 take: limit,
@@ -184,7 +184,7 @@ const getBidHistory = async (ticketId, page = 1, limit = 20) => {
                     }
                 }
             }),
-            index_1.prisma.bid.count({ where: { ticketId } })
+            database_1.prisma.bid.count({ where: { ticketId } })
         ]);
         return {
             bids,
