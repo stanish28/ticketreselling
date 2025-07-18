@@ -118,6 +118,7 @@ app.use('*', (req, res) => {
 });
 
 // Start server
+console.log("PORT ENV:", process.env.PORT, "PORT VAR:", PORT);
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
