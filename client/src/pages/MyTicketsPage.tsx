@@ -61,18 +61,12 @@ const MyTicketsPage: React.FC = () => {
 
   const fetchMyTickets = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/tickets/my', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch tickets');
+      const response = await ticketsAPI.getMyTickets();
+      if (response.success) {
+        setTickets((response.data || []) as PurchasedTicket[]);
+      } else {
+        toast.error(response.message || 'Failed to fetch tickets');
       }
-
-      const data = await response.json();
-      setTickets(data.data || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch tickets');
     } finally {
@@ -152,7 +146,9 @@ const MyTicketsPage: React.FC = () => {
   const handleCancelListing = async (ticketId: string) => {
     setCancellingListing(ticketId);
     try {
-      const response = await fetch(`http://localhost:3001/api/tickets/${ticketId}/cancel-listing`, {
+      // Note: This endpoint might not exist in the API service yet
+      // For now, we'll keep the fetch call but update the URL
+      const response = await fetch(`https://ticketreselling-production.up.railway.app/api/tickets/${ticketId}/cancel-listing`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -276,7 +272,9 @@ const MyTicketsPage: React.FC = () => {
 
     setResellLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/tickets/${resellTicket.id}/resell`, {
+      // Note: This endpoint might not exist in the API service yet
+      // For now, we'll keep the fetch call but update the URL
+      const response = await fetch(`https://ticketreselling-production.up.railway.app/api/tickets/${resellTicket.id}/resell`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
