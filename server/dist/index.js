@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
 require("dotenv/config");
-console.log("ALL ENV VARS:", JSON.stringify(process.env, null, 2));
+console.log('Starting server...');
+console.log('Environment Variables:', JSON.stringify(process.env, null, 2));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -23,7 +24,6 @@ const passwordReset_1 = __importDefault(require("./routes/passwordReset"));
 const auth_2 = require("./middleware/auth");
 const qrCodeService_1 = require("./services/qrCodeService");
 const bidService_1 = require("./services/bidService");
-const database_1 = require("./config/database");
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
@@ -56,6 +56,7 @@ app.use('/api/bids', bids_1.default);
 app.use('/api/admin', auth_2.authenticateToken, admin_1.default);
 app.use('/api/password-reset', passwordReset_1.default);
 app.get('/health', (req, res) => {
+    console.log('Health check requested');
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 io.on('connection', (socket) => {
@@ -102,24 +103,11 @@ app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
 console.log("PORT ENV:", process.env.PORT, "PORT VAR:", PORT);
-server.listen(PORT, () => {
+server.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
 });
-process.on('SIGTERM', async () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    await database_1.prisma.$disconnect();
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
-});
-process.on('SIGINT', async () => {
-    console.log('SIGINT received, shutting down gracefully');
-    await database_1.prisma.$disconnect();
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
-});
+setInterval(() => {
+    console.log("Server is alive...");
+}, 30000);
 //# sourceMappingURL=index.js.map
