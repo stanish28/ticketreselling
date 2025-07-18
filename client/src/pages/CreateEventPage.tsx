@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
+import { eventsAPI } from '../services/api';
 
 interface CreateEventFormData {
   title: string;
@@ -51,22 +52,7 @@ const CreateEventPage: React.FC = () => {
       
       console.log('Sending event data:', eventData); // Debug log
       
-      const response = await fetch('http://localhost:3001/api/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(eventData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error:', errorData); // Debug log
-        throw new Error(errorData.error || 'Failed to create event');
-      }
-
-      const result = await response.json();
+      const result = await eventsAPI.create(eventData);
       console.log('Success response:', result); // Debug log
       
       toast.success('Event created successfully!');

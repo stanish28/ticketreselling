@@ -5,21 +5,9 @@ import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { CalendarIcon, MapPinIcon, UsersIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { eventsAPI } from '../services/api';
 
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  venue: string;
-  date: string;
-  category: string;
-  capacity: number;
-  image?: string;
-  createdAt: string;
-  _count: {
-    tickets: number;
-  };
-}
+import { Event } from '../types';
 
 const AdminEventsPage: React.FC = () => {
   const { user } = useAuth();
@@ -33,17 +21,7 @@ const AdminEventsPage: React.FC = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/events', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch events');
-      }
-
-      const data = await response.json();
+      const data = await eventsAPI.getAll();
       console.log('API Response:', data); // Debug log
       
       // Handle the correct API response structure
@@ -69,17 +47,7 @@ const AdminEventsPage: React.FC = () => {
 
     setDeletingEvent(eventId);
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete event');
-      }
-
+      await eventsAPI.delete(eventId);
       toast.success('Event deleted successfully');
       setEvents(events.filter(event => event.id !== eventId));
     } catch (error: any) {
@@ -195,7 +163,7 @@ const AdminEventsPage: React.FC = () => {
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
                       <UsersIcon className="h-4 w-4 mr-2" />
-                      {event._count.tickets} tickets • Capacity: {event.capacity}
+                      {event._count?.tickets || 0} tickets • Capacity: {event.capacity}
                     </div>
                   </div>
                   
