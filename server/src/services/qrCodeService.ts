@@ -114,7 +114,7 @@ const sendQRCodeEmail = async (
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
-          <h1 style="margin: 0; font-size: 28px;">🎫 FastPass Ticket</h1>
+          <h1 style="margin: 0; font-size: 28px;">🎫 LayLow-India Ticket</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Your QR code is ready!</p>
         </div>
         
@@ -149,7 +149,7 @@ const sendQRCodeEmail = async (
         </div>
         
         <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
-          <p>Thank you for using FastPass!</p>
+          <p>Thank you for using LayLow-India!</p>
           <p>If you have any questions, please contact our support team.</p>
         </div>
       </div>

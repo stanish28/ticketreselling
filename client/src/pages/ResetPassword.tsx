@@ -96,7 +96,7 @@ const ResetPassword: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4">
-            <span className="text-2xl font-bold text-white">FP</span>
+            <span className="text-2xl font-bold text-white">L</span>
           </div>
           <div className="flex items-center justify-center">
             <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@ const ResetPassword: React.FC = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4">
-            <span className="text-2xl font-bold text-white">FP</span>
+            <span className="text-2xl font-bold text-white">L</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Reset Password</h1>
           <p className="text-purple-200">Enter your new password</p>

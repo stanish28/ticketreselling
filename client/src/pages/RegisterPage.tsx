@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import toast from 'react-hot-toast';
@@ -14,8 +14,7 @@ interface RegisterFormData {
 }
 
 const RegisterPage: React.FC = () => {
-  const { register: registerUser, user } = useAuth();
-  const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [showAccountExistsAlert, setShowAccountExistsAlert] = useState(false);
@@ -28,6 +27,11 @@ const RegisterPage: React.FC = () => {
   } = useForm<RegisterFormData>();
 
   const password = watch('password');
+
+  // Debug logging
+  useEffect(() => {
+    console.log('RegisterPage rendered - all fields should be visible');
+  }, []);
 
   // Show success message after registration
   useEffect(() => {
@@ -95,8 +99,8 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white font-sans py-8 px-4">
-      <div className="max-w-md w-full space-y-8 bg-[#F5F5DC] rounded-2xl shadow-lg p-10 border border-gray-200">
-        <div className="flex flex-col items-center">
+      <div className="max-w-md w-full bg-[#F5F5DC] rounded-2xl shadow-lg p-10 border border-gray-200">
+        <div className="flex flex-col items-center mb-8">
           {/* Orange ticket icon SVG */}
           <svg className="w-12 h-12 text-[#FF6B35] mb-4" fill="currentColor" viewBox="0 0 24 24">
             <rect x="3" y="7" width="18" height="10" rx="3"/>
@@ -154,8 +158,9 @@ const RegisterPage: React.FC = () => {
           </div>
         )}
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-5">
+            {/* Full Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-bold text-gray-900 mb-2">
                 Full Name
@@ -179,6 +184,7 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
 
+            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-bold text-gray-900 mb-2">
                 Email address
@@ -202,6 +208,7 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
 
+            {/* Phone Field */}
             <div>
               <label htmlFor="phone" className="block text-sm font-bold text-gray-900 mb-2">
                 Phone Number (Optional)
@@ -216,6 +223,7 @@ const RegisterPage: React.FC = () => {
               />
             </div>
             
+            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-bold text-gray-900 mb-2">
                 Password
@@ -239,6 +247,7 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
 
+            {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-900 mb-2">
                 Confirm Password
