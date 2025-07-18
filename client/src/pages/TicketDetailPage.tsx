@@ -5,46 +5,8 @@ import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { CalendarIcon, MapPinIcon, CurrencyDollarIcon, UserIcon, ClockIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-
-interface Ticket {
-  id: string;
-  price: number;
-  section?: string;
-  row?: string;
-  seat?: string;
-  status: string;
-  listingType: string;
-  endTime?: string;
-  createdAt: string;
-  event: {
-    id: string;
-    title: string;
-    venue: string;
-    date: string;
-    image?: string;
-    category: string;
-  };
-  seller: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-  _count: {
-    bids: number;
-  };
-}
-
-interface Bid {
-  id: string;
-  amount: number;
-  createdAt: string;
-  bidder: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
+import { ticketsAPI, bidsAPI } from '../services/api.ts';
+import { Ticket, Bid } from '../types';
 
 const TicketDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -67,17 +29,11 @@ const TicketDetailPage: React.FC = () => {
 
   const fetchTicketDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/tickets/${id}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch ticket details');
-      }
-
-      const data = await response.json();
-      setTicket(data.data);
+      const data = await ticketsAPI.getById(id!);
+      setTicket(data.data || null);
 
       // If it's an auction, fetch bids
-      if (data.data.listingType === 'AUCTION') {
+      if (data.data?.listingType === 'AUCTION') {
         fetchBids();
       }
     } catch (error: any) {
@@ -89,19 +45,16 @@ const TicketDetailPage: React.FC = () => {
 
   const fetchBids = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/bids/ticket/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setBids(data.data || []);
-        
-        // Calculate minimum bid amount (10% higher than highest bid)
-        if (data.data && data.data.length > 0) {
-          const highestBid = data.data[0]; // Bids are ordered by amount desc
-          const minAmount = Math.max(1, highestBid.amount * 1.1);
-          setMinBidAmount(minAmount);
-        } else {
-          setMinBidAmount(1);
-        }
+      const data = await bidsAPI.getTicketBids(id!);
+      setBids(data.data || []);
+      
+      // Calculate minimum bid amount (10% higher than highest bid)
+      if (data.data && data.data.length > 0) {
+        const highestBid = data.data[0]; // Bids are ordered by amount desc
+        const minAmount = Math.max(1, highestBid.amount * 1.1);
+        setMinBidAmount(minAmount);
+      } else {
+        setMinBidAmount(1);
       }
     } catch (error) {
       console.error('Failed to fetch bids:', error);
@@ -124,21 +77,7 @@ const TicketDetailPage: React.FC = () => {
         cvv: '123'
       };
 
-      const response = await fetch(`http://localhost:3001/api/tickets/${id}/purchase`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(purchaseData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to purchase ticket');
-      }
-
-      const result = await response.json();
+      const result = await ticketsAPI.purchase(id!, purchaseData);
       toast.success('Ticket purchased successfully!');
       
       // Refresh navbar ticket count
@@ -169,21 +108,7 @@ const TicketDetailPage: React.FC = () => {
 
     setPlacingBid(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/bids/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ amount }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to place bid');
-      }
-
-      const responseData = await response.json();
+      const responseData = await bidsAPI.placeBid(id!, { amount });
       toast.success(responseData.message || 'Bid placed successfully!');
       setBidAmount('');
       fetchBids(); // Refresh bids
@@ -253,7 +178,7 @@ const TicketDetailPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to={`/events/${ticket.event.id}`}
+            to={`/events/${ticket.event?.id}`}
             className="text-[#FF6B35] hover:text-[#E55A2B] mb-4 inline-flex items-center text-lg"
           >
             ← Back to Event
@@ -265,7 +190,7 @@ const TicketDetailPage: React.FC = () => {
           {/* Ticket Information */}
           <div className="lg:col-span-2">
             <div className="bg-[#F5F5DC] shadow-lg rounded-2xl overflow-hidden border border-gray-200">
-              {ticket.event.image && (
+              {ticket.event?.image && (
                 <img
                   src={ticket.event.image}
                   alt={ticket.event.title}
@@ -277,20 +202,20 @@ const TicketDetailPage: React.FC = () => {
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                   <div className="flex items-center space-x-2">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getListingTypeColor(ticket.listingType)}`}>{isAuction ? 'Auction' : 'Direct Sale'}</span>
-                    {ticket.seller.role !== 'ADMIN' && (
+                    {ticket.seller?.role !== 'ADMIN' && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">Resell Ticket</span>
                     )}
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{ticket.event.title}</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{ticket.event?.title}</h2>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center text-gray-700">
                     <CalendarIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
-                    <span className="text-lg">{format(new Date(ticket.event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}</span>
+                    <span className="text-lg">{format(new Date(ticket.event?.date || ''), 'EEEE, MMMM dd, yyyy - h:mm a')}</span>
                   </div>
                   <div className="flex items-center text-gray-700">
                     <MapPinIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
-                    <span className="text-lg">{ticket.event.venue}</span>
+                    <span className="text-lg">{ticket.event?.venue}</span>
                   </div>
                   <div className="flex items-center text-gray-700">
                     <TicketIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
@@ -302,7 +227,7 @@ const TicketDetailPage: React.FC = () => {
                   </div>
                   <div className="flex items-center text-gray-700">
                     <UserIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
-                    <span className="text-lg">Sold by <span className="font-bold text-gray-900">{ticket.seller.name}</span></span>
+                    <span className="text-lg">Sold by <span className="font-bold text-gray-900">{ticket.seller?.name || 'Unknown'}</span></span>
                   </div>
                 </div>
                 {/* Price Section */}
