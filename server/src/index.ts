@@ -64,8 +64,10 @@ app.use('/api/password-reset', passwordResetRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
+  console.log('Health check requested'); // Add this line
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
