@@ -4,8 +4,10 @@ export interface User {
   name: string;
   phone: string | null;
   role: 'USER' | 'ADMIN';
+  emailVerified: string | null;
   createdAt: string;
   updatedAt: string;
+  banned?: boolean;
   _count?: {
     ticketsSold: number;
     purchases: number;
@@ -53,6 +55,7 @@ export interface Ticket {
   _count?: {
     bids: number;
   };
+  ticketType?: 'SEATED' | 'STANDING';
 }
 
 export interface Bid {

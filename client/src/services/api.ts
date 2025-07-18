@@ -57,6 +57,12 @@ export const authAPI = {
 
   getCurrentUser: (): Promise<ApiResponse<User>> =>
     api.get('/auth/me').then(res => res.data),
+
+  verifyEmail: (token: string): Promise<ApiResponse<{ message: string }>> =>
+    api.get(`/auth/verify-email?token=${token}`).then(res => res.data),
+
+  resendVerification: (email: string): Promise<ApiResponse<{ message: string }>> =>
+    api.post('/auth/resend-verification', { email }).then(res => res.data),
 };
 
 // Events API
@@ -115,6 +121,9 @@ export const bidsAPI = {
   getAuctionStatus: (ticketId: string): Promise<ApiResponse<any>> =>
     api.get(`/bids/ticket/${ticketId}`).then(res => res.data),
 
+  getTicketBids: (ticketId: string): Promise<ApiResponse<Bid[]>> =>
+    api.get(`/bids/ticket/${ticketId}`).then(res => res.data),
+
   getMyBids: (): Promise<ApiResponse<Bid[]>> =>
     api.get('/bids/my-bids').then(res => res.data),
 
@@ -165,6 +174,9 @@ export const adminAPI = {
 
   getRevenueAnalytics: (params?: { period?: string }): Promise<ApiResponse<any>> =>
     api.get('/admin/analytics/revenue', { params }).then(res => res.data),
+
+  banUser: (id: string, banned: boolean): Promise<ApiResponse<User>> =>
+    api.patch(`/admin/users/${id}/ban`, { banned }).then(res => res.data),
 };
 
 export default api; 

@@ -92,6 +92,7 @@ router.get('/users', async (req, res) => {
                     phone: true,
                     role: true,
                     createdAt: true,
+                    banned: true,
                     _count: {
                         select: {
                             ticketsSold: true,
@@ -150,6 +151,7 @@ router.put('/users/:id', [
                 phone: true,
                 role: true,
                 createdAt: true,
+                banned: true,
                 _count: {
                     select: {
                         ticketsSold: true,
@@ -198,6 +200,40 @@ router.delete('/users/:id', async (req, res) => {
     catch (error) {
         console.error('Delete user error:', error);
         return res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+router.patch('/users/:id/ban', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { banned } = req.body;
+        if (typeof banned !== 'boolean') {
+            res.status(400).json({ error: 'Missing or invalid banned value' });
+            return;
+        }
+        if (req.user && req.user.id === id) {
+            res.status(400).json({ error: 'You cannot ban/unban yourself' });
+            return;
+        }
+        const user = await index_1.prisma.user.findUnique({ where: { id } });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+        if (user.role === 'ADMIN') {
+            res.status(403).json({ error: 'Cannot ban/unban another admin' });
+            return;
+        }
+        const updated = await index_1.prisma.user.update({
+            where: { id },
+            data: { banned }
+        });
+        res.json({ success: true, user: updated, message: banned ? 'User banned' : 'User unbanned' });
+        return;
+    }
+    catch (error) {
+        console.error('Ban/unban user error:', error);
+        res.status(500).json({ error: 'Failed to update user ban status' });
+        return;
     }
 });
 router.post('/events', [

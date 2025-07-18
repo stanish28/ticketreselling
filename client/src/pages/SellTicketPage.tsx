@@ -16,7 +16,8 @@ const SellTicketPage: React.FC = () => {
     listingType: 'DIRECT_SALE' as ListingType,
     section: '',
     row: '',
-    seat: ''
+    seat: '',
+    endTime: '',
   });
 
   const navigate = useNavigate();
@@ -40,10 +41,11 @@ const SellTicketPage: React.FC = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'listingType' ? (value as ListingType) : value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,14 +59,18 @@ const SellTicketPage: React.FC = () => {
     }
 
     try {
-      const response = await ticketsAPI.create({
+      const ticketData: any = {
         ...formData,
         price: parseFloat(formData.price)
-      });
+      };
+      if (formData.listingType !== 'AUCTION') {
+        delete ticketData.endTime;
+      }
+      const response = await ticketsAPI.create(ticketData);
 
       if (response.success) {
         toast.success('Ticket listed successfully!');
-        navigate('/my-listings');
+        navigate('/my-tickets');
       } else {
         toast.error(response.message || 'Failed to list ticket.');
       }
@@ -100,7 +106,7 @@ const SellTicketPage: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price ($)</label>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price (₹)</label>
             <input
               type="number"
               id="price"
@@ -128,6 +134,21 @@ const SellTicketPage: React.FC = () => {
               <option value="AUCTION">Auction</option>
             </select>
           </div>
+
+          {formData.listingType === 'AUCTION' && (
+            <div>
+              <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">Auction End Time</label>
+              <input
+                type="datetime-local"
+                id="endTime"
+                name="endTime"
+                value={formData.endTime}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

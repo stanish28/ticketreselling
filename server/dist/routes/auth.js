@@ -9,6 +9,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_validator_1 = require("express-validator");
 const index_1 = require("../index");
 const auth_1 = require("../middleware/auth");
+const emailVerificationService_1 = require("../services/emailVerificationService");
 const router = (0, express_1.Router)();
 router.post('/register', [
     (0, express_validator_1.body)('email').isEmail().normalizeEmail(),
@@ -36,7 +37,12 @@ router.post('/register', [
             where: { email }
         });
         if (existingUser) {
-            res.status(400).json({ error: 'User already exists' });
+            res.status(400).json({
+                error: 'Account already exists',
+                code: 'USER_ALREADY_EXISTS',
+                message: 'An account with this email already exists. Please sign in or reset your password.',
+                actions: ['signin', 'reset_password']
+            });
             return;
         }
         const hashedPassword = await bcryptjs_1.default.hash(password, 12);
@@ -45,7 +51,8 @@ router.post('/register', [
                 email,
                 name,
                 password: hashedPassword,
-                phone: phone && phone.trim() !== '' ? phone : null
+                phone: phone && phone.trim() !== '' ? phone : null,
+                emailVerified: null
             },
             select: {
                 id: true,
@@ -53,9 +60,17 @@ router.post('/register', [
                 name: true,
                 phone: true,
                 role: true,
+                emailVerified: true,
                 createdAt: true
             }
         });
+        try {
+            const verificationToken = (0, emailVerificationService_1.generateVerificationToken)(user.id);
+            await (0, emailVerificationService_1.sendVerificationEmail)(email, name, verificationToken);
+        }
+        catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+        }
         const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({
             success: true,
@@ -63,7 +78,7 @@ router.post('/register', [
                 user,
                 token
             },
-            message: 'User registered successfully'
+            message: 'User registered successfully. Please check your email to verify your account.'
         });
     }
     catch (error) {
@@ -89,9 +104,25 @@ router.post('/login', [
             res.status(401).json({ error: 'Invalid credentials' });
             return;
         }
+        if (user.banned) {
+            res.status(403).json({
+                error: 'Your account has been banned',
+                code: 'USER_BANNED',
+                message: 'Your account has been banned. Please contact support if you believe this is a mistake.'
+            });
+            return;
+        }
         const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
         if (!isPasswordValid) {
             res.status(401).json({ error: 'Invalid credentials' });
+            return;
+        }
+        if (!user.emailVerified && user.role !== 'ADMIN') {
+            res.status(403).json({
+                error: 'Email verification required',
+                code: 'EMAIL_NOT_VERIFIED',
+                message: 'Please verify your email address before logging in'
+            });
             return;
         }
         const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -121,6 +152,53 @@ router.get('/me', auth_1.authenticateToken, async (req, res) => {
     catch (error) {
         console.error('Get user error:', error);
         res.status(500).json({ error: 'Failed to get user data' });
+    }
+});
+router.get('/verify-email', async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token || typeof token !== 'string') {
+            res.status(400).json({ error: 'Verification token is required' });
+            return;
+        }
+        const result = await (0, emailVerificationService_1.verifyEmailToken)(token);
+        if (!result.success) {
+            res.status(400).json({ error: result.error });
+            return;
+        }
+        res.json({
+            success: true,
+            message: 'Email verified successfully! You can now log in to your account.'
+        });
+    }
+    catch (error) {
+        console.error('Email verification error:', error);
+        res.status(500).json({ error: 'Email verification failed' });
+    }
+});
+router.post('/resend-verification', [
+    (0, express_validator_1.body)('email').isEmail().normalizeEmail()
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errors: errors.array() });
+            return;
+        }
+        const { email } = req.body;
+        const result = await (0, emailVerificationService_1.resendVerificationEmail)(email);
+        if (!result.success) {
+            res.status(400).json({ error: result.error });
+            return;
+        }
+        res.json({
+            success: true,
+            message: 'Verification email sent successfully. Please check your inbox.'
+        });
+    }
+    catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({ error: 'Failed to resend verification email' });
     }
 });
 exports.default = router;

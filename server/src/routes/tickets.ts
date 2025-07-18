@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 import { authenticateToken, optionalAuth } from '../middleware/auth';
 import { AuthenticatedRequest, CreateTicketRequest } from '../types';
 import { processPayment } from '../utils/payment';
@@ -598,21 +598,33 @@ router.put('/:id/resell', authenticateToken, async (req: AuthenticatedRequest, r
       return res.status(403).json({ error: 'You are not the owner of this ticket' });
     }
 
-    // Only allow price and listingType to be changed
-    const updatedTicket = await prisma.ticket.update({
-      where: { id },
-      data: {
-        price: price,
-        listingType: listingType,
-        status: 'AVAILABLE',
-        buyerId: null,
-        sellerId: userId,
-      },
-      include: {
-        event: true,
-        seller: true,
-      },
+    // Use a transaction to update ticket and clear all previous bids
+    const result = await prisma.$transaction(async (tx) => {
+      // Clear all previous bids for this ticket
+      await tx.bid.deleteMany({
+        where: { ticketId: id },
+      });
+
+      // Update the ticket
+      const updatedTicket = await tx.ticket.update({
+        where: { id },
+        data: {
+          price: price,
+          listingType: listingType,
+          status: 'AVAILABLE',
+          buyerId: null,
+          sellerId: userId,
+        },
+        include: {
+          event: true,
+          seller: true,
+        },
+      });
+
+      return updatedTicket;
     });
+
+    const updatedTicket = result;
 
     return res.json({
       success: true,

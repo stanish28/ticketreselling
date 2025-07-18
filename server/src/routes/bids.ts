@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { prisma } from '../index';
+import { prisma } from '../config/database';
 import { authenticateToken } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
 
@@ -13,15 +13,6 @@ router.get('/ticket/:ticketId', async (req: Request, res: Response) => {
 
     const bids = await prisma.bid.findMany({
       where: { ticketId },
-      include: {
-        bidder: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
       orderBy: { amount: 'desc' },
     });
 
@@ -86,36 +77,51 @@ router.post('/:ticketId', [
       orderBy: { amount: 'desc' },
     });
 
-    // Validate bid amount - allow any price for offers
-    const minBidAmount = 1; // Minimum $1 offer
+    // Check if user already has a bid on this ticket
+    const existingUserBid = await prisma.bid.findFirst({
+      where: {
+        ticketId,
+        bidderId: userId,
+        status: 'PENDING',
+      },
+    });
+
+    // Calculate minimum bid amount (10% higher than current highest bid)
+    const currentHighestAmount = highestBid?.amount || 0;
+    const minBidAmount = Math.max(1, currentHighestAmount * 1.1); // At least 10% higher
+
     if (amount < minBidAmount) {
       return res.status(400).json({ 
-        error: `Offer must be at least $${minBidAmount.toFixed(2)}` 
+        error: `Bid must be at least ₹${minBidAmount.toFixed(2)} (10% higher than current highest bid)` 
       });
     }
 
-    // Create the bid
-    const bid = await prisma.bid.create({
-      data: {
-        ticketId,
-        bidderId: userId,
-        amount,
-      },
-      include: {
-        bidder: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+    let bid;
+    let message;
+
+    if (existingUserBid) {
+      // Update existing bid
+      bid = await prisma.bid.update({
+        where: { id: existingUserBid.id },
+        data: { amount },
+      });
+      message = 'Bid updated successfully';
+    } else {
+      // Create new bid
+      bid = await prisma.bid.create({
+        data: {
+          ticketId,
+          bidderId: userId,
+          amount,
         },
-      },
-    });
+      });
+      message = 'Bid placed successfully';
+    }
 
     return res.status(201).json({
       success: true,
       data: bid,
-      message: 'Bid placed successfully',
+      message,
     });
   } catch (error) {
     console.error('Place bid error:', error);
@@ -221,9 +227,6 @@ router.put('/:bidId/accept', authenticateToken, async (req: AuthenticatedRequest
       const updatedBid = await tx.bid.update({
         where: { id: bidId },
         data: { status: 'ACCEPTED' },
-        include: {
-          bidder: true,
-        },
       });
 
       console.log('Updating ticket to SOLD...');
@@ -262,16 +265,25 @@ router.put('/:bidId/accept', authenticateToken, async (req: AuthenticatedRequest
           buyerId: bid.bidderId,
           amount: bid.amount,
           status: 'COMPLETED',
+          updatedAt: new Date(),
         },
         create: {
           ticketId: bid.ticketId,
           buyerId: bid.bidderId,
           amount: bid.amount,
           status: 'COMPLETED',
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
       console.log('Transaction completed successfully');
+      console.log('Updated ticket:', {
+        id: updatedTicket.id,
+        status: updatedTicket.status,
+        buyerId: updatedTicket.buyerId,
+        sellerId: updatedTicket.sellerId
+      });
       return { updatedBid, updatedTicket };
     });
 
@@ -280,6 +292,7 @@ router.put('/:bidId/accept', authenticateToken, async (req: AuthenticatedRequest
       success: true,
       data: result,
       message: 'Offer accepted successfully',
+      buyerNotification: `Congratulations! Your offer of ₹${bid.amount} for ${bid.ticket.event.title} has been accepted. Check your "My Tickets" page to view your purchased ticket.`,
     });
   } catch (error) {
     console.error('Accept offer error:', error);
@@ -319,9 +332,6 @@ router.put('/:bidId/reject', authenticateToken, async (req: AuthenticatedRequest
     const updatedBid = await prisma.bid.update({
       where: { id: bidId },
       data: { status: 'REJECTED' },
-      include: {
-        bidder: true,
-      },
     });
 
     return res.json({

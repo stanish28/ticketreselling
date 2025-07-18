@@ -535,20 +535,27 @@ router.put('/:id/resell', auth_1.authenticateToken, async (req, res) => {
         if (ticket.buyerId !== userId) {
             return res.status(403).json({ error: 'You are not the owner of this ticket' });
         }
-        const updatedTicket = await index_1.prisma.ticket.update({
-            where: { id },
-            data: {
-                price: price,
-                listingType: listingType,
-                status: 'AVAILABLE',
-                buyerId: null,
-                sellerId: userId,
-            },
-            include: {
-                event: true,
-                seller: true,
-            },
+        const result = await index_1.prisma.$transaction(async (tx) => {
+            await tx.bid.deleteMany({
+                where: { ticketId: id },
+            });
+            const updatedTicket = await tx.ticket.update({
+                where: { id },
+                data: {
+                    price: price,
+                    listingType: listingType,
+                    status: 'AVAILABLE',
+                    buyerId: null,
+                    sellerId: userId,
+                },
+                include: {
+                    event: true,
+                    seller: true,
+                },
+            });
+            return updatedTicket;
         });
+        const updatedTicket = result;
         return res.json({
             success: true,
             data: updatedTicket,

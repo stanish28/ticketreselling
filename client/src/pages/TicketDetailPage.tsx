@@ -57,6 +57,7 @@ const TicketDetailPage: React.FC = () => {
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [placingBid, setPlacingBid] = useState(false);
+  const [minBidAmount, setMinBidAmount] = useState(1);
 
   useEffect(() => {
     if (id) {
@@ -92,6 +93,15 @@ const TicketDetailPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setBids(data.data || []);
+        
+        // Calculate minimum bid amount (10% higher than highest bid)
+        if (data.data && data.data.length > 0) {
+          const highestBid = data.data[0]; // Bids are ordered by amount desc
+          const minAmount = Math.max(1, highestBid.amount * 1.1);
+          setMinBidAmount(minAmount);
+        } else {
+          setMinBidAmount(1);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch bids:', error);
@@ -102,6 +112,7 @@ const TicketDetailPage: React.FC = () => {
     e.preventDefault();
     if (!user) {
       toast.error('Please login to purchase tickets');
+      navigate('/login');
       return;
     }
 
@@ -172,7 +183,8 @@ const TicketDetailPage: React.FC = () => {
         throw new Error(errorData.error || 'Failed to place bid');
       }
 
-      toast.success('Bid placed successfully!');
+      const responseData = await response.json();
+      toast.success(responseData.message || 'Bid placed successfully!');
       setBidAmount('');
       fetchBids(); // Refresh bids
     } catch (error: any) {
@@ -208,7 +220,7 @@ const TicketDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -216,13 +228,13 @@ const TicketDetailPage: React.FC = () => {
 
   if (!ticket) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Ticket Not Found</h2>
-          <p className="text-gray-600">The ticket you're looking for doesn't exist.</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ticket Not Found</h2>
+          <p className="text-xl text-gray-600">The ticket you're looking for doesn't exist.</p>
           <Link
             to="/tickets"
-            className="mt-4 inline-block text-blue-600 hover:text-blue-700"
+            className="mt-4 inline-block text-[#FF6B35] hover:text-[#E55A2B] text-lg"
           >
             ← Back to Tickets
           </Link>
@@ -236,23 +248,23 @@ const TicketDetailPage: React.FC = () => {
   const isExpired = ticket.endTime && new Date(ticket.endTime) < new Date();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link
             to={`/events/${ticket.event.id}`}
-            className="text-blue-600 hover:text-blue-700 mb-4 inline-flex items-center"
+            className="text-[#FF6B35] hover:text-[#E55A2B] mb-4 inline-flex items-center text-lg"
           >
             ← Back to Event
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Ticket Details</h1>
+          <h1 className="text-5xl font-bold text-gray-900 mb-2">Ticket Details</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Ticket Information */}
           <div className="lg:col-span-2">
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="bg-[#F5F5DC] shadow-lg rounded-2xl overflow-hidden border border-gray-200">
               {ticket.event.image && (
                 <img
                   src={ticket.event.image}
@@ -260,59 +272,48 @@ const TicketDetailPage: React.FC = () => {
                   className="w-full h-64 object-cover"
                 />
               )}
-              
-              <div className="p-6">
+              <div className="p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(ticket.status)}`}>
-                    {ticket.status}
-                  </span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                   <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getListingTypeColor(ticket.listingType)}`}>
-                      {isAuction ? 'Auction' : 'Direct Sale'}
-                    </span>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getListingTypeColor(ticket.listingType)}`}>{isAuction ? 'Auction' : 'Direct Sale'}</span>
                     {ticket.seller.role !== 'ADMIN' && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
-                        Resell Ticket
-                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">Resell Ticket</span>
                     )}
                   </div>
                 </div>
-
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{ticket.event.title}</h2>
-                
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{ticket.event.title}</h2>
                 <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-gray-600">
-                    <CalendarIcon className="h-5 w-5 mr-3" />
-                    {format(new Date(ticket.event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}
+                  <div className="flex items-center text-gray-700">
+                    <CalendarIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
+                    <span className="text-lg">{format(new Date(ticket.event.date), 'EEEE, MMMM dd, yyyy - h:mm a')}</span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <MapPinIcon className="h-5 w-5 mr-3" />
-                    {ticket.event.venue}
+                  <div className="flex items-center text-gray-700">
+                    <MapPinIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
+                    <span className="text-lg">{ticket.event.venue}</span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <TicketIcon className="h-5 w-5 mr-3" />
-                    {ticket.section && `Section ${ticket.section}`}
-                    {ticket.row && ` • Row ${ticket.row}`}
-                    {ticket.seat && ` • Seat ${ticket.seat}`}
+                  <div className="flex items-center text-gray-700">
+                    <TicketIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
+                    <span className="text-lg">
+                      {ticket.section && `Section ${ticket.section}`}
+                      {ticket.row && ` • Row ${ticket.row}`}
+                      {ticket.seat && ` • Seat ${ticket.seat}`}
+                    </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <UserIcon className="h-5 w-5 mr-3" />
-                    Sold by {ticket.seller.name}
+                  <div className="flex items-center text-gray-700">
+                    <UserIcon className="h-6 w-6 mr-3 text-[#FF6B35]" />
+                    <span className="text-lg">Sold by <span className="font-bold text-gray-900">{ticket.seller.name}</span></span>
                   </div>
                 </div>
-
                 {/* Price Section */}
                 <div className="border-t border-gray-200 pt-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium text-gray-900">Price</span>
+                    <span className="text-xl font-bold text-gray-900">Price</span>
                     <div className="flex items-center">
                       <CurrencyDollarIcon className="h-6 w-6 text-gray-400 mr-2" />
-                      <span className="text-3xl font-bold text-gray-900">
-                        ${ticket.price.toFixed(2)}
-                      </span>
+                      <span className="text-4xl font-bold text-[#FF6B35]">₹{ticket.price.toFixed(2)}</span>
                     </div>
                   </div>
-
                   {isAuction && ticket.endTime && (
                     <div className="mt-4 flex items-center text-sm text-gray-600">
                       <ClockIcon className="h-4 w-4 mr-2" />
@@ -329,26 +330,18 @@ const TicketDetailPage: React.FC = () => {
 
             {/* Auction Bids */}
             {isAuction && (
-              <div className="mt-8 bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Offers</h3>
+              <div className="mt-8 bg-[#F5F5DC] shadow-lg rounded-2xl p-8 border border-gray-200">
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">Offers</h3>
                 {bids.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
                     {bids.map((bid) => (
-                      <div key={bid.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{bid.bidder.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {format(new Date(bid.createdAt), 'MMM dd, h:mm a')}
-                          </p>
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          ${bid.amount.toFixed(2)}
-                        </div>
+                      <div key={bid.id} className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-between">
+                        <span className="text-xl font-bold text-[#FF6B35]">₹{bid.amount.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No offers yet. Be the first to make an offer!</p>
+                  <p className="text-xl text-gray-600">No offers yet. Be the first to make an offer!</p>
                 )}
               </div>
             )}
@@ -356,22 +349,22 @@ const TicketDetailPage: React.FC = () => {
 
           {/* Purchase/Auction Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-white shadow rounded-lg p-6 sticky top-6">
+            <div className="bg-[#F5F5DC] shadow-lg rounded-2xl p-8 sticky top-6 border border-gray-200">
               {!isAvailable ? (
                 <div className="text-center">
-                  <div className="text-red-600 text-lg font-medium mb-2">Ticket Not Available</div>
-                  <p className="text-gray-600">This ticket has been sold or is no longer available.</p>
+                  <div className="text-red-600 text-xl font-bold mb-2">Ticket Not Available</div>
+                  <p className="text-lg text-gray-600">This ticket has been sold or is no longer available.</p>
                 </div>
               ) : isAuction ? (
                 /* Auction Panel */
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Make Offer</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Make Offer</h3>
                   {!user ? (
                     <div className="text-center">
-                      <p className="text-gray-600 mb-4">Please login to make an offer</p>
+                      <p className="text-lg text-gray-600 mb-4">Please login to make an offer</p>
                       <Link
                         to="/login"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        className="w-full bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#E55A2B] transition-all text-lg"
                       >
                         Login
                       </Link>
@@ -379,7 +372,7 @@ const TicketDetailPage: React.FC = () => {
                   ) : (
                     <form onSubmit={handlePlaceBid}>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-bold text-gray-900 mb-2">
                           Offer Amount
                         </label>
                         <div className="relative">
@@ -387,22 +380,22 @@ const TicketDetailPage: React.FC = () => {
                           <input
                             type="number"
                             step="0.01"
-                            min="1"
+                            min={minBidAmount}
                             value={bidAmount}
                             onChange={(e) => setBidAmount(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent text-lg"
                             placeholder="Enter your offer amount"
                             required
                           />
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Make an offer - any amount is welcome!
+                        <p className="text-sm text-gray-600 mt-1">
+                          Minimum bid: <span className="text-[#FF6B35] font-bold">₹{minBidAmount.toFixed(2)}</span> (10% higher than current highest bid)
                         </p>
                       </div>
                       <button
                         type="submit"
                         disabled={placingBid || !!isExpired}
-                        className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#E55A2B] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                       >
                         {placingBid ? <LoadingSpinner size="sm" /> : 'Make Offer'}
                       </button>
@@ -410,98 +403,16 @@ const TicketDetailPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                /* Direct Sale Panel */
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Purchase Ticket</h3>
-                  {!user ? (
-                    <div className="text-center">
-                      <p className="text-gray-600 mb-4">Please login to purchase this ticket</p>
-                      <Link
-                        to="/login"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        Login
-                      </Link>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="mb-4">
-                        <p className="text-sm text-gray-600 mb-2">Total Price</p>
-                        <div className="text-2xl font-bold text-gray-900">
-                          ${ticket.price.toFixed(2)}
-                        </div>
-                      </div>
-                      
-                      {showPurchaseForm ? (
-                        <form onSubmit={handlePurchase}>
-                          <div className="space-y-4 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Card Number
-                              </label>
-                              <input
-                                type="text"
-                                defaultValue="4242424242424242"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="1234 5678 9012 3456"
-                                required
-                              />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Expiry Date
-                                </label>
-                                <input
-                                  type="text"
-                                  defaultValue="12/25"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="MM/YY"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  CVV
-                                </label>
-                                <input
-                                  type="text"
-                                  defaultValue="123"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="123"
-                                  required
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowPurchaseForm(false)}
-                              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              disabled={purchasing}
-                              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {purchasing ? <LoadingSpinner size="sm" /> : 'Complete Purchase'}
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <button
-                          onClick={() => setShowPurchaseForm(true)}
-                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                          Buy Now
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                /* Direct Purchase Panel */
+                <form onSubmit={handlePurchase}>
+                  <button
+                    type="submit"
+                    disabled={purchasing}
+                    className="w-full bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#E55A2B] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  >
+                    {purchasing ? <LoadingSpinner size="sm" /> : 'Purchase Ticket'}
+                  </button>
+                </form>
               )}
             </div>
           </div>

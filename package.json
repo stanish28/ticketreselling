@@ -12,10 +12,18 @@
     "db:setup": "cd server && npm run db:setup",
     "db:migrate": "cd server && npm run db:migrate"
   },
-  "keywords": ["tickets", "marketplace", "events", "bidding"],
+  "keywords": [
+    "tickets",
+    "marketplace",
+    "events",
+    "bidding"
+  ],
   "author": "FastPass Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react-icons": "^5.5.0"
   }
-} 
+}

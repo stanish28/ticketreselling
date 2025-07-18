@@ -1,3 +1,9 @@
 node_modules/
-.eslintcache
 .cache/
+client/node_modules/
+client/.cache/
+node_modules
+node_modules
+node_modules
+node_modules
+.env

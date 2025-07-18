@@ -164,7 +164,7 @@ const TicketsPage: React.FC = () => {
                       <MapPinIcon className="w-4 h-4 mr-2" />
                       {ticket.event?.venue}
                     </div>
-                    <p className="text-lg font-bold text-blue-600">${ticket.price.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-blue-600">₹{ticket.price.toFixed(2)}</p>
                   </div>
                   
                   <Link

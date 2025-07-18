@@ -1,327 +1,148 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { 
-  Bars3Icon, 
-  XMarkIcon, 
-  UserIcon,
-  TicketIcon,
-  HomeIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  UsersIcon
-} from '@heroicons/react/24/outline';
-import { Menu, Transition } from '@headlessui/react';
+import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
+  const location = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [ticketCount, setTicketCount] = useState(0);
-
-  useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
-      fetchTicketCount();
-    }
-  }, [user]);
-
-  const fetchTicketCount = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/tickets/my', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setTicketCount(data.data?.length || 0);
-      }
-    } catch (error) {
-      console.error('Failed to fetch ticket count:', error);
-    }
-  };
-
-  // Expose refresh function for external use
-  const refreshTicketCount = () => {
-    fetchTicketCount();
-  };
-
-  // Make refreshTicketCount available globally for other components
-  React.useEffect(() => {
-    (window as any).refreshNavbarTicketCount = refreshTicketCount;
-    return () => {
-      delete (window as any).refreshNavbarTicketCount;
-    };
-  }, []);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const isActive = (href: string) => location.pathname === href;
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
-  const navigation = [
-    { name: 'Home', href: '/', icon: HomeIcon },
-    { name: 'Events', href: '/events', icon: CalendarIcon },
-    { name: 'Tickets', href: '/tickets', icon: TicketIcon },
+  const navLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/events', label: 'Events' },
+    ...(user ? [{ to: '/my-tickets', label: 'My Tickets' }] : [])
   ];
-
-  const userNavigation = [
-    { name: 'Profile', href: '/profile' },
-    { name: 'My Tickets', href: '/my-tickets' },
-    { name: 'My Listings', href: '/my-listings' },
-    { name: 'My Bids', href: '/my-bids' },
-    { name: 'Sell Ticket', href: '/sell-ticket' },
-  ];
-
-  const adminNavigation = [
-    { name: 'Dashboard', href: '/admin', icon: ChartBarIcon },
-    { name: 'Users', href: '/admin/users', icon: UsersIcon },
-    { name: 'Events', href: '/admin/events', icon: CalendarIcon },
-    { name: 'Tickets', href: '/admin/tickets', icon: TicketIcon },
-  ];
-
-  // For admin users, show only admin navigation
-  const mainNavigation = user?.role === 'ADMIN' 
-    ? adminNavigation
-    : user 
-      ? [...navigation, { name: 'My Tickets', href: '/my-tickets', icon: TicketIcon }]
-      : navigation;
 
   return (
-    <nav className="bg-white shadow-lg relative z-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">F</span>
-              </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">FastPass</span>
-              {user?.role === 'ADMIN' && (
-                <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                  Admin
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {mainNavigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors relative"
-              >
-                {item.name}
-                {item.name === 'My Tickets' && ticketCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {ticketCount}
-                  </span>
-                )}
-              </Link>
+    <nav aria-label="Main navigation" className="sticky top-0 z-50 bg-white shadow-sm py-5 px-4 md:px-10 flex items-center justify-between text-lg">
+      <div className="flex items-center space-x-8">
+        <Link to="/" className="flex items-center space-x-2" aria-label="Fastpass Home">
+          <span className="w-9 h-9 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-2xl">L</span>
+          <span className="font-extrabold text-2xl text-[#222] tracking-tight">Fastpass</span>
+        </Link>
+        {/* Desktop Nav Links */}
+        {user && user.role === 'ADMIN' ? (
+          <ul className="hidden md:flex items-center space-x-10 ml-10" role="menubar">
+            <li>
+              <Link to="/admin" className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`}>Dashboard</Link>
+            </li>
+          </ul>
+        ) : (
+          <ul className="hidden md:flex items-center space-x-10 ml-10" role="menubar">
+            {navLinks.map(link => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive(link.to) ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`}
+                  aria-current={isActive(link.to) ? 'page' : undefined}
+                >
+                  {link.label}
+                </Link>
+              </li>
             ))}
-          </div>
-
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="relative">
-                <Menu as="div" className="relative ml-3">
-                  <div>
-                    <Menu.Button className="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                      <span className="sr-only">Open user menu</span>
-                      <UserIcon className="w-8 h-8 text-gray-700 bg-gray-100 rounded-full p-1" />
-                       <span className="text-sm font-medium text-gray-700">
-                        {user.name}
-                      </span>
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30">
-                      {user.role !== 'ADMIN' && userNavigation.map((item) => (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <Link
-                              to={item.href}
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } block px-4 py-2 text-sm text-gray-700`}
-                            >
-                              {item.name}
-                            </Link>
-                          )}
-                        </Menu.Item>
-                      ))}
-                      {user.role === 'ADMIN' && (
-                        <div>
-                          <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Admin Panel
-                          </div>
-                          {adminNavigation.map((item) => (
-                            <Menu.Item key={item.name}>
-                              {({ active }) => (
-                                <Link
-                                  to={item.href}
-                                  className={`${
-                                    active ? 'bg-gray-100' : ''
-                                  } block px-4 py-2 text-sm text-gray-700`}
-                                >
-                                  {item.name}
-                                </Link>
-                              )}
-                            </Menu.Item>
-                          ))}
-                        </div>
-                      )}
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            onClick={handleLogout}
-                            className={`${
-                              active ? 'bg-gray-100' : ''
-                            } block w-full text-left px-4 py-2 text-sm text-red-600`}
-                          >
-                            Logout
-                          </button>
-                        )}
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 p-2 rounded-md"
-            >
-              {isMenuOpen ? (
-                <XMarkIcon className="w-6 h-6" />
-              ) : (
-                <Bars3Icon className="w-6 h-6" />
-              )}
-            </button>
-          </div>
-        </div>
+          </ul>
+        )}
       </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-            {mainNavigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium relative"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-                {item.name === 'My Tickets' && ticketCount > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 inline-flex items-center justify-center">
-                    {ticketCount}
-                  </span>
-                )}
-              </Link>
-            ))}
-            
-            {user && (
-              <>
-                {user.role !== 'ADMIN' && (
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <div className="px-3 py-2 text-sm font-medium text-gray-500">
-                      User Menu
-                    </div>
-                    {userNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                
-                {user.role === 'ADMIN' && (
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <div className="px-3 py-2 text-sm font-medium text-gray-500">
-                      Admin Panel
-                    </div>
-                    {adminNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full text-left text-red-600 hover:text-red-700 block px-3 py-2 rounded-md text-base font-medium"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </>
-            )}
-            
-            {!user && (
-              <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
-                </Link>
+      {/* Desktop User Actions */}
+      <div className="hidden md:flex items-center space-x-4">
+        {user ? (
+          <div className="relative">
+            <button
+              aria-label="Profile menu"
+              className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors"
+              onClick={() => setProfileOpen(v => !v)}
+            >
+              <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-lg">
+                {user.name?.charAt(0).toUpperCase()}
               </div>
+              <div className="hidden md:block text-left">
+                <div className="font-semibold text-[#222] hover:text-[#FF6B35] transition-colors cursor-pointer">
+                  {user.name}
+                </div>
+                <div className="text-sm text-gray-600">{user.email}</div>
+              </div>
+              <FaChevronDown className="ml-1 text-[#D6A77A]" />
+            </button>
+            {/* Profile Dropdown */}
+            {profileOpen && (
+              <ul className="absolute right-0 mt-2 w-48 bg-white border border-[#E5E5E5] rounded-lg shadow-lg py-2 z-50" role="menu">
+                <li>
+                  <Link to="/profile" className="block px-4 py-2 text-[#222] hover:bg-[#F5E7D6] transition-colors" role="menuitem">Profile</Link>
+                </li>
+                <li>
+                  <Link to="/my-tickets" className="block px-4 py-2 text-[#222] hover:bg-[#F5E7D6] transition-colors" role="menuitem">My Tickets</Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-[#FF6B35] hover:bg-[#F5E7D6] transition-colors" role="menuitem">Logout</button>
+                </li>
+              </ul>
             )}
+          </div>
+        ) : (
+          <>
+            <Link to="/register" className="px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-base">Sign Up</Link>
+            <Link to="/login" className="px-6 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-base">Log In</Link>
+          </>
+        )}
+      </div>
+      {/* Hamburger Menu for Mobile */}
+      <div className="md:hidden flex items-center">
+        <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-[#F5E7D6] transition-colors">
+          <FaBars className="text-2xl text-[#D6A77A]" />
+        </button>
+      </div>
+      {/* Mobile Menu Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end">
+          <div className="w-72 bg-white h-full shadow-lg p-6 flex flex-col">
+            <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="self-end mb-6 p-2 rounded-lg hover:bg-[#F5E7D6] transition-colors">
+              <FaTimes className="text-2xl text-[#D6A77A]" />
+            </button>
+            <ul className="flex flex-col space-y-4" role="menu">
+              {user && user.role === 'ADMIN' ? (
+                <li>
+                  <Link to="/admin" className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`} onClick={() => setMobileOpen(false)} role="menuitem">Dashboard</Link>
+                </li>
+              ) : (
+                navLinks.map(link => (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive(link.to) ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`}
+                      aria-current={isActive(link.to) ? 'page' : undefined}
+                      onClick={() => setMobileOpen(false)}
+                      role="menuitem"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+            <div className="flex-1" />
+            <div className="flex flex-col space-y-3 mt-8">
+              {user ? (
+                <>
+                  <Link to="/profile" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>Profile</Link>
+                  <Link to="/my-tickets" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>My Tickets</Link>
+                  <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="block w-full text-left px-4 py-2 text-[#FF6B35] hover:bg-[#F5E7D6] rounded-lg transition-colors">Logout</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/register" className="px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-base" onClick={() => setMobileOpen(false)}>Sign Up</Link>
+                  <Link to="/login" className="px-6 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-base" onClick={() => setMobileOpen(false)}>Log In</Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

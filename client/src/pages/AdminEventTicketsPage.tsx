@@ -61,7 +61,8 @@ const AdminEventTicketsPage: React.FC = () => {
     seat: '',
     listingType: 'DIRECT_SALE' as 'DIRECT_SALE' | 'AUCTION',
     endTime: '',
-    quantity: '1'
+    quantity: '1',
+    ticketType: 'SEATED' as 'SEATED' | 'STANDING',
   });
 
   useEffect(() => {
@@ -114,10 +115,11 @@ const AdminEventTicketsPage: React.FC = () => {
           eventId,
           price: parseFloat(formData.price),
           section: formData.section || undefined,
-          row: formData.row || undefined,
-          seat: formData.seat || undefined,
+          row: formData.ticketType === 'SEATED' ? (formData.row || undefined) : undefined,
+          seat: formData.ticketType === 'SEATED' ? (formData.seat || undefined) : undefined,
           listingType: formData.listingType,
-          endTime: formData.listingType === 'AUCTION' && formData.endTime ? formData.endTime : undefined
+          endTime: formData.listingType === 'AUCTION' && formData.endTime ? formData.endTime : undefined,
+          ticketType: formData.ticketType,
         };
 
         const response = await fetch('http://localhost:3001/api/tickets', {
@@ -145,7 +147,8 @@ const AdminEventTicketsPage: React.FC = () => {
         seat: '',
         listingType: 'DIRECT_SALE',
         endTime: '',
-        quantity: '1'
+        quantity: '1',
+        ticketType: 'SEATED',
       });
       fetchEventAndTickets(); // Refresh the list
     } catch (error: any) {
@@ -285,6 +288,17 @@ const AdminEventTicketsPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
+                  <label className="block text-sm font-medium text-gray-700">Ticket Type *</label>
+                  <select
+                    value={formData.ticketType}
+                    onChange={e => setFormData({ ...formData, ticketType: e.target.value as 'SEATED' | 'STANDING' })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="SEATED">Seated</option>
+                    <option value="STANDING">Standing</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700">Section</label>
                   <input
                     type="text"
@@ -294,26 +308,30 @@ const AdminEventTicketsPage: React.FC = () => {
                     placeholder="e.g., A, B, C"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Row</label>
-                  <input
-                    type="text"
-                    value={formData.row}
-                    onChange={(e) => setFormData({ ...formData, row: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., 1, 2, 3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Seat</label>
-                  <input
-                    type="text"
-                    value={formData.seat}
-                    onChange={(e) => setFormData({ ...formData, seat: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., 1, 2, 3"
-                  />
-                </div>
+                {formData.ticketType === 'SEATED' && (
+                  <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Row</label>
+                    <input
+                      type="text"
+                      value={formData.row}
+                      onChange={(e) => setFormData({ ...formData, row: e.target.value })}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., 1, 2, 3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Seat</label>
+                    <input
+                      type="text"
+                      value={formData.seat}
+                      onChange={(e) => setFormData({ ...formData, seat: e.target.value })}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., 1, 2, 3"
+                    />
+                  </div>
+                  </>
+                )}
               </div>
 
               {formData.listingType === 'AUCTION' && (
@@ -410,7 +428,7 @@ const AdminEventTicketsPage: React.FC = () => {
                         <div className="flex items-center">
                           <CurrencyDollarIcon className="h-4 w-4 text-gray-400 mr-1" />
                           <span className="text-sm font-medium text-gray-900">
-                            ${ticket.price.toFixed(2)}
+                            ₹{ticket.price.toFixed(2)}
                           </span>
                         </div>
                       </td>

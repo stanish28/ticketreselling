@@ -224,7 +224,7 @@ const AdminTickets: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">${ticket.price.toFixed(2)}</div>
+                      <div className="text-sm font-medium text-gray-900">₹{ticket.price.toFixed(2)}</div>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getListingTypeBadgeColor(ticket.listingType)}`}>
                         {ticket.listingType.replace('_', ' ')}
                       </span>
