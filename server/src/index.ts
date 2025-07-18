@@ -45,7 +45,14 @@ const limiter = rateLimit({
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://ticketreselling-d1mb24cys-stanish28s-projects.vercel.app',
+    'https://*.vercel.app'
+  ],
+  credentials: true
+}));
 app.use(morgan('combined'));
 // Temporarily disable rate limiting for development
 if (process.env.NODE_ENV === 'production') {
