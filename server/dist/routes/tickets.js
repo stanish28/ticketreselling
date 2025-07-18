@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const auth_1 = require("../middleware/auth");
 const payment_1 = require("../utils/payment");
 const qrCode_1 = require("../utils/qrCode");
@@ -14,7 +14,7 @@ const router = express_1.default.Router();
 router.get('/my', auth_1.authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const tickets = await index_1.prisma.ticket.findMany({
+        const tickets = await database_1.prisma.ticket.findMany({
             where: {
                 buyerId: userId,
                 status: 'SOLD',
@@ -64,7 +64,7 @@ router.get('/my', auth_1.authenticateToken, async (req, res) => {
 router.get('/my-listings', auth_1.authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const listings = await index_1.prisma.ticket.findMany({
+        const listings = await database_1.prisma.ticket.findMany({
             where: {
                 sellerId: userId,
                 status: 'AVAILABLE',
@@ -122,7 +122,7 @@ router.get('/', auth_1.optionalAuth, async (req, res) => {
             };
         }
         const [tickets, total] = await Promise.all([
-            index_1.prisma.ticket.findMany({
+            database_1.prisma.ticket.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -150,7 +150,7 @@ router.get('/', auth_1.optionalAuth, async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.ticket.count({ where })
+            database_1.prisma.ticket.count({ where })
         ]);
         res.json({
             success: true,
@@ -173,7 +173,7 @@ router.get('/', auth_1.optionalAuth, async (req, res) => {
 router.get('/:id', auth_1.optionalAuth, async (req, res) => {
     try {
         const { id } = req.params;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id },
             include: {
                 event: {
@@ -248,14 +248,14 @@ router.post('/', [
         }
         const ticketData = req.body;
         const userId = req.user.id;
-        const event = await index_1.prisma.event.findUnique({
+        const event = await database_1.prisma.event.findUnique({
             where: { id: ticketData.eventId }
         });
         if (!event) {
             res.status(404).json({ error: 'Event not found' });
             return;
         }
-        const ticket = await index_1.prisma.ticket.create({
+        const ticket = await database_1.prisma.ticket.create({
             data: {
                 ...ticketData,
                 sellerId: userId,
@@ -302,7 +302,7 @@ router.post('/:id/purchase', auth_1.authenticateToken, async (req, res) => {
             console.log('Payment validation failed');
             return res.status(400).json({ error: 'Payment information is required' });
         }
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id },
             include: {
                 event: true,
@@ -339,7 +339,7 @@ router.post('/:id/purchase', auth_1.authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Payment failed' });
         }
         console.log('Updating ticket status...');
-        const updatedTicket = await index_1.prisma.ticket.update({
+        const updatedTicket = await database_1.prisma.ticket.update({
             where: { id },
             data: {
                 status: 'SOLD',
@@ -352,7 +352,7 @@ router.post('/:id/purchase', auth_1.authenticateToken, async (req, res) => {
             },
         });
         console.log('Creating purchase record...');
-        await index_1.prisma.purchase.upsert({
+        await database_1.prisma.purchase.upsert({
             where: {
                 ticketId: id,
             },
@@ -442,7 +442,7 @@ router.put('/:id', [
         const { id } = req.params;
         const userId = req.user.id;
         const updateData = req.body;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id }
         });
         if (!ticket) {
@@ -457,7 +457,7 @@ router.put('/:id', [
             res.status(400).json({ error: 'Cannot update sold ticket' });
             return;
         }
-        const updatedTicket = await index_1.prisma.ticket.update({
+        const updatedTicket = await database_1.prisma.ticket.update({
             where: { id },
             data: updateData,
             include: {
@@ -493,7 +493,7 @@ router.delete('/:id', auth_1.authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id }
         });
         if (!ticket) {
@@ -508,7 +508,7 @@ router.delete('/:id', auth_1.authenticateToken, async (req, res) => {
             res.status(400).json({ error: 'Cannot delete sold ticket' });
             return;
         }
-        await index_1.prisma.ticket.delete({
+        await database_1.prisma.ticket.delete({
             where: { id }
         });
         res.json({
@@ -526,7 +526,7 @@ router.put('/:id/resell', auth_1.authenticateToken, async (req, res) => {
         const { id } = req.params;
         const userId = req.user.id;
         const { price, listingType } = req.body;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id },
         });
         if (!ticket) {
@@ -535,7 +535,7 @@ router.put('/:id/resell', auth_1.authenticateToken, async (req, res) => {
         if (ticket.buyerId !== userId) {
             return res.status(403).json({ error: 'You are not the owner of this ticket' });
         }
-        const result = await index_1.prisma.$transaction(async (tx) => {
+        const result = await database_1.prisma.$transaction(async (tx) => {
             await tx.bid.deleteMany({
                 where: { ticketId: id },
             });
@@ -571,7 +571,7 @@ router.put('/:id/cancel-listing', auth_1.authenticateToken, async (req, res) => 
     try {
         const { id } = req.params;
         const userId = req.user.id;
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id },
             include: {
                 event: true,
@@ -587,7 +587,7 @@ router.put('/:id/cancel-listing', auth_1.authenticateToken, async (req, res) => 
         if (ticket.status !== 'AVAILABLE') {
             return res.status(400).json({ error: 'Cannot cancel a sold ticket' });
         }
-        const pendingBids = await index_1.prisma.bid.findMany({
+        const pendingBids = await database_1.prisma.bid.findMany({
             where: {
                 ticketId: id,
                 status: 'PENDING',
@@ -598,7 +598,7 @@ router.put('/:id/cancel-listing', auth_1.authenticateToken, async (req, res) => 
                 error: 'Cannot cancel listing with pending bids. Please reject all bids first.'
             });
         }
-        const updatedTicket = await index_1.prisma.ticket.update({
+        const updatedTicket = await database_1.prisma.ticket.update({
             where: { id },
             data: {
                 status: 'SOLD',
@@ -611,7 +611,7 @@ router.put('/:id/cancel-listing', auth_1.authenticateToken, async (req, res) => 
                 buyer: true,
             },
         });
-        await index_1.prisma.bid.deleteMany({
+        await database_1.prisma.bid.deleteMany({
             where: { ticketId: id },
         });
         return res.json({

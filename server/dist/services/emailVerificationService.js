@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resendVerificationEmail = exports.verifyEmailToken = exports.sendVerificationEmail = exports.generateVerificationToken = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
@@ -77,7 +77,7 @@ const verifyEmailToken = async (token) => {
             return { success: false, error: 'Invalid token type' };
         }
         const userId = decoded.userId;
-        const user = await index_1.prisma.user.findUnique({
+        const user = await database_1.prisma.user.findUnique({
             where: { id: userId }
         });
         if (!user) {
@@ -86,7 +86,7 @@ const verifyEmailToken = async (token) => {
         if (user.emailVerified) {
             return { success: false, error: 'Email already verified' };
         }
-        await index_1.prisma.user.update({
+        await database_1.prisma.user.update({
             where: { id: userId },
             data: { emailVerified: new Date() }
         });
@@ -105,7 +105,7 @@ const verifyEmailToken = async (token) => {
 exports.verifyEmailToken = verifyEmailToken;
 const resendVerificationEmail = async (email) => {
     try {
-        const user = await index_1.prisma.user.findUnique({
+        const user = await database_1.prisma.user.findUnique({
             where: { email }
         });
         if (!user) {

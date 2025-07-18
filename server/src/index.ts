@@ -31,6 +31,9 @@ const io = new Server(server, {
   }
 });
 
+if (!process.env.PORT) {
+  throw new Error('PORT env not set!');
+}
 const PORT = process.env.PORT;
 
 // Rate limiting

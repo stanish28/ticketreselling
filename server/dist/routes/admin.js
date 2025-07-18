@@ -2,21 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 router.use(auth_1.requireAdmin);
 router.get('/dashboard', async (req, res) => {
     try {
         const [totalUsers, totalEvents, totalTickets, totalRevenue, recentPurchases, topEvents] = await Promise.all([
-            index_1.prisma.user.count(),
-            index_1.prisma.event.count(),
-            index_1.prisma.ticket.count(),
-            index_1.prisma.purchase.aggregate({
+            database_1.prisma.user.count(),
+            database_1.prisma.event.count(),
+            database_1.prisma.ticket.count(),
+            database_1.prisma.purchase.aggregate({
                 where: { status: 'COMPLETED' },
                 _sum: { amount: true }
             }),
-            index_1.prisma.purchase.findMany({
+            database_1.prisma.purchase.findMany({
                 where: { status: 'COMPLETED' },
                 take: 10,
                 orderBy: { createdAt: 'desc' },
@@ -40,7 +40,7 @@ router.get('/dashboard', async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.event.findMany({
+            database_1.prisma.event.findMany({
                 take: 5,
                 orderBy: { date: 'asc' },
                 include: {
@@ -80,7 +80,7 @@ router.get('/users', async (req, res) => {
             ];
         }
         const [users, total] = await Promise.all([
-            index_1.prisma.user.findMany({
+            database_1.prisma.user.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -102,7 +102,7 @@ router.get('/users', async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.user.count({ where })
+            database_1.prisma.user.count({ where })
         ]);
         res.json({
             success: true,
@@ -135,13 +135,13 @@ router.put('/users/:id', [
         }
         const { id } = req.params;
         const updateData = req.body;
-        const existingUser = await index_1.prisma.user.findUnique({
+        const existingUser = await database_1.prisma.user.findUnique({
             where: { id }
         });
         if (!existingUser) {
             return res.status(404).json({ error: 'User not found' });
         }
-        const updatedUser = await index_1.prisma.user.update({
+        const updatedUser = await database_1.prisma.user.update({
             where: { id },
             data: updateData,
             select: {
@@ -175,21 +175,21 @@ router.put('/users/:id', [
 router.delete('/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const existingUser = await index_1.prisma.user.findUnique({
+        const existingUser = await database_1.prisma.user.findUnique({
             where: { id }
         });
         if (!existingUser) {
             return res.status(404).json({ error: 'User not found' });
         }
         if (existingUser.role === 'ADMIN') {
-            const adminCount = await index_1.prisma.user.count({
+            const adminCount = await database_1.prisma.user.count({
                 where: { role: 'ADMIN' }
             });
             if (adminCount <= 1) {
                 return res.status(400).json({ error: 'Cannot delete the last admin user' });
             }
         }
-        await index_1.prisma.user.delete({
+        await database_1.prisma.user.delete({
             where: { id }
         });
         return res.json({
@@ -214,7 +214,7 @@ router.patch('/users/:id/ban', async (req, res) => {
             res.status(400).json({ error: 'You cannot ban/unban yourself' });
             return;
         }
-        const user = await index_1.prisma.user.findUnique({ where: { id } });
+        const user = await database_1.prisma.user.findUnique({ where: { id } });
         if (!user) {
             res.status(404).json({ error: 'User not found' });
             return;
@@ -223,7 +223,7 @@ router.patch('/users/:id/ban', async (req, res) => {
             res.status(403).json({ error: 'Cannot ban/unban another admin' });
             return;
         }
-        const updated = await index_1.prisma.user.update({
+        const updated = await database_1.prisma.user.update({
             where: { id },
             data: { banned }
         });
@@ -251,7 +251,7 @@ router.post('/events', [
             return res.status(400).json({ errors: errors.array() });
         }
         const eventData = req.body;
-        const newEvent = await index_1.prisma.event.create({
+        const newEvent = await database_1.prisma.event.create({
             data: {
                 ...eventData,
                 date: new Date(eventData.date)
@@ -284,13 +284,13 @@ router.put('/events/:id', [
         }
         const { id } = req.params;
         const updateData = req.body;
-        const existingEvent = await index_1.prisma.event.findUnique({
+        const existingEvent = await database_1.prisma.event.findUnique({
             where: { id }
         });
         if (!existingEvent) {
             return res.status(404).json({ error: 'Event not found' });
         }
-        const updatedEvent = await index_1.prisma.event.update({
+        const updatedEvent = await database_1.prisma.event.update({
             where: { id },
             data: {
                 ...updateData,
@@ -316,7 +316,7 @@ router.put('/events/:id', [
 router.delete('/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const existingEvent = await index_1.prisma.event.findUnique({
+        const existingEvent = await database_1.prisma.event.findUnique({
             where: { id },
             include: {
                 _count: {
@@ -332,7 +332,7 @@ router.delete('/events/:id', async (req, res) => {
                 error: 'Cannot delete event with existing tickets. Please delete all tickets first.'
             });
         }
-        await index_1.prisma.event.delete({
+        await database_1.prisma.event.delete({
             where: { id }
         });
         return res.json({
@@ -353,7 +353,7 @@ router.get('/events', async (req, res) => {
         if (category)
             where.category = category;
         const [events, total] = await Promise.all([
-            index_1.prisma.event.findMany({
+            database_1.prisma.event.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -368,7 +368,7 @@ router.get('/events', async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.event.count({ where })
+            database_1.prisma.event.count({ where })
         ]);
         const eventsWithRevenue = events.map((event) => ({
             ...event,
@@ -403,7 +403,7 @@ router.get('/tickets', async (req, res) => {
         if (eventId)
             where.eventId = eventId;
         const [tickets, total] = await Promise.all([
-            index_1.prisma.ticket.findMany({
+            database_1.prisma.ticket.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -436,7 +436,7 @@ router.get('/tickets', async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.ticket.count({ where })
+            database_1.prisma.ticket.count({ where })
         ]);
         res.json({
             success: true,
@@ -472,13 +472,13 @@ router.put('/tickets/:id', [
         }
         const { id } = req.params;
         const updateData = req.body;
-        const existingTicket = await index_1.prisma.ticket.findUnique({
+        const existingTicket = await database_1.prisma.ticket.findUnique({
             where: { id }
         });
         if (!existingTicket) {
             return res.status(404).json({ error: 'Ticket not found' });
         }
-        const updatedTicket = await index_1.prisma.ticket.update({
+        const updatedTicket = await database_1.prisma.ticket.update({
             where: { id },
             data: updateData,
             include: {
@@ -523,13 +523,13 @@ router.put('/tickets/:id', [
 router.delete('/tickets/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const existingTicket = await index_1.prisma.ticket.findUnique({
+        const existingTicket = await database_1.prisma.ticket.findUnique({
             where: { id }
         });
         if (!existingTicket) {
             return res.status(404).json({ error: 'Ticket not found' });
         }
-        await index_1.prisma.$transaction(async (tx) => {
+        await database_1.prisma.$transaction(async (tx) => {
             await tx.bid.deleteMany({
                 where: { ticketId: id }
             });
@@ -558,7 +558,7 @@ router.get('/purchases', async (req, res) => {
         if (status)
             where.status = status;
         const [purchases, total] = await Promise.all([
-            index_1.prisma.purchase.findMany({
+            database_1.prisma.purchase.findMany({
                 where,
                 skip,
                 take: Number(limit),
@@ -585,7 +585,7 @@ router.get('/purchases', async (req, res) => {
                     }
                 }
             }),
-            index_1.prisma.purchase.count({ where })
+            database_1.prisma.purchase.count({ where })
         ]);
         return res.json({
             success: true,
@@ -611,7 +611,7 @@ router.get('/analytics/revenue', async (req, res) => {
         const days = Number(period);
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - days);
-        const revenue = await index_1.prisma.purchase.aggregate({
+        const revenue = await database_1.prisma.purchase.aggregate({
             where: {
                 status: 'COMPLETED',
                 createdAt: {
@@ -621,7 +621,7 @@ router.get('/analytics/revenue', async (req, res) => {
             _sum: { amount: true },
             _count: true
         });
-        const dailyRevenue = await index_1.prisma.purchase.groupBy({
+        const dailyRevenue = await database_1.prisma.purchase.groupBy({
             by: ['createdAt'],
             where: {
                 status: 'COMPLETED',

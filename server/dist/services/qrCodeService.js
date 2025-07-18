@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateQRCodeForTicket = exports.generateAndSendQRCodes = void 0;
 const qrcode_1 = __importDefault(require("qrcode"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
@@ -18,7 +18,7 @@ const generateAndSendQRCodes = async () => {
     try {
         const now = new Date();
         const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const tickets = await index_1.prisma.ticket.findMany({
+        const tickets = await database_1.prisma.ticket.findMany({
             where: {
                 status: 'SOLD',
                 event: {
@@ -148,7 +148,7 @@ const sendQRCodeEmail = async (email, name, qrCodeDataURL, ticket) => {
 };
 const generateQRCodeForTicket = async (ticketId) => {
     try {
-        const ticket = await index_1.prisma.ticket.findUnique({
+        const ticket = await database_1.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
                 event: {

@@ -7,7 +7,7 @@ exports.requestPasswordReset = exports.resetPassword = exports.verifyPasswordRes
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const index_1 = require("../index");
+const database_1 = require("../config/database");
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
@@ -78,7 +78,7 @@ const verifyPasswordResetToken = async (token) => {
             return { success: false, error: 'Invalid token type' };
         }
         const userId = decoded.userId;
-        const user = await index_1.prisma.user.findUnique({
+        const user = await database_1.prisma.user.findUnique({
             where: { id: userId }
         });
         if (!user) {
@@ -100,7 +100,7 @@ exports.verifyPasswordResetToken = verifyPasswordResetToken;
 const resetPassword = async (userId, newPassword) => {
     try {
         const hashedPassword = await bcryptjs_1.default.hash(newPassword, 12);
-        await index_1.prisma.user.update({
+        await database_1.prisma.user.update({
             where: { id: userId },
             data: { password: hashedPassword }
         });
@@ -114,7 +114,7 @@ const resetPassword = async (userId, newPassword) => {
 exports.resetPassword = resetPassword;
 const requestPasswordReset = async (email) => {
     try {
-        const user = await index_1.prisma.user.findUnique({
+        const user = await database_1.prisma.user.findUnique({
             where: { email }
         });
         if (!user) {
