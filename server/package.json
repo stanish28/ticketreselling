@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "start": "npx prisma generate && npx prisma db push && node dist/index.js",
+    "start": "npx prisma generate && node dist/index.js",
     "postinstall": "npx prisma generate",
     "db:setup": "prisma generate && prisma db push",
+    "db:push": "npx prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "start:dev": "PORT=8080 node dist/index.js"
