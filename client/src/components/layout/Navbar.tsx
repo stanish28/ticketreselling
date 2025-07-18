@@ -23,21 +23,21 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav aria-label="Main navigation" className="sticky top-0 z-50 bg-white shadow-sm py-5 px-4 md:px-10 flex items-center justify-between text-lg">
+    <nav aria-label="Main navigation" className="sticky top-0 z-50 bg-white shadow-sm py-4 px-4 md:px-8 flex items-center justify-between text-base">
       <div className="flex items-center space-x-8">
-        <Link to="/" className="flex items-center space-x-2" aria-label="Fastpass Home">
-          <span className="w-9 h-9 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-2xl">L</span>
-          <span className="font-extrabold text-2xl text-[#222] tracking-tight">Fastpass</span>
+        <Link to="/" className="flex items-center space-x-2" aria-label="LayLow-India Home">
+          <span className="w-7 h-7 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-base">L</span>
+          <span className="font-display font-extrabold text-xl text-[#222] tracking-tight">LayLow-India</span>
         </Link>
         {/* Desktop Nav Links */}
         {user && user.role === 'ADMIN' ? (
-          <ul className="hidden md:flex items-center space-x-10 ml-10" role="menubar">
+          <ul className="hidden md:flex items-center space-x-8 ml-8" role="menubar">
             <li>
               <Link to="/admin" className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`}>Dashboard</Link>
             </li>
           </ul>
         ) : (
-          <ul className="hidden md:flex items-center space-x-10 ml-10" role="menubar">
+          <ul className="hidden md:flex items-center space-x-8 ml-8" role="menubar">
             {navLinks.map(link => (
               <li key={link.to}>
                 <Link
@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
         )}
       </div>
       {/* Desktop User Actions */}
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-3">
         {user ? (
           <div className="relative">
             <button
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
               className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors"
               onClick={() => setProfileOpen(v => !v)}
             >
-              <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-9 h-9 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-base">
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <div className="hidden md:block text-left">
@@ -89,8 +89,8 @@ const Navbar: React.FC = () => {
           </div>
         ) : (
           <>
-            <Link to="/register" className="px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-base">Sign Up</Link>
-            <Link to="/login" className="px-6 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-base">Log In</Link>
+            <Link to="/register" className="px-5 py-2.5 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-sm">Sign Up</Link>
+            <Link to="/login" className="px-5 py-2.5 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-sm">Log In</Link>
           </>
         )}
       </div>
@@ -130,6 +130,7 @@ const Navbar: React.FC = () => {
             </ul>
             <div className="flex-1" />
             <div className="flex flex-col space-y-3 mt-8">
+              <Link to="/legal" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>Legal</Link>
               {user ? (
                 <>
                   <Link to="/profile" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>Profile</Link>
@@ -138,8 +139,8 @@ const Navbar: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/register" className="px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-base" onClick={() => setMobileOpen(false)}>Sign Up</Link>
-                  <Link to="/login" className="px-6 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-base" onClick={() => setMobileOpen(false)}>Log In</Link>
+                  <Link to="/register" className="px-5 py-2.5 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-sm" onClick={() => setMobileOpen(false)}>Sign Up</Link>
+                  <Link to="/login" className="px-5 py-2.5 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-sm" onClick={() => setMobileOpen(false)}>Log In</Link>
                 </>
               )}
             </div>

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar.tsx';
+import Footer from './components/layout/Footer.tsx';
 import MobileBottomNav from './components/layout/MobileBottomNav.tsx';
+import ScrollToTop from './components/common/ScrollToTop.tsx';
 import HomePage from './pages/HomePage.tsx';
 import EventsPage from './pages/EventsPage.tsx';
 import EventDetailPage from './pages/EventDetailPage.tsx';
@@ -25,10 +27,14 @@ import AdminRoute from './components/auth/AdminRoute.tsx';
 import { Toaster } from 'react-hot-toast';
 import SellTicketPage from './pages/SellTicketPage.tsx';
 import UiTestPage from './pages/UiTestPage.tsx';
+import LegalPage from './pages/LegalPage.tsx';
+import FAQPage from './pages/FAQPage.tsx';
+import FeedbackButton from './components/common/FeedbackButton.tsx';
 
 function App() {
   return (
     <>
+      <ScrollToTop />
       <Toaster position="top-right" />
       <Navbar />
       <main className="pb-16 md:pb-0">
@@ -42,6 +48,8 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/legal" element={<LegalPage />} />
+          <Route path="/faq" element={<FAQPage />} />
 
           {/* Private Routes */}
           <Route path="/my-tickets" element={<PrivateRoute><MyTicketsPage /></PrivateRoute>} />
@@ -59,7 +67,9 @@ function App() {
           <Route path="/ui-test" element={<UiTestPage />} />
         </Routes>
       </main>
+      <Footer />
       <MobileBottomNav />
+      <FeedbackButton variant="floating" />
     </>
   );
 }
