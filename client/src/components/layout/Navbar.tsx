@@ -102,49 +102,86 @@ const Navbar: React.FC = () => {
       </div>
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end">
-          <div className="w-80 sm:w-96 bg-white h-full shadow-lg p-6 flex flex-col">
-            <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="self-end mb-6 p-2 rounded-lg hover:bg-[#F5E7D6] transition-colors">
-              <FaTimes className="text-2xl text-[#D6A77A]" />
-            </button>
-            <ul className="flex flex-col space-y-4" role="menu">
-              {user && user.role === 'ADMIN' ? (
-                <li>
-                  <Link to="/admin" className={`font-semibold px-3 py-3 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A] hover:bg-[#F5E7D6]'}`} onClick={() => setMobileOpen(false)} role="menuitem">Dashboard</Link>
-                </li>
-              ) : (
-                navLinks.map(link => (
-                  <li key={link.to}>
-                    <Link
-                      to={link.to}
-                      className={`font-semibold px-3 py-3 rounded-lg transition-colors ${isActive(link.to) ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A] hover:bg-[#F5E7D6]'}`}
-                      aria-current={isActive(link.to) ? 'page' : undefined}
-                      onClick={() => setMobileOpen(false)}
-                      role="menuitem"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))
-              )}
-            </ul>
-            <div className="flex-1" />
-            <div className="flex flex-col space-y-3 mt-8">
-              <Link to="/legal" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>Legal</Link>
-              <Link to="/faq" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>FAQ</Link>
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-end">
+          <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col">
+            {/* Header with Logo and Close Button */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <Link to="/" className="flex items-center space-x-2" onClick={() => setMobileOpen(false)}>
+                <span className="w-8 h-8 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-lg">L</span>
+                <span className="font-display font-extrabold text-xl text-[#222] tracking-tight">LayLow-India</span>
+              </Link>
+              <button 
+                aria-label="Close menu" 
+                onClick={() => setMobileOpen(false)} 
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <FaTimes className="text-xl text-[#D6A77A]" />
+              </button>
+            </div>
+
+            {/* User Profile Section (if logged in) */}
+            {user && (
+              <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-[#F5E7D6] to-[#FAF8F6]">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-lg">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-[#222] text-lg">{user.name}</div>
+                    <div className="text-sm text-gray-600">{user.email}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Logout Only Section */}
+            <div className="flex-1 p-6 pb-24 flex items-center justify-center">
               {user ? (
-                <>
-                  <Link to="/profile" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>Profile</Link>
-                  <Link to="/my-tickets" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>My Tickets</Link>
-                  <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="block w-full text-left px-4 py-3 text-[#FF6B35] hover:bg-[#F5E7D6] rounded-lg transition-colors">Logout</button>
-                </>
+                <div className="w-full max-w-sm">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <h3 className="text-lg font-bold text-[#222] mb-2">Welcome back, {user.name}!</h3>
+                    <p className="text-sm text-gray-600">Ready to sign out?</p>
+                  </div>
+                  
+                  <button 
+                    onClick={() => { setMobileOpen(false); handleLogout(); }} 
+                    className="w-full flex items-center justify-center px-6 py-4 text-[#FF6B35] rounded-xl transition-all duration-200 hover:bg-red-50 border-2 border-[#FF6B35] hover:border-red-400 font-semibold text-lg"
+                  >
+                    <span className="text-xl mr-3">🚪</span>
+                    <span>Logout</span>
+                  </button>
+                </div>
               ) : (
-                <>
-                  <Link to="/register" className="px-5 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-sm text-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
-                  <Link to="/login" className="px-5 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-sm text-center" onClick={() => setMobileOpen(false)}>Log In</Link>
-                </>
+                <div className="text-center">
+                  <p className="text-gray-600">Please log in to access your account.</p>
+                </div>
               )}
             </div>
+
+            {/* Auth Buttons (if not logged in) */}
+            {!user && (
+              <div className="p-6 border-t border-gray-100 bg-gray-50 pb-24">
+                <div className="flex flex-col space-y-3">
+                  <Link 
+                    to="/register" 
+                    className="px-6 py-4 rounded-xl font-bold bg-[#D6A77A] text-white shadow-lg hover:bg-[#b98a5e] transition-all duration-200 text-center text-base" 
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                  <Link 
+                    to="/login" 
+                    className="px-6 py-4 rounded-xl font-bold bg-white border-2 border-[#D6A77A] text-[#D6A77A] hover:bg-[#F5E7D6] transition-all duration-200 text-center text-base" 
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Log In
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

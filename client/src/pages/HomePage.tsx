@@ -105,7 +105,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="w-full py-8 md:py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden max-w-full">
+    <section className="w-full py-12 md:py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden max-w-full">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -right-10 w-20 h-20 md:w-40 md:h-40 bg-gradient-to-br from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
@@ -124,12 +124,13 @@ function HowItWorks() {
           <h2 className="text-2xl md:text-section-title font-display text-[#222] mb-4 bg-gradient-to-r from-[#222] via-[#D6A77A] to-[#FF6B35] bg-clip-text text-transparent px-2 md:px-0">
             How LayLow-India Works
           </h2>
-          <p className="text-sm md:text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose px-2 md:px-0">
+          <p className="text-sm md:text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose px-2 md:px-0 leading-relaxed">
             Get your tickets in just three simple steps. Our platform makes buying and selling tickets effortless and secure.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+        {/* Mobile: Vertical stack with better spacing */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {steps.map((step, index) => (
             <div
               key={index}
@@ -143,14 +144,19 @@ function HowItWorks() {
               aria-label={`${step.title} - ${flippedCards.includes(index) ? 'Showing details' : 'Click to see details'}`}
               aria-expanded={flippedCards.includes(index)}
             >
-              {/* Connection line between cards */}
+              {/* Connection line between cards - Mobile: Vertical, Desktop: Horizontal */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] transform -translate-y-1/2 z-10"></div>
+                <>
+                  {/* Mobile: Vertical connection line */}
+                  <div className="md:hidden absolute -bottom-8 left-1/2 w-0.5 h-8 bg-gradient-to-b from-[#D6A77A] to-[#FF6B35] transform -translate-x-1/2 z-10"></div>
+                  {/* Desktop: Horizontal connection line */}
+                  <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] transform -translate-y-1/2 z-10"></div>
+                </>
               )}
 
-              {/* Flip Card Container */}
+              {/* Flip Card Container - Mobile: Taller, Desktop: Original height */}
               <div 
-                className={`relative w-full h-[250px] md:h-[300px] group-hover:-translate-y-2 transition-all duration-300 ease-in-out transform perspective-1000`}
+                className={`relative w-full h-[280px] md:h-[300px] group-hover:-translate-y-2 transition-all duration-300 ease-in-out transform perspective-1000`}
                 style={{ 
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden'
@@ -158,26 +164,26 @@ function HowItWorks() {
               >
                 {/* Front of Card */}
                 <div 
-                  className={`absolute inset-0 w-full h-full rounded-3xl p-6 bg-gradient-to-br ${step.gradient} text-white shadow-xl relative overflow-hidden`}
+                  className={`absolute inset-0 w-full h-full rounded-3xl p-4 md:p-6 bg-gradient-to-br ${step.gradient} text-white shadow-xl relative overflow-hidden`}
                   style={{ 
                     transform: flippedCards.includes(index) ? 'rotateY(180deg)' : 'rotateY(0deg)',
                     backfaceVisibility: 'hidden',
                     transition: 'transform 0.6s ease-in-out'
                   }}
                 >
-                  {/* Floating badge */}
-                  <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-bl-3xl rounded-tr-3xl text-sm font-bold shadow-xl transform group-hover:scale-110 transition-transform duration-300 border-2 border-white">
+                  {/* Floating badge - Mobile: Smaller, Desktop: Original */}
+                  <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-2 md:px-3 py-1 rounded-bl-3xl rounded-tr-3xl text-xs md:text-sm font-bold shadow-xl transform group-hover:scale-110 transition-transform duration-300 border-2 border-white">
                     Step {index + 1}
                   </div>
 
                   <div className="flex flex-col items-center justify-center h-full text-center px-2">
-                    <h3 className="text-xl md:text-3xl font-display font-bold leading-tight">{step.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-display font-bold leading-tight">{step.title}</h3>
                   </div>
                 </div>
 
                 {/* Back of Card */}
                 <div 
-                  className={`absolute inset-0 w-full h-full rounded-3xl p-6 bg-white shadow-xl border border-gray-200`}
+                  className={`absolute inset-0 w-full h-full rounded-3xl p-4 md:p-6 bg-white shadow-xl border border-gray-200`}
                   style={{ 
                     transform: flippedCards.includes(index) ? 'rotateY(0deg)' : 'rotateY(-180deg)',
                     backfaceVisibility: 'hidden',
@@ -185,10 +191,10 @@ function HowItWorks() {
                   }}
                 >
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <h4 className={`text-lg font-bold mb-4 ${step.accentColor}`}>{step.backTitle}</h4>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <h4 className={`text-base md:text-lg font-bold mb-3 md:mb-4 ${step.accentColor}`}>{step.backTitle}</h4>
+                    <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm text-gray-600">
                       {step.backItems.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start gap-3">
+                        <li key={itemIndex} className="flex items-start gap-2 md:gap-3">
                           <span className="text-[#D6A77A] mt-0.5 flex-shrink-0">✓</span>
                           <span className="text-left">{item}</span>
                         </li>

@@ -39,9 +39,6 @@ const MobileBottomNav: React.FC = () => {
               <span className={`text-xs font-medium truncate ${active ? 'font-semibold' : ''}`}>
                 {item.label}
               </span>
-              {active && (
-                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#D6A77A] rounded-full"></div>
-              )}
             </Link>
           );
         })}
