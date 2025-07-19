@@ -41,7 +41,7 @@ function App() {
       <ScrollToTop />
       <Toaster position="top-right" />
       <Navbar />
-      <main className="pb-16 md:pb-0">
+      <main className="pt-20 pb-16 md:pb-0">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/events" element={<EventsPage />} />

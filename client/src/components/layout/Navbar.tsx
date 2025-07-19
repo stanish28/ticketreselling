@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav aria-label="Main navigation" className="sticky top-0 z-50 bg-white shadow-sm py-4 px-4 md:px-8 flex items-center justify-between text-base">
+    <nav aria-label="Main navigation" className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm py-4 px-4 md:px-8 flex items-center justify-between text-base">
       <div className="flex items-center space-x-8">
         <Link to="/" className="flex items-center space-x-2" aria-label="LayLow-India Home">
           <span className="w-7 h-7 rounded-lg bg-[#D6A77A] flex items-center justify-center font-extrabold text-white text-base">L</span>

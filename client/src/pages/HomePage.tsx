@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
-import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard, FaChevronLeft, FaChevronRight, FaArrowUp, FaPlus, FaPhone, FaEnvelope, FaWhatsapp, FaComments } from "react-icons/fa";
 import FeedbackButton from '../components/common/FeedbackButton.tsx';
 import { Event } from '../types/index.ts';
 import { eventsAPI } from '../services/api.ts';
@@ -100,14 +100,7 @@ const trustBadges = [
   { icon: <FaUsers className="text-2xl" />, text: "Money-back Guarantee" }
 ];
 
-// Add live ticker data
-const liveTickerItems = [
-  "🎫 Priya just bought Taylor Swift tickets in Mumbai",
-  "⚽ IPL final tickets selling fast in Bangalore", 
-  "🎭 Comedy show tickets available in Delhi",
-  "🎸 Ed Sheeran concert tickets released in Chennai",
-  "🏏 Cricket match tickets selling in Kolkata"
-];
+
 
 const TestimonialCard: React.FC<{ name: string; city: string; rating: number; text: string; img?: string }> = ({
   name, city, rating, text, img
@@ -135,7 +128,149 @@ const TestimonialCard: React.FC<{ name: string; city: string; rating: number; te
 
 // --- Main Home Page ---
 
-// --- Main Home Page ---
+// Floating Action Buttons Component
+const FloatingActionButtons = () => {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Show scroll to top button when user scrolls down
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Toggle FAB menu
+  const toggleFAB = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // FAB menu items
+  const fabItems = [
+    {
+      icon: <FaPhone className="text-white text-lg" />,
+      label: 'Call Support',
+      color: 'bg-blue-500 hover:bg-blue-600',
+      action: () => window.open('tel:+919876543210')
+    },
+    {
+      icon: <FaWhatsapp className="text-white text-lg" />,
+      label: 'WhatsApp',
+      color: 'bg-green-500 hover:bg-green-600',
+      action: () => window.open('https://wa.me/919876543210')
+    },
+    {
+      icon: <FaEnvelope className="text-white text-lg" />,
+      label: 'Email Us',
+      color: 'bg-purple-500 hover:bg-purple-600',
+      action: () => window.open('mailto:support@laylow-india.com')
+    },
+    {
+      icon: <FaComments className="text-white text-lg" />,
+      label: 'Live Chat',
+      color: 'bg-orange-500 hover:bg-orange-600',
+      action: () => alert('Opening live chat...')
+    }
+  ];
+
+  return (
+    <div className="absolute top-4 right-4 z-50 flex flex-col items-end space-y-4">
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="group bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] hover:from-[#C89A6B] hover:to-[#E55A2B] text-white w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95"
+          aria-label="Scroll to top"
+        >
+          <FaArrowUp className="text-lg group-hover:animate-bounce" />
+        </button>
+      )}
+
+      {/* FAB Menu Items - appear when expanded */}
+      <div className={`flex flex-col items-end space-y-3 transition-all duration-300 ${isExpanded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4 pointer-events-none'}`}>
+        {fabItems.map((item, index) => (
+          <div key={index} className="flex items-center space-x-3 group">
+            {/* Label */}
+            <div className="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              {item.label}
+            </div>
+            {/* Button */}
+            <button
+              onClick={item.action}
+              className={`${item.color} w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95`}
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animation: isExpanded ? 'fabSlideIn 0.3s ease-out forwards' : ''
+              }}
+              aria-label={item.label}
+            >
+              {item.icon}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Main FAB Button */}
+      <button
+        onClick={toggleFAB}
+        className="bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] hover:from-[#C89A6B] hover:to-[#E55A2B] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95 relative overflow-hidden"
+        aria-label={isExpanded ? "Close menu" : "Open menu"}
+        aria-expanded={isExpanded}
+      >
+        {/* Background pulse effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] rounded-full animate-ping opacity-20"></div>
+        
+        {/* Icon with rotation animation */}
+        <FaPlus 
+          className={`text-xl transition-transform duration-300 relative z-10 ${
+            isExpanded ? 'rotate-45' : 'rotate-0'
+          }`} 
+        />
+      </button>
+
+      {/* Backdrop for mobile - close FAB when tapped */}
+      {isExpanded && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-20 -z-10 md:hidden"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+
+      {/* Custom CSS styles */}
+      <style>{`
+        @keyframes fabSlideIn {
+          from {
+            transform: translateX(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        /* Smooth transitions for mobile */
+        @media (max-width: 768px) {
+          .group:hover .opacity-0 {
+            opacity: 1;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 function HowItWorks() {
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -487,26 +622,7 @@ function SafetyCards() {
   );
 }
 
-// Add Live Ticker Component
-const LiveTicker: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % liveTickerItems.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-[#D6A77A] text-white py-1.5 px-4 overflow-hidden">
-      <div className="max-w-5xl mx-auto flex items-center justify-center">
-        <span className="text-xs font-medium animate-pulse mr-2">🔴 LIVE</span>
-        <span className="text-xs">{liveTickerItems[currentIndex]}</span>
-      </div>
-    </div>
-  );
-};
 
 // Add Social Proof Stats Component
 const SocialProofStats: React.FC = () => (
@@ -579,10 +695,8 @@ const HomePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [isFabExpanded, setIsFabExpanded] = useState(false);
   const [currentTicketIndex, setCurrentTicketIndex] = useState(1); // Start at 1 to show first real ticket
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [dynamicEvents, setDynamicEvents] = useState<Event[]>([]);
@@ -633,7 +747,7 @@ const HomePage: React.FC = () => {
             scrollVelocity = (currentScrollTop - lastScrollTop) / timeDiff;
           }
           
-          setShowScrollTop(currentScrollTop > 400);
+          // Scroll to top is now handled by FloatingActionButtons component
           
           // Calculate scroll progress
           const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -754,9 +868,7 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Scroll to top is now handled by FloatingActionButtons component
 
   // Custom smooth scroll with easing
   const smoothScrollTo = (targetY: number, duration: number = 800) => {
@@ -851,7 +963,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div 
-      className={`bg-[#FAF8F6] min-h-screen font-sans overflow-x-hidden momentum-scroll ${isScrolling ? 'scrolling' : 'scrolled'}`} 
+      className={`relative bg-[#FAF8F6] min-h-screen font-sans overflow-x-hidden momentum-scroll ${isScrolling ? 'scrolling' : 'scrolled'}`} 
       style={{ maxWidth: '100vw', overflowX: 'hidden' }}
     >
       {/* Scroll Progress Indicator */}
@@ -862,8 +974,7 @@ const HomePage: React.FC = () => {
         />
       </div>
       
-      {/* Live Ticker */}
-      <LiveTicker />
+
       
       {/* Hero Section */}
       <section className="relative w-full min-h-[420px] md:h-[480px] lg:h-[560px] flex items-center justify-center overflow-hidden max-w-full">
@@ -942,7 +1053,7 @@ const HomePage: React.FC = () => {
       {/* Trending Tickets section */}
       <section 
         id="trending-tickets" 
-        className={`w-full max-w-5xl mx-auto py-12 px-4 transition-all duration-1000 ${
+        className={`relative w-full max-w-5xl mx-auto py-12 px-4 transition-all duration-1000 ${
           visibleSections.has('trending-tickets') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
@@ -1414,90 +1525,6 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50">
-        {/* Desktop: Always show all buttons */}
-        <div className="hidden md:flex flex-col gap-3">
-          <Link
-            to="/sell-ticket"
-            className="w-14 h-14 bg-[#FF6B35] text-white rounded-full shadow-xl hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
-            aria-label="Sell your ticket"
-          >
-            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📤</span>
-          </Link>
-          <Link
-            to="/events"
-            className="w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
-            aria-label="Browse events"
-          >
-            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
-          </Link>
-                                             <FeedbackButton
-               variant="button"
-               className="!w-14 !h-14 !bg-[#4A90E2] !text-white !rounded-full !shadow-xl hover:!bg-[#357ABD] !transition-all !duration-300 hover:!scale-110 active:!scale-95 !flex !items-center !justify-center group !border-2 !border-white !p-0 !min-w-0"
-             >
-               <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📝</span>
-             </FeedbackButton>
-        </div>
-
-        {/* Mobile: Expandable FAB */}
-        <div className="md:hidden relative">
-          {/* Expanded buttons */}
-          <div className={`absolute bottom-16 right-0 flex flex-col-reverse gap-3 transition-all duration-500 ease-in-out ${isFabExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-            <Link
-              to="/sell-ticket"
-              className="w-14 h-14 bg-[#FF6B35] text-white rounded-full shadow-xl hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
-              aria-label="Sell your ticket"
-            >
-              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📤</span>
-            </Link>
-            <Link
-              to="/events"
-              className="w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
-              aria-label="Browse events"
-            >
-              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
-            </Link>
-            <FeedbackButton
-              variant="button"
-              className="!w-14 !h-14 !bg-[#4A90E2] !text-white !rounded-full !shadow-xl hover:!bg-[#357ABD] !transition-all !duration-300 hover:!scale-110 active:!scale-95 !flex !items-center !justify-center group !border-2 !border-white !p-0 !min-w-0"
-            >
-              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📝</span>
-            </FeedbackButton>
-          </div>
-
-          {/* Main FAB button */}
-          <button
-            onClick={() => setIsFabExpanded(!isFabExpanded)}
-            className="w-14 h-14 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white relative z-10"
-            aria-label="Quick actions"
-          >
-            <svg 
-              width="24" 
-              height="24" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              className={`transition-transform duration-300 ${isFabExpanded ? 'rotate-45' : 'rotate-0'}`}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      {/* Scroll to Top Button - Positioned separately to avoid overlap */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-50 w-12 h-12 md:w-14 md:h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white"
-          aria-label="Scroll to top"
-        >
-          <svg width="20" height="20" className="md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 };
