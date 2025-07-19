@@ -1,97 +1,92 @@
-import { prisma } from '../src/config/database';
+import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+
+const prisma = new PrismaClient();
 
 async function createSampleEvents() {
   try {
-    // Check if events already exist
-    const existingEvents = await prisma.event.count();
-    if (existingEvents > 0) {
-      console.log(`${existingEvents} events already exist in the database`);
-      return;
-    }
+    console.log('Creating sample events...');
 
+    // Sample events data
     const sampleEvents = [
       {
-        title: 'Garba Night 2024',
-        description: 'Join us for an unforgettable evening of traditional Garba dance, music, and celebration. Experience the vibrant culture of Gujarat with live performances and authentic food.',
-        venue: 'Mumbai Convention Center',
-        date: new Date('2024-10-15T19:00:00Z'),
-        image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
-        category: 'Cultural',
-        capacity: 500
+        title: 'Ed Sheeran Live in Mumbai',
+        description: 'Experience the magic of Ed Sheeran live in concert at the iconic DY Patil Stadium. A night of unforgettable music and memories.',
+        venue: 'DY Patil Stadium, Mumbai',
+        date: new Date('2025-03-15T19:00:00.000Z'),
+        category: 'Concert',
+        capacity: 50000,
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80'
       },
       {
-        title: 'Rock Music Festival',
-        description: 'The biggest rock music festival of the year featuring top international and local artists. Get ready for an electrifying night of rock and roll!',
-        venue: 'Bangalore Palace Grounds',
-        date: new Date('2024-11-20T18:00:00Z'),
-        image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
-        category: 'Music',
-        capacity: 2000
+        title: 'IPL Final 2025',
+        description: 'Witness the grand finale of IPL 2025 with the best teams competing for the ultimate trophy.',
+        venue: 'Wankhede Stadium, Mumbai',
+        date: new Date('2025-05-25T19:30:00.000Z'),
+        category: 'Sports',
+        capacity: 35000,
+        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80'
       },
       {
-        title: 'Comedy Night Special',
-        description: 'Laugh your heart out with India\'s top comedians. A night filled with humor, wit, and endless entertainment.',
-        venue: 'Delhi Comedy Club',
-        date: new Date('2024-12-05T20:00:00Z'),
-        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+        title: 'Comedy Night with Kapil Sharma',
+        description: 'Laugh your heart out with India\'s favorite comedian Kapil Sharma and his talented team.',
+        venue: 'NCPA, Mumbai',
+        date: new Date('2025-04-10T20:00:00.000Z'),
         category: 'Comedy',
-        capacity: 300
+        capacity: 2000,
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
       },
       {
-        title: 'Tech Conference 2024',
-        description: 'Join industry leaders and innovators for the most anticipated tech conference. Learn about the latest trends in technology and network with professionals.',
-        venue: 'Hyderabad International Convention Center',
-        date: new Date('2024-11-10T09:00:00Z'),
-        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80',
-        category: 'Technology',
-        capacity: 1000
+        title: 'Tech Conference 2025',
+        description: 'Join industry leaders and innovators for the biggest tech conference of the year.',
+        venue: 'Bombay Exhibition Centre, Mumbai',
+        date: new Date('2025-06-20T09:00:00.000Z'),
+        category: 'Conference',
+        capacity: 5000,
+        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80'
       },
       {
-        title: 'Bollywood Night',
-        description: 'Experience the magic of Bollywood with live performances, dance competitions, and celebrity appearances. A night to remember!',
-        venue: 'Chennai Grand Hotel',
-        date: new Date('2024-12-25T19:30:00Z'),
-        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80',
-        category: 'Entertainment',
-        capacity: 800
+        title: 'Bollywood Music Night',
+        description: 'A magical evening of Bollywood\'s greatest hits performed by top artists.',
+        venue: 'Jio World Garden, Mumbai',
+        date: new Date('2025-07-05T18:30:00.000Z'),
+        category: 'Music',
+        capacity: 8000,
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80'
       },
       {
-        title: 'Food Festival',
-        description: 'Taste the best cuisines from around the world. From street food to gourmet dishes, this festival has it all!',
-        venue: 'Kolkata Food Street',
-        date: new Date('2024-10-30T12:00:00Z'),
-        image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80',
+        title: 'Food Festival 2025',
+        description: 'Taste the best cuisines from around the world at this grand food festival.',
+        venue: 'Bandra Kurla Complex, Mumbai',
+        date: new Date('2025-08-15T12:00:00.000Z'),
         category: 'Food',
-        capacity: 1500
+        capacity: 15000,
+        image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80'
       }
     ];
 
-    console.log('Creating sample events...');
-    
+    // Create events
     for (const eventData of sampleEvents) {
       const event = await prisma.event.create({
         data: eventData
       });
       console.log(`Created event: ${event.title}`);
-      
-      // Create some sample tickets for each event
-      const ticketPrices = [999, 1499, 799, 1299, 899, 699];
-      const randomPrice = ticketPrices[Math.floor(Math.random() * ticketPrices.length)];
-      
-      await prisma.ticket.create({
-        data: {
-          eventId: event.id,
-          sellerId: '1', // Assuming admin user ID is 1
-          price: randomPrice,
-          status: 'AVAILABLE',
-          listingType: 'DIRECT_SALE',
-          section: 'General',
-          row: 'A',
-          seat: '1'
-        }
-      });
-      
-      console.log(`Created ticket for ${event.title} at ₹${randomPrice}`);
+
+      // Add some sample tickets for each event
+      const ticketPrices = [800, 1200, 1800, 2500, 3500];
+      for (let i = 0; i < 5; i++) {
+        await prisma.ticket.create({
+          data: {
+            eventId: event.id,
+            sellerId: 'cmd8zknph00018p98dtsrh0rk', // Use the admin user ID
+            price: ticketPrices[i],
+            status: 'AVAILABLE',
+            seat: `${i + 1}`,
+            ticketType: 'SEATED'
+          }
+        });
+      }
+      console.log(`Added 5 tickets for ${event.title}`);
     }
 
     console.log('Sample events and tickets created successfully!');
