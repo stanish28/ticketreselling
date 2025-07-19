@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
@@ -6,7 +6,7 @@ import { CalendarIcon, MapPinIcon, UsersIcon, TicketIcon, CurrencyDollarIcon, Cl
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { eventsAPI } from '../services/api.ts';
-import { Event, Ticket } from '../types';
+import { Event } from '../types';
 
 const EventDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,22 +15,27 @@ const EventDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'direct' | 'auction'>('all');
 
-  useEffect(() => {
-    if (id) {
-      fetchEvent();
-    }
-  }, [id]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
+    if (!id) return;
+    
     try {
-      const data = await eventsAPI.getById(id!);
-      setEvent(data.data || null);
+      setLoading(true);
+      const response = await eventsAPI.getById(id);
+      if (response.success) {
+        setEvent(response.data || null);
+      } else {
+        toast.error('Failed to fetch event details');
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch event');
+      toast.error(error.message || 'Failed to fetch event details');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
 
   const getFilteredTickets = () => {
     if (!event || !event.tickets) return [];
@@ -211,9 +216,12 @@ const EventDetailPage: React.FC = () => {
               {availableTickets.map((ticket) => (
                 <div key={ticket.id} className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
+                    {/* Hide Available status tag on mobile */}
+                    <span className={`hidden md:inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                     <div className="flex items-center space-x-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getListingTypeColor(ticket.listingType)}`}>{ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}</span>
+                      {/* Hide Direct Sale/Auction tag on mobile */}
+                      <span className={`hidden md:inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getListingTypeColor(ticket.listingType)}`}>{ticket.listingType === 'AUCTION' ? 'Auction' : 'Direct Sale'}</span>
+                      {/* Show only Resell tag on mobile */}
                       {ticket.seller?.role !== 'ADMIN' && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Resell</span>
                       )}

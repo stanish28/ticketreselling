@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaChevronLeft, FaChevronDown, FaChevronRight, FaEnvelope, FaComments } from 'react-icons/fa';
+import { FaChevronDown, FaChevronRight, FaEnvelope, FaComments } from 'react-icons/fa';
 import ContactSupportButton from '../components/common/ContactSupportButton.tsx';
 import FeedbackButton from '../components/common/FeedbackButton.tsx';
 

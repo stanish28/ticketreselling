@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { adminAPI } from '../../services/api.ts';
 import { User, PaginatedResponse } from '../../types/index.ts';
 import LoadingSpinner from '../../components/common/LoadingSpinner.tsx';
 import { 
   MagnifyingGlassIcon, 
   PencilIcon, 
-  TrashIcon,
-  EyeIcon,
-  PlusIcon
+  TrashIcon
+  // EyeIcon,
+  // PlusIcon
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -23,11 +23,7 @@ const AdminUsers: React.FC = () => {
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [banningUser, setBanningUser] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [currentPage, searchTerm]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getUsers({
@@ -49,7 +45,11 @@ const AdminUsers: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);

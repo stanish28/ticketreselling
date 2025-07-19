@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
-import { PlusIcon, TrashIcon, PencilIcon, TicketIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, TicketIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { eventsAPI, ticketsAPI } from '../services/api.ts';
 import { Event, Ticket } from '../types';
@@ -10,7 +10,7 @@ import { Event, Ticket } from '../types';
 const AdminEventTicketsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { user } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,13 +30,7 @@ const AdminEventTicketsPage: React.FC = () => {
     ticketType: 'SEATED' as 'SEATED' | 'STANDING',
   });
 
-  useEffect(() => {
-    if (eventId) {
-      fetchEventAndTickets();
-    }
-  }, [eventId]);
-
-  const fetchEventAndTickets = async () => {
+  const fetchEventAndTickets = useCallback(async () => {
     try {
       const [eventResponse, ticketsResponse] = await Promise.all([
         eventsAPI.getById(eventId!),
@@ -55,7 +49,13 @@ const AdminEventTicketsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEventAndTickets();
+    }
+  }, [eventId, fetchEventAndTickets]);
 
   const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();

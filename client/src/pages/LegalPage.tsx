@@ -3,12 +3,7 @@ import { Link } from 'react-router-dom';
 
 const LegalPage: React.FC = () => {
 
-  const navItems = [
-    { href: '/legal/terms', label: 'Terms of Service' },
-    { href: '/legal/privacy', label: 'Privacy Policy' },
-    { href: '/legal/refund', label: 'Refund Policy' },
-    { href: '/legal/seller-agreement', label: 'Seller Agreement' }
-  ];
+  
 
   return (
     <div className="min-h-screen bg-[#FAF8F6] font-sans">

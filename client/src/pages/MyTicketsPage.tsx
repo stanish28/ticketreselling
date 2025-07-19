@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.tsx';
+// import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
 import { CalendarIcon, MapPinIcon, CurrencyDollarIcon, TicketIcon, QrCodeIcon, EyeIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
@@ -34,7 +34,7 @@ interface Bid {
 }
 
 const MyTicketsPage: React.FC = () => {
-  const { user } = useAuth();
+  // const { user: authUser } = useAuth();
   const [tickets, setTickets] = useState<PurchasedTicket[]>([]);
   const [listings, setListings] = useState<ListedTicket[]>([]);
   const [loading, setLoading] = useState(true);

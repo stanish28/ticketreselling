@@ -33,7 +33,7 @@ import TermsOfServicePage from './pages/TermsOfServicePage.tsx';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.tsx';
 import RefundPolicyPage from './pages/RefundPolicyPage.tsx';
 import SellerAgreementPage from './pages/SellerAgreementPage.tsx';
-import FeedbackButton from './components/common/FeedbackButton.tsx';
+
 
 function App() {
   return (

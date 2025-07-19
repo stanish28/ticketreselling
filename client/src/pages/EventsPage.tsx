@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { eventsAPI } from '../services/api.ts';
 import { Event } from '../types';
@@ -10,7 +10,6 @@ import {
   MagnifyingGlassIcon, 
   XMarkIcon,
   FunnelIcon,
-  StarIcon,
   ClockIcon,
   FireIcon,
   SparklesIcon
@@ -33,18 +32,13 @@ const EventsPage: React.FC = () => {
     maxPrice: ''
   });
   const [categories, setCategories] = useState<string[]>([]);
-  const [stats, setStats] = useState({
-    totalEvents: 0,
-    upcomingEvents: 0,
-    featuredEvents: 0
-  });
+  // const [stats, setStats] = useState({
+  //   totalEvents: 0,
+  //   upcomingEvents: 0,
+  //   featuredEvents: 0
+  // });
 
-  useEffect(() => {
-    fetchEvents();
-    fetchCategories();
-  }, []);
-
-  const fetchEvents = async (newFilters = filters) => {
+  const fetchEvents = useCallback(async (newFilters = filters) => {
     setLoading(true);
     try {
       const params: any = { 
@@ -63,26 +57,23 @@ const EventsPage: React.FC = () => {
         setEvents(eventsData);
         
         // Calculate stats
-        const now = new Date();
-        const upcomingEvents = eventsData.filter(event => new Date(event.date) > now).length;
-        
-        setStats({
-          totalEvents: eventsData.length,
-          upcomingEvents,
-          featuredEvents: 0
-        });
+        // const now = new Date();
+        // const upcomingEvents = eventsData.filter(event => new Date(event.date) > now).length;
       } else {
         setEvents([]);
-        setStats({ totalEvents: 0, upcomingEvents: 0, featuredEvents: 0 });
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch events');
       setEvents([]);
-      setStats({ totalEvents: 0, upcomingEvents: 0, featuredEvents: 0 });
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchEvents();
+    fetchCategories();
+  }, [fetchEvents]);
 
   const fetchCategories = async () => {
     try {

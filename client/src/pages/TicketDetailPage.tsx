@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/common/LoadingSpinner.tsx';
@@ -16,32 +16,38 @@ const TicketDetailPage: React.FC = () => {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  // const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [placingBid, setPlacingBid] = useState(false);
   const [minBidAmount, setMinBidAmount] = useState(1);
 
-  useEffect(() => {
-    if (id) {
-      fetchTicketDetails();
-    }
-  }, [id]);
-
-  const fetchTicketDetails = async () => {
+  const fetchTicketDetails = useCallback(async () => {
+    if (!id) return;
+    
     try {
-      const data = await ticketsAPI.getById(id!);
-      setTicket(data.data || null);
+      setLoading(true);
+      const response = await ticketsAPI.getById(id);
+      if (response.success) {
+        setTicket(response.data || null);
 
-      // If it's an auction, fetch bids
-      if (data.data?.listingType === 'AUCTION') {
-        fetchBids();
+        // If it's an auction, fetch bids
+        if (response.data?.listingType === 'AUCTION') {
+          // Fetch bids after setting ticket
+          setTimeout(() => fetchBids(), 0);
+        }
+      } else {
+        toast.error('Failed to fetch ticket details');
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch ticket details');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    fetchTicketDetails();
+  }, [fetchTicketDetails]);
 
   const fetchBids = async () => {
     try {
@@ -77,7 +83,7 @@ const TicketDetailPage: React.FC = () => {
         cvv: '123'
       };
 
-      const result = await ticketsAPI.purchase(id!, purchaseData);
+      await ticketsAPI.purchase(id!, purchaseData);
       toast.success('Ticket purchased successfully!');
       
       // Refresh navbar ticket count
@@ -199,9 +205,12 @@ const TicketDetailPage: React.FC = () => {
               )}
               <div className="p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
+                  {/* Hide Available status tag on mobile */}
+                  <span className={`hidden md:inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                   <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getListingTypeColor(ticket.listingType)}`}>{isAuction ? 'Auction' : 'Direct Sale'}</span>
+                    {/* Hide Direct Sale/Auction tag on mobile */}
+                    <span className={`hidden md:inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${getListingTypeColor(ticket.listingType)}`}>{isAuction ? 'Auction' : 'Direct Sale'}</span>
+                    {/* Show only Resell tag on mobile */}
                     {ticket.seller?.role !== 'ADMIN' && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">Resell Ticket</span>
                     )}

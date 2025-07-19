@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { adminAPI } from '../../services/api.ts';
 import { Ticket, PaginatedResponse } from '../../types/index.ts';
 import LoadingSpinner from '../../components/common/LoadingSpinner.tsx';
@@ -6,7 +6,7 @@ import {
   MagnifyingGlassIcon, 
   PencilIcon, 
   TrashIcon,
-  EyeIcon,
+  // EyeIcon,
   FunnelIcon
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
@@ -23,11 +23,7 @@ const AdminTickets: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deletingTicket, setDeletingTicket] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTickets();
-  }, [currentPage, searchTerm, statusFilter]);
-
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getTickets({
@@ -48,7 +44,11 @@ const AdminTickets: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, statusFilter]);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [fetchTickets]);
 
   const handleEditTicket = (ticket: Ticket) => {
     setEditingTicket(ticket);

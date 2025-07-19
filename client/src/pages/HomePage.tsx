@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
 import { FaSearch, FaLock, FaRegSmile } from "react-icons/fa";
-import { Event, Ticket } from '../types';
+import { Event } from '../types';
 import { eventsAPI } from '../services/api.ts';
 
 const TestimonialCard: React.FC<{ name: string; city: string; rating: number; text: string; img?: string }> = ({
@@ -365,32 +365,26 @@ const HomePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Carousel state for mobile trending tickets
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
     let ticking = false;
-    let lastScrollTop = 0;
-    let scrollVelocity = 0;
-    let lastScrollTime = Date.now();
     let scrollTimeout: NodeJS.Timeout | null = null;
     
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const currentTime = Date.now();
           const currentScrollTop = window.scrollY;
-          const timeDiff = currentTime - lastScrollTime;
-          
-          // Calculate scroll velocity
-          if (timeDiff > 0) {
-            scrollVelocity = (currentScrollTop - lastScrollTop) / timeDiff;
-          }
           
           // Scroll to top is now handled by FloatingActionButtons component
           
@@ -410,11 +404,7 @@ const HomePage: React.FC = () => {
           // Set timeout to detect when scrolling stops
           scrollTimeout = setTimeout(() => {
             setIsScrolling(false);
-            scrollVelocity = 0;
           }, 150); // Adjust this value to control when scrolling is considered "stopped"
-          
-          lastScrollTop = currentScrollTop;
-          lastScrollTime = currentTime;
           
           ticking = false;
         });
@@ -451,9 +441,7 @@ const HomePage: React.FC = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            requestAnimationFrame(() => {
-              setVisibleSections(prev => new Set(prev).add(entry.target.id));
-            });
+            // Section is visible - could add animations here if needed
           }
         });
       },
@@ -513,30 +501,47 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
+  // Carousel handlers for mobile trending tickets
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe && currentSlide < events.length - 1) {
+      setCurrentSlide(currentSlide + 1);
+    } else if (isRightSwipe && currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
+  const nextSlide = () => {
+    if (currentSlide < events.length - 1) {
+      setCurrentSlide(currentSlide + 1);
+    }
+  };
+
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+    }
+  };
+
   // Scroll to top is now handled by FloatingActionButtons component
 
-  // Custom smooth scroll with easing
-  const smoothScrollTo = (targetY: number, duration: number = 800) => {
-    const startY = window.pageYOffset;
-    const distance = targetY - startY;
-    const startTime = performance.now();
 
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
-    const animateScroll = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = easeOutCubic(progress);
-      
-      window.scrollTo(0, startY + distance * easedProgress);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animateScroll);
-      }
-    };
-
-    requestAnimationFrame(animateScroll);
-  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -705,87 +710,217 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {events.map((event, idx) => {
-              const displayEvent = transformEventForDisplay(event);
-              return (
+          <>
+            {/* Mobile Carousel */}
+            <div className="md:hidden relative">
               <div 
-                key={event.id} 
-                className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu"
-                style={{
-                  animationDelay: `${idx * 100}ms`,
-                  animation: 'fadeInUp 0.6s ease-out forwards'
-                }}
+                className="flex transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
-                {/* Badges */}
-                <div className="w-full flex flex-wrap gap-2 mb-3">
-                  {displayEvent.displayBadges.map((badge, badgeIdx) => (
-                    <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-                
-                {/* Image with overlay */}
-                <div className="relative w-full mb-3 overflow-hidden rounded-xl">
-                  <img
-                    src={displayEvent.displayImage}
-                    alt={`Event: ${displayEvent.displayName} in ${displayEvent.displayLocation}`}
-                    loading="lazy"
-                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                
-                {/* Event Details */}
-                <div className="w-full text-center">
-                  <div className="text-card-title font-display text-[#222] mb-1 group-hover:text-[#D6A77A] transition-colors duration-300">{displayEvent.displayName}</div>
-                  <div className="text-caption mb-2 flex items-center justify-center gap-2">
-                    <span>{displayEvent.displayDate} • {displayEvent.displayLocation}</span>
-                    <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
-                      {displayEvent.category}
-                    </span>
-                  </div>
-                  
-                  {/* Rating and Sold Count */}
-                  <div className="flex items-center justify-center gap-4 mb-3 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span className="text-[#D6A77A]">★</span>
-                      <span className="text-[#6B6B6B]">{displayEvent.displayRating.toFixed(1)}</span>
+                {events.map((event, idx) => {
+                  const displayEvent = transformEventForDisplay(event);
+                  return (
+                    <div 
+                      key={event.id} 
+                      className="w-full flex-shrink-0 px-2"
+                    >
+                      <div className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu">
+                        {/* Badges */}
+                        <div className="w-full flex flex-wrap gap-2 mb-3">
+                          {displayEvent.displayBadges.map((badge, badgeIdx) => (
+                            <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                              {badge}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        {/* Image with overlay */}
+                        <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                          <img
+                            src={displayEvent.displayImage}
+                            alt={`Event: ${displayEvent.displayName} in ${displayEvent.displayLocation}`}
+                            loading="lazy"
+                            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        
+                        {/* Event Details */}
+                        <div className="w-full text-center">
+                          <div className="text-card-title font-display text-[#222] mb-1 group-hover:text-[#D6A77A] transition-colors duration-300">{displayEvent.displayName}</div>
+                          <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                            <span>{displayEvent.displayDate} • {displayEvent.displayLocation}</span>
+                            <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                              {displayEvent.category}
+                            </span>
+                          </div>
+                          
+                          {/* Rating and Sold Count */}
+                          <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#D6A77A]">★</span>
+                              <span className="text-[#6B6B6B]">{displayEvent.displayRating.toFixed(1)}</span>
+                            </div>
+                            <div className="text-[#6B6B6B]">
+                              {displayEvent.displaySoldCount} sold
+                            </div>
+                          </div>
+                          
+                          {/* Price Section */}
+                          <div className="mb-3">
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                              <span className="text-3xl font-black text-[#D6A77A] group-hover:text-[#FF6B35] transition-colors duration-300">₹{displayEvent.displayPrice}</span>
+                              <span className="text-lg text-[#A9A9A9] line-through">₹{displayEvent.displayOriginalPrice}</span>
+                            </div>
+                            <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                              {Math.round(((displayEvent.displayOriginalPrice - displayEvent.displayPrice) / displayEvent.displayOriginalPrice) * 100)}% OFF
+                            </div>
+                          </div>
+                          
+                          {/* CTA Button */}
+                          <Link 
+                            to={`/events/${event.id}`}
+                            className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-base group-hover:shadow-[0_10px_25px_rgba(255,107,53,0.4)] flex items-center justify-center gap-2"
+                          >
+                            <span>🎟️</span>
+                            Buy Ticket
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[#6B6B6B]">
-                      {displayEvent.displaySoldCount} sold
-                    </div>
-                  </div>
-                  
-                  {/* Price Section */}
-                  <div className="mb-3">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <span className="text-3xl font-black text-[#D6A77A] group-hover:text-[#FF6B35] transition-colors duration-300">₹{displayEvent.displayPrice}</span>
-                      <span className="text-lg text-[#A9A9A9] line-through">₹{displayEvent.displayOriginalPrice}</span>
-                    </div>
-                    <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
-                      {Math.round(((displayEvent.displayOriginalPrice - displayEvent.displayPrice) / displayEvent.displayOriginalPrice) * 100)}% OFF
-                    </div>
-                  </div>
-                  
-                  {/* CTA Button */}
-                  <Link 
-                    to={`/events/${event.id}`}
-                    className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-base group-hover:shadow-[0_10px_25px_rgba(255,107,53,0.4)] flex items-center justify-center gap-2"
-                  >
-                    <span>🎟️</span>
-                    Buy Ticket
-                  </Link>
-                </div>
+                  );
+                })}
               </div>
-            );
-          })}
-          </div>
+              
+              {/* Navigation Dots */}
+              <div className="flex justify-center mt-6 space-x-2">
+                {events.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      idx === currentSlide 
+                        ? 'bg-[#FF6B35] scale-110' 
+                        : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+              
+              {/* Navigation Arrows */}
+              {events.length > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    disabled={currentSlide === 0}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Previous slide"
+                  >
+                    ←
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    disabled={currentSlide === events.length - 1}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Next slide"
+                  >
+                    →
+                  </button>
+                </>
+              )}
+            </div>
+            
+            {/* Desktop Grid */}
+            <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {events.map((event, idx) => {
+                const displayEvent = transformEventForDisplay(event);
+                return (
+                <div 
+                  key={event.id} 
+                  className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu"
+                  style={{
+                    animationDelay: `${idx * 100}ms`,
+                    animation: 'fadeInUp 0.6s ease-out forwards'
+                  }}
+                >
+                  {/* Badges */}
+                  <div className="w-full flex flex-wrap gap-2 mb-3">
+                    {displayEvent.displayBadges.map((badge, badgeIdx) => (
+                      <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  {/* Image with overlay */}
+                  <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                    <img
+                      src={displayEvent.displayImage}
+                      alt={`Event: ${displayEvent.displayName} in ${displayEvent.displayLocation}`}
+                      loading="lazy"
+                      className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  {/* Event Details */}
+                  <div className="w-full text-center">
+                    <div className="text-card-title font-display text-[#222] mb-1 group-hover:text-[#D6A77A] transition-colors duration-300">{displayEvent.displayName}</div>
+                    <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                      <span>{displayEvent.displayDate} • {displayEvent.displayLocation}</span>
+                      <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                        {displayEvent.category}
+                      </span>
+                    </div>
+                    
+                    {/* Rating and Sold Count */}
+                    <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#D6A77A]">★</span>
+                        <span className="text-[#6B6B6B]">{displayEvent.displayRating.toFixed(1)}</span>
+                      </div>
+                      <div className="text-[#6B6B6B]">
+                        {displayEvent.displaySoldCount} sold
+                      </div>
+                    </div>
+                    
+                    {/* Price Section */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <span className="text-3xl font-black text-[#D6A77A] group-hover:text-[#FF6B35] transition-colors duration-300">₹{displayEvent.displayPrice}</span>
+                        <span className="text-lg text-[#A9A9A9] line-through">₹{displayEvent.displayOriginalPrice}</span>
+                      </div>
+                      <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                        {Math.round(((displayEvent.displayOriginalPrice - displayEvent.displayPrice) / displayEvent.displayOriginalPrice) * 100)}% OFF
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <Link 
+                      to={`/events/${event.id}`}
+                      className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-base group-hover:shadow-[0_10px_25px_rgba(255,107,53,0.4)] flex items-center justify-center gap-2"
+                    >
+                      <span>🎟️</span>
+                      Buy Ticket
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+            </div>
+          </>
         )}
       </section>
 
