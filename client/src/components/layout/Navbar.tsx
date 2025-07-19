@@ -103,21 +103,21 @@ const Navbar: React.FC = () => {
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end">
-          <div className="w-72 bg-white h-full shadow-lg p-6 flex flex-col">
+          <div className="w-80 sm:w-96 bg-white h-full shadow-lg p-6 flex flex-col">
             <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="self-end mb-6 p-2 rounded-lg hover:bg-[#F5E7D6] transition-colors">
               <FaTimes className="text-2xl text-[#D6A77A]" />
             </button>
             <ul className="flex flex-col space-y-4" role="menu">
               {user && user.role === 'ADMIN' ? (
                 <li>
-                  <Link to="/admin" className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`} onClick={() => setMobileOpen(false)} role="menuitem">Dashboard</Link>
+                  <Link to="/admin" className={`font-semibold px-3 py-3 rounded-lg transition-colors ${isActive('/admin') ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A] hover:bg-[#F5E7D6]'}`} onClick={() => setMobileOpen(false)} role="menuitem">Dashboard</Link>
                 </li>
               ) : (
                 navLinks.map(link => (
                   <li key={link.to}>
                     <Link
                       to={link.to}
-                      className={`font-semibold px-3 py-2 rounded-lg transition-colors ${isActive(link.to) ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A]'}`}
+                      className={`font-semibold px-3 py-3 rounded-lg transition-colors ${isActive(link.to) ? 'bg-[#F5E7D6] text-[#D6A77A] font-bold' : 'text-[#222] hover:text-[#D6A77A] hover:bg-[#F5E7D6]'}`}
                       aria-current={isActive(link.to) ? 'page' : undefined}
                       onClick={() => setMobileOpen(false)}
                       role="menuitem"
@@ -130,17 +130,18 @@ const Navbar: React.FC = () => {
             </ul>
             <div className="flex-1" />
             <div className="flex flex-col space-y-3 mt-8">
-              <Link to="/legal" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>Legal</Link>
+              <Link to="/legal" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>Legal</Link>
+              <Link to="/faq" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>FAQ</Link>
               {user ? (
                 <>
-                  <Link to="/profile" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>Profile</Link>
-                  <Link to="/my-tickets" className="block px-4 py-2 text-[#222] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>My Tickets</Link>
-                  <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="block w-full text-left px-4 py-2 text-[#FF6B35] hover:bg-[#F5E7D6] rounded-lg transition-colors">Logout</button>
+                  <Link to="/profile" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>Profile</Link>
+                  <Link to="/my-tickets" className="block px-4 py-3 text-[#222] rounded-lg transition-colors hover:bg-[#F5E7D6] hover:text-[#D6A77A]" onClick={() => setMobileOpen(false)}>My Tickets</Link>
+                  <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="block w-full text-left px-4 py-3 text-[#FF6B35] hover:bg-[#F5E7D6] rounded-lg transition-colors">Logout</button>
                 </>
               ) : (
                 <>
-                  <Link to="/register" className="px-5 py-2.5 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-sm" onClick={() => setMobileOpen(false)}>Sign Up</Link>
-                  <Link to="/login" className="px-5 py-2.5 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-sm" onClick={() => setMobileOpen(false)}>Log In</Link>
+                  <Link to="/register" className="px-5 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition text-sm text-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
+                  <Link to="/login" className="px-5 py-3 rounded-full font-bold bg-white border border-[#E5E5E5] text-[#222] hover:bg-[#F5E7D6] transition text-sm text-center" onClick={() => setMobileOpen(false)}>Log In</Link>
                 </>
               )}
             </div>

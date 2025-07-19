@@ -44,6 +44,15 @@ router.get('/', async (req, res) => {
         take: Number(limit),
         orderBy: { date: 'asc' },
         include: {
+          tickets: {
+            where: { status: 'AVAILABLE' },
+            include: {
+              seller: {
+                select: { id: true, name: true, email: true, role: true }
+              }
+            },
+            orderBy: { price: 'asc' }
+          },
           _count: {
             select: {
               tickets: {
@@ -71,6 +80,24 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Get events error:', error);
     res.status(500).json({ error: 'Failed to fetch events' });
+  }
+});
+
+// Get event categories
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await prisma.event.findMany({
+      select: { category: true },
+      distinct: ['category']
+    });
+
+    res.json({
+      success: true,
+      data: categories.map((c: any) => c.category)
+    });
+  } catch (error) {
+    console.error('Get categories error:', error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
 
@@ -218,24 +245,6 @@ router.delete('/:id', [authenticateToken, requireAdmin], async (req: Authenticat
   } catch (error) {
     console.error('Delete event error:', error);
     res.status(500).json({ error: 'Failed to delete event' });
-  }
-});
-
-// Get event categories
-router.get('/categories', async (req, res) => {
-  try {
-    const categories = await prisma.event.findMany({
-      select: { category: true },
-      distinct: ['category']
-    });
-
-    res.json({
-      success: true,
-      data: categories.map((c: any) => c.category)
-    });
-  } catch (error) {
-    console.error('Get categories error:', error);
-    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
 

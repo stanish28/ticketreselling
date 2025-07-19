@@ -28,19 +28,19 @@ const MobileBottomNav: React.FC = () => {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all duration-200 min-w-0 flex-1 ${
+              className={`flex flex-col items-center justify-center py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 min-w-0 flex-1 ${
                 active 
-                  ? 'text-orange-500 bg-orange-50' 
-                  : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                  ? 'text-[#D6A77A] bg-[#F5E7D6]' 
+                  : 'text-gray-600 hover:text-[#D6A77A] hover:bg-[#F5E7D6]'
               }`}
               aria-label={item.label}
             >
-              <Icon className={`text-xl mb-1 ${active ? 'scale-110' : ''} transition-transform duration-200`} />
+              <Icon className={`text-lg sm:text-xl mb-1 ${active ? 'scale-110' : ''} transition-transform duration-200`} />
               <span className={`text-xs font-medium truncate ${active ? 'font-semibold' : ''}`}>
                 {item.label}
               </span>
               {active && (
-                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-orange-500 rounded-full"></div>
+                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#D6A77A] rounded-full"></div>
               )}
             </Link>
           );
