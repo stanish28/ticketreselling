@@ -7,20 +7,7 @@ import { eventsAPI } from '../services/api.ts';
 
 
 
-// Add social proof data
-const socialProofData = {
-  userCount: "50,000+",
-  ticketsSold: "1,247",
-  trustScore: "99.8%",
-  supportHours: "24/7"
-};
 
-const trustBadges = [
-  { icon: <FaShieldAlt className="text-2xl" />, text: "256-bit SSL Security" },
-  { icon: <FaCreditCard className="text-2xl" />, text: "Secure Payments" },
-  { icon: <FaTicketAlt className="text-2xl" />, text: "100% Verified Tickets" },
-  { icon: <FaUsers className="text-2xl" />, text: "Money-back Guarantee" }
-];
 
 
 
@@ -324,63 +311,7 @@ function SafetyCards() {
 // Add Live Ticker Component
 
 
-// Add Social Proof Stats Component
-const SocialProofStats: React.FC = () => (
-  <section className="w-full py-12 bg-white">
-    <div className="max-w-6xl mx-auto px-4">
-      {/* Main Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-        <div className="text-center">
-          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">50,000+</div>
-          <div className="text-sm text-[#6B6B6B] font-medium">Happy Users</div>
-        </div>
-        <div className="text-center">
-          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">1,247</div>
-          <div className="text-sm text-[#6B6B6B] font-medium">Tickets Sold</div>
-        </div>
-        <div className="text-center">
-          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">99.8%</div>
-          <div className="text-sm text-[#6B6B6B] font-medium">Trust Score</div>
-        </div>
-        <div className="text-center">
-          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">24/7</div>
-          <div className="text-sm text-[#6B6B6B] font-medium">Support</div>
-        </div>
-      </div>
 
-      {/* Trust Indicators */}
-      <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-8">
-        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
-          <span className="text-[#D6A77A]">🔒</span>
-          <span className="text-sm font-medium text-[#6B6B6B]">256-bit SSL</span>
-        </div>
-        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
-          <span className="text-[#D6A77A]">💳</span>
-          <span className="text-sm font-medium text-[#6B6B6B]">Secure Payments</span>
-        </div>
-        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
-          <span className="text-[#D6A77A]">✅</span>
-          <span className="text-sm font-medium text-[#6B6B6B]">Verified Tickets</span>
-        </div>
-        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
-          <span className="text-[#D6A77A]">💰</span>
-          <span className="text-sm font-medium text-[#6B6B6B]">Money-back Guarantee</span>
-        </div>
-      </div>
-
-      {/* Press Mentions */}
-      <div className="text-center">
-        <p className="text-sm text-[#A9A9A9] mb-3">Featured in</p>
-        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 opacity-70">
-          <span className="text-lg font-bold text-[#6B6B6B]">Economic Times</span>
-          <span className="text-lg font-bold text-[#6B6B6B]">YourStory</span>
-          <span className="text-lg font-bold text-[#6B6B6B]">TechCrunch India</span>
-          <span className="text-lg font-bold text-[#6B6B6B]">Inc42</span>
-        </div>
-      </div>
-    </div>
-  </section>
-);
 
 
 
@@ -738,8 +669,7 @@ const HomePage: React.FC = () => {
       {/* Safety Section (Moved up from section 8) */}
       <SafetyCards />
 
-      {/* Social Proof Stats */}
-      <SocialProofStats />
+
 
       {/* Testimonials */}
       <section className="w-full max-w-5xl mx-auto py-10 px-4">
@@ -767,7 +697,7 @@ const HomePage: React.FC = () => {
           <p className="text-body-large text-[#6B6B6B]">Here are some quick answers:</p>
         </div>
         
-        <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-2xl shadow-lg border border-[#E5E5E5] p-6">
             <h3 className="text-card-title font-display text-[#222] mb-3">
               How do I know the tickets are genuine?
