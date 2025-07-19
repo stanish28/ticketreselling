@@ -3,39 +3,81 @@ import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
 import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import FeedbackButton from '../components/common/FeedbackButton.tsx';
+import { Event } from '../types/index.ts';
+import { eventsAPI } from '../services/api.ts';
 
-const events = [
+// Helper function to transform Event data for display
+const transformEventForDisplay = (event: Event) => {
+  const eventDate = new Date(event.date);
+  const formattedDate = eventDate.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  
+  // Generate badges based on event data
+  const badges = ['🔥 Trending'];
+  if (event._count?.tickets && event._count.tickets < 10) {
+    badges.push(`⏳ Only ${event._count.tickets} left`);
+  }
+  
+  // Calculate average price from tickets if available
+  const avgPrice = event.tickets && event.tickets.length > 0 
+    ? Math.round(event.tickets.reduce((sum, ticket) => sum + ticket.price, 0) / event.tickets.length)
+    : 999;
+  
+  const originalPrice = Math.round(avgPrice * 1.3); // 30% markup for original price
+  
+  return {
+    id: event.id,
+    name: event.title,
+    date: formattedDate,
+    location: event.venue,
+    image: event.image || 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
+    price: avgPrice,
+    badges,
+    originalPrice,
+    category: event.category,
+    rating: 4.8, // Default rating
+    soldCount: event._count?.tickets || 0
+  };
+};
+
+// Static events for fallback
+const staticEvents = [
   {
+    id: 'static-1',
     name: 'Garba Night',
     date: 'Sept 17',
     location: 'Mumbai',
     image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
     price: 999,
-    badges: ['🔥 Trending', '⏳ Only 4 left', '✅ Verified Seller'],
+    badges: ['🔥 Trending', '⏳ Only 4 left'],
     originalPrice: 1299,
     category: 'Cultural',
     rating: 4.8,
     soldCount: 156
   },
   {
+    id: 'static-2',
     name: 'Music Festival',
     date: 'Oct 5',
     location: 'Bangalore',
     image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
     price: 1499,
-    badges: ['🔥 Trending', '⏳ Only 2 left', '✅ Verified Seller'],
+    badges: ['🔥 Trending', '⏳ Only 2 left'],
     originalPrice: 1999,
     category: 'Music',
     rating: 4.9,
     soldCount: 89
   },
   {
+    id: 'static-3',
     name: 'Comedy Club',
     date: 'Oct 20',
     location: 'Delhi',
     image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
     price: 799,
-    badges: ['🔥 Trending', '⏳ Only 6 left', '✅ Verified Seller'],
+    badges: ['🔥 Trending', '⏳ Only 6 left'],
     originalPrice: 999,
     category: 'Comedy',
     rating: 4.7,
@@ -362,11 +404,11 @@ function SafetyCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-stretch">
       {safetyFeatures.map((feature, index) => (
         <div 
           key={index}
-          className="relative h-72 md:h-80 cursor-pointer group"
+          className="relative h-72 md:h-80 cursor-pointer group flex flex-col"
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={() => handleMouseLeave(index)}
           onTouchEnd={() => handleTouch(index)}
@@ -392,19 +434,18 @@ function SafetyCards() {
             }}
           >
                         {/* Front Side */}
-            <div className="w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-center text-center border border-[#D6A77A]/20 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2 relative overflow-hidden">
+            <div className="w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-between text-center border border-[#D6A77A]/20 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2 relative overflow-hidden">
               {/* Background gradient overlay */}
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
               
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col items-center justify-center flex-1">
                 <div className="w-16 h-16 md:w-24 md:h-24 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg md:text-card-title font-display text-[#222] mb-3 md:mb-4 group-hover:text-[#D6A77A] transition-colors duration-300">{feature.title}</h3>
-                <p className="text-sm md:text-body text-[#6B6B6B] mb-4 md:mb-6 prose">
+                <p className="text-sm md:text-body text-[#6B6B6B] prose">
                   {feature.description}
                 </p>
-
               </div>
             </div>
           </div>
@@ -421,14 +462,14 @@ function SafetyCards() {
             }}
           >
                         {/* Back Side */}
-            <div className={`w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br ${feature.gradient} text-white shadow-xl relative overflow-hidden`}>
+            <div className={`w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-between text-center bg-gradient-to-br ${feature.gradient} text-white shadow-xl relative overflow-hidden`}>
               {/* Animated background pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-4 right-4 w-8 h-8 border-2 border-white rounded-full animate-ping"></div>
               </div>
               
-              <div className="relative z-10">
-                                  <h3 className="text-lg md:text-card-title font-display mb-4 md:mb-6">{feature.backTitle}</h3>
+              <div className="relative z-10 flex flex-col items-center justify-center flex-1">
+                <h3 className="text-lg md:text-card-title font-display mb-4 md:mb-6">{feature.backTitle}</h3>
                 <div className="space-y-3 md:space-y-4 text-left">
                   {feature.backItems.map((item, itemIndex) => (
                     <div key={itemIndex} className="flex items-center group/item">
@@ -437,7 +478,6 @@ function SafetyCards() {
                     </div>
                   ))}
                 </div>
-
               </div>
             </div>
           </div>
@@ -545,6 +585,32 @@ const HomePage: React.FC = () => {
   const [isFabExpanded, setIsFabExpanded] = useState(false);
   const [currentTicketIndex, setCurrentTicketIndex] = useState(1); // Start at 1 to show first real ticket
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [dynamicEvents, setDynamicEvents] = useState<Event[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [eventsError, setEventsError] = useState('');
+
+  // Fetch trending events from API
+  useEffect(() => {
+    const fetchTrendingEvents = async () => {
+      try {
+        setIsLoadingEvents(true);
+        const response = await eventsAPI.getAll({ limit: 6 }); // Get top 6 trending events
+        if (response.data?.events) {
+          setDynamicEvents(response.data.events);
+        } else {
+          setDynamicEvents([]);
+        }
+      } catch (err) {
+        console.error('Error fetching trending events:', err);
+        setEventsError('Failed to load trending events');
+        setDynamicEvents([]);
+      } finally {
+        setIsLoadingEvents(false);
+      }
+    };
+
+    fetchTrendingEvents();
+  }, []);
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
@@ -666,9 +732,10 @@ const HomePage: React.FC = () => {
 
   const nextTicket = () => {
     if (isTransitioning) return;
+    const displayEvents = dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents;
     
     setCurrentTicketIndex((prev) => {
-      if (prev === events.length) {
+      if (prev === displayEvents.length) {
         // When reaching the last real ticket, animate to the cloned first ticket
         setIsTransitioning(true);
         // After animation completes, instantly jump to the real first ticket
@@ -676,7 +743,7 @@ const HomePage: React.FC = () => {
           setCurrentTicketIndex(1);
           setIsTransitioning(false);
         }, 500);
-        return events.length + 1; // This will show the cloned first ticket
+        return displayEvents.length + 1; // This will show the cloned first ticket
       }
       return prev + 1;
     });
@@ -684,6 +751,7 @@ const HomePage: React.FC = () => {
 
   const prevTicket = () => {
     if (isTransitioning) return;
+    const displayEvents = dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents;
     
     setCurrentTicketIndex((prev) => {
       if (prev === 1) {
@@ -691,7 +759,7 @@ const HomePage: React.FC = () => {
         setIsTransitioning(true);
         // After animation completes, instantly jump to the real last ticket
         setTimeout(() => {
-          setCurrentTicketIndex(events.length);
+          setCurrentTicketIndex(displayEvents.length);
           setIsTransitioning(false);
         }, 500);
         return 0; // This will show the cloned last ticket
@@ -702,8 +770,9 @@ const HomePage: React.FC = () => {
 
   // Get the actual ticket index for dots (0-based)
   const getActualIndex = () => {
-    if (currentTicketIndex === 0) return events.length - 1; // Cloned last ticket
-    if (currentTicketIndex === events.length + 1) return 0; // Cloned first ticket
+    const displayEvents = dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents;
+    if (currentTicketIndex === 0) return displayEvents.length - 1; // Cloned last ticket
+    if (currentTicketIndex === displayEvents.length + 1) return 0; // Cloned first ticket
     return currentTicketIndex - 1; // Real tickets
   };
 
@@ -805,7 +874,7 @@ const HomePage: React.FC = () => {
         
         {/* Desktop: Grid Layout */}
         <div className="hidden md:grid grid-cols-3 gap-6">
-          {events.map((event, idx) => (
+          {(dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents).map((event, idx) => (
             <div 
               key={idx} 
               className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu"
@@ -894,7 +963,7 @@ const HomePage: React.FC = () => {
               }}
             >
               {/* Clone of last ticket at the beginning for seamless loop */}
-              {events.slice(-1).map((event, idx) => (
+              {(dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents).slice(-1).map((event, idx) => (
                 <div 
                   key={`clone-last-${idx}`} 
                   className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
@@ -967,7 +1036,7 @@ const HomePage: React.FC = () => {
               ))}
 
               {/* Original tickets */}
-              {events.map((event, idx) => (
+              {(dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents).map((event, idx) => (
                 <div 
                   key={idx} 
                   className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
@@ -1040,7 +1109,7 @@ const HomePage: React.FC = () => {
               ))}
 
               {/* Clone of first ticket at the end for seamless loop */}
-              {events.slice(0, 1).map((event, idx) => (
+              {(dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents).slice(0, 1).map((event, idx) => (
                 <div 
                   key={`clone-first-${idx}`} 
                   className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
@@ -1126,7 +1195,7 @@ const HomePage: React.FC = () => {
             
             {/* Dots Indicator */}
             <div className="flex gap-2">
-              {events.map((_, idx) => (
+              {(dynamicEvents.length > 0 ? dynamicEvents.map(transformEventForDisplay) : staticEvents).map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentTicketIndex(idx + 1)}
@@ -1157,7 +1226,7 @@ const HomePage: React.FC = () => {
       {/* Safety Section (Moved up from section 8) */}
       <section 
         id="safety-section"
-        className={`w-full py-16 bg-gradient-to-br from-white via-[#FAF8F6] to-white relative overflow-hidden transition-all duration-1000 ${
+        className={`w-full py-8 bg-gradient-to-br from-white via-[#FAF8F6] to-white relative overflow-hidden transition-all duration-1000 ${
           visibleSections.has('safety-section') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
@@ -1185,52 +1254,12 @@ const HomePage: React.FC = () => {
           
                     <SafetyCards />
           
-          {/* Additional Security Info */}
-          <div className="mt-12 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] rounded-3xl p-8 text-white text-center relative overflow-hidden">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-6 left-6 w-12 h-12 border-2 border-white rounded-full animate-ping"></div>
-              <div className="absolute bottom-6 right-6 w-8 h-8 border-2 border-white rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 left-1/3 w-6 h-6 border-2 border-white rounded-full animate-bounce"></div>
-            </div>
-            
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-4">
-                <span className="text-2xl animate-pulse">🔒</span>
-                <span className="font-semibold tracking-wide">Bank-Level Security</span>
-                <span className="text-2xl animate-pulse">🔒</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-3 font-display">Enterprise-Grade Protection</h3>
-              <p className="text-body-large opacity-90 mb-6 max-w-2xl mx-auto prose">
-                We use the same security protocols as major banks to protect your data and transactions.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-lg">
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">256-bit SSL encryption</span>
-                </div>
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">PCI DSS compliant</span>
-                </div>
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">GDPR compliant</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Bottom spacing */}
+          <div className="mt-12"></div>
         </div>
       </section>
 
-      {/* Social Proof Stats */}
-      <SocialProofStats />
 
-      {/* Trust Badges */}
-      <TrustBadges />
-
-      {/* Press Mentions */}
-      <PressMentions />
 
       {/* Testimonials */}
       <section className="w-full max-w-5xl mx-auto py-10 px-4">
