@@ -29,6 +29,10 @@ import SellTicketPage from './pages/SellTicketPage.tsx';
 import UiTestPage from './pages/UiTestPage.tsx';
 import LegalPage from './pages/LegalPage.tsx';
 import FAQPage from './pages/FAQPage.tsx';
+import TermsOfServicePage from './pages/TermsOfServicePage.tsx';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage.tsx';
+import RefundPolicyPage from './pages/RefundPolicyPage.tsx';
+import SellerAgreementPage from './pages/SellerAgreementPage.tsx';
 import FeedbackButton from './components/common/FeedbackButton.tsx';
 
 function App() {
@@ -49,6 +53,10 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/legal" element={<LegalPage />} />
+          <Route path="/legal/terms" element={<TermsOfServicePage />} />
+          <Route path="/legal/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/legal/refund" element={<RefundPolicyPage />} />
+          <Route path="/legal/seller-agreement" element={<SellerAgreementPage />} />
           <Route path="/faq" element={<FAQPage />} />
 
           {/* Private Routes */}
