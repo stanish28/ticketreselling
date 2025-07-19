@@ -147,14 +147,7 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center mt-6">
-            <Link
-              to="/"
-              className="font-bold text-[#FF6B35] hover:text-[#E55A2B] hover:underline hover:underline-offset-4 transition-all text-lg"
-            >
-              Back to home
-            </Link>
-          </div>
+
         </form>
       </div>
     </div>

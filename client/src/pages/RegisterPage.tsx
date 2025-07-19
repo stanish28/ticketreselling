@@ -84,12 +84,7 @@ const RegisterPage: React.FC = () => {
               >
                 Go to Login
               </Link>
-              <Link
-                to="/"
-                className="block w-full text-center bg-white border-2 border-[#FF6B35] text-[#FF6B35] font-bold py-4 px-6 rounded-xl hover:bg-[#FF6B35] hover:text-white transition-all text-lg"
-              >
-                Back to Home
-              </Link>
+
             </div>
           </div>
         </div>
@@ -283,14 +278,7 @@ const RegisterPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center mt-6">
-            <Link
-              to="/"
-              className="font-bold text-[#FF6B35] hover:text-[#E55A2B] hover:underline hover:underline-offset-4 transition-all text-lg"
-            >
-              Back to home
-            </Link>
-          </div>
+
         </form>
       </div>
     </div>

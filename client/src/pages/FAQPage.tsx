@@ -88,14 +88,7 @@ const FAQPage: React.FC = () => {
       {/* Navigation Bar */}
       <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-[#E5E5E5]">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between h-16">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-3 text-[#6B6B6B] hover:text-[#222] transition-colors"
-            >
-              <FaChevronLeft className="text-base" />
-              <span className="text-base font-medium">Back to Home</span>
-            </Link>
+          <div className="flex items-center justify-center h-16">
             <div className="flex items-center space-x-3">
               <span className="w-7 h-7 rounded-lg bg-[#D6A77A] flex items-center justify-center font-bold text-white text-base">L</span>
               <span className="font-display font-bold text-xl text-[#222]">LayLow-India</span>
