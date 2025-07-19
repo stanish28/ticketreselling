@@ -62,6 +62,47 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: smooth;
+}
+
+/* Momentum scrolling for smoother stop */
+.smooth-momentum {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Custom momentum scrolling */
+.momentum-scroll {
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: smooth;
+}
+
+/* Scrolling states for smooth transitions */
+.momentum-scroll.scrolling {
+  transition: none;
+}
+
+.momentum-scroll.scrolled {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth deceleration for scroll end */
+.momentum-scroll.scrolled * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optimize scroll performance */
+.momentum-scroll {
+  will-change: scroll-position;
+  transform: translateZ(0);
 }
 
 /* Custom scrollbar */
@@ -87,6 +128,48 @@ html {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+/* Smooth scroll optimizations */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced momentum scrolling */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+  overscroll-behavior: smooth;
+}
+
+/* Momentum-based scroll deceleration */
+@supports (scroll-behavior: smooth) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Fallback for browsers that don't support smooth scrolling */
+@supports not (scroll-behavior: smooth) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Optimize animations for better performance */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Loading states */

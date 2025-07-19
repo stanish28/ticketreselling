@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
 import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard, FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -588,6 +588,8 @@ const HomePage: React.FC = () => {
   const [dynamicEvents, setDynamicEvents] = useState<Event[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [eventsError, setEventsError] = useState('');
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch trending events from API
   useEffect(() => {
@@ -614,14 +616,51 @@ const HomePage: React.FC = () => {
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
+    let ticking = false;
+    let lastScrollTop = 0;
+    let scrollVelocity = 0;
+    let lastScrollTime = Date.now();
+    
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-      
-      // Calculate scroll progress
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      setScrollProgress(Math.min(scrollPercent, 100));
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentTime = Date.now();
+          const currentScrollTop = window.scrollY;
+          const timeDiff = currentTime - lastScrollTime;
+          
+          // Calculate scroll velocity
+          if (timeDiff > 0) {
+            scrollVelocity = (currentScrollTop - lastScrollTop) / timeDiff;
+          }
+          
+          setShowScrollTop(currentScrollTop > 400);
+          
+          // Calculate scroll progress
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const scrollPercent = (currentScrollTop / docHeight) * 100;
+          setScrollProgress(Math.min(scrollPercent, 100));
+          
+          // Set scrolling state
+          setIsScrolling(true);
+          
+          // Clear previous timeout
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+          
+          // Set timeout to detect when scrolling stops
+          scrollTimeoutRef.current = setTimeout(() => {
+            setIsScrolling(false);
+            scrollVelocity = 0;
+          }, 150); // Adjust this value to control when scrolling is considered "stopped"
+          
+          lastScrollTop = currentScrollTop;
+          lastScrollTime = currentTime;
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     // Prevent horizontal scrolling and snap back to center
@@ -648,16 +687,22 @@ const HomePage: React.FC = () => {
       }
     };
 
-    // Intersection Observer for scroll animations
+    // Intersection Observer for scroll animations with better performance
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisibleSections(prev => new Set(prev).add(entry.target.id));
+            requestAnimationFrame(() => {
+              setVisibleSections(prev => new Set(prev).add(entry.target.id));
+            });
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      { 
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5], 
+        rootMargin: '0px 0px -100px 0px',
+        root: null
+      }
     );
 
     // Observe sections
@@ -701,11 +746,39 @@ const HomePage: React.FC = () => {
       window.removeEventListener('wheel', preventWheelHorizontalScroll);
       document.removeEventListener('touchstart', preventTouchHorizontalScroll);
       observer.disconnect();
+      
+      // Cleanup timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Custom smooth scroll with easing
+  const smoothScrollTo = (targetY: number, duration: number = 800) => {
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      
+      window.scrollTo(0, startY + distance * easedProgress);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -777,7 +850,10 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FAF8F6] min-h-screen font-sans overflow-x-hidden" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div 
+      className={`bg-[#FAF8F6] min-h-screen font-sans overflow-x-hidden momentum-scroll ${isScrolling ? 'scrolling' : 'scrolled'}`} 
+      style={{ maxWidth: '100vw', overflowX: 'hidden' }}
+    >
       {/* Scroll Progress Indicator */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
         <div 
