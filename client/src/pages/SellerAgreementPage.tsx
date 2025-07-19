@@ -7,18 +7,8 @@ const SellerAgreementPage: React.FC = () => {
     <div className="min-h-screen bg-[#FAF8F6] font-sans">
 
 
-            {/* Main Content */}
+      {/* Main Content */}
       <main className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
-        {/* Back to Legal Policies */}
-        <div className="mb-8">
-          <Link 
-            to="/legal" 
-            className="inline-flex items-center text-[#D6A77A] hover:text-[#b98a5e] transition-colors font-medium"
-          >
-            ← Back to Legal Policies
-          </Link>
-        </div>
-
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-section-title font-display text-[#222] mb-6">
@@ -27,8 +17,8 @@ const SellerAgreementPage: React.FC = () => {
           <p className="text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose">
             Guidelines and obligations for sellers on LayLow-India platform to ensure fair and secure transactions.
           </p>
- 
-          </div>
+
+        </div>
 
         {/* Seller Agreement Content */}
         <div className="bg-white rounded-2xl shadow-lg border border-[#E5E5E5] p-8">
