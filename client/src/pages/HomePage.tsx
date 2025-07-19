@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
-import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard } from "react-icons/fa";
+import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import FeedbackButton from '../components/common/FeedbackButton.tsx';
 
 const events = [
@@ -169,7 +169,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="w-full py-8 md:py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden">
+    <section className="w-full py-8 md:py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden max-w-full">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -right-10 w-20 h-20 md:w-40 md:h-40 bg-gradient-to-br from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
@@ -177,7 +177,7 @@ function HowItWorks() {
         <div className="absolute top-1/2 left-1/4 w-10 h-10 md:w-20 md:h-20 bg-gradient-to-r from-[#D6A77A]/5 to-[#FF6B35]/5 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 overflow-x-hidden">
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center gap-1 md:gap-2 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-semibold mb-4 shadow-lg tracking-wide">
             <span className="animate-pulse">🚀</span>
@@ -543,6 +543,8 @@ const HomePage: React.FC = () => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isFabExpanded, setIsFabExpanded] = useState(false);
+  const [currentTicketIndex, setCurrentTicketIndex] = useState(1); // Start at 1 to show first real ticket
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
@@ -554,6 +556,30 @@ const HomePage: React.FC = () => {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = (scrollTop / docHeight) * 100;
       setScrollProgress(Math.min(scrollPercent, 100));
+    };
+
+    // Prevent horizontal scrolling and snap back to center
+    const handleHorizontalScroll = () => {
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+      if (scrollLeft !== 0) {
+        // Snap back to center horizontally
+        window.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    // More aggressive horizontal scroll prevention
+    const preventWheelHorizontalScroll = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        // Snap back to center
+        window.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
     };
 
     // Intersection Observer for scroll animations
@@ -573,9 +599,41 @@ const HomePage: React.FC = () => {
     sections.forEach(section => observer.observe(section));
 
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleHorizontalScroll);
+    window.addEventListener('wheel', preventWheelHorizontalScroll, { passive: false });
+    
+    // Also prevent horizontal scroll on touch devices
+    const preventTouchHorizontalScroll = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const startX = touch.clientX;
+      
+      const handleTouchMove = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const diffX = Math.abs(currentX - startX);
+        
+        // If horizontal movement is detected, prevent it
+        if (diffX > 10) {
+          e.preventDefault();
+        }
+      };
+      
+      const handleTouchEnd = () => {
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+      
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    };
+    
+    document.addEventListener('touchstart', preventTouchHorizontalScroll);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleHorizontalScroll);
+      window.removeEventListener('wheel', preventWheelHorizontalScroll);
+      document.removeEventListener('touchstart', preventTouchHorizontalScroll);
       observer.disconnect();
     };
   }, []);
@@ -606,8 +664,51 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const nextTicket = () => {
+    if (isTransitioning) return;
+    
+    setCurrentTicketIndex((prev) => {
+      if (prev === events.length) {
+        // When reaching the last real ticket, animate to the cloned first ticket
+        setIsTransitioning(true);
+        // After animation completes, instantly jump to the real first ticket
+        setTimeout(() => {
+          setCurrentTicketIndex(1);
+          setIsTransitioning(false);
+        }, 500);
+        return events.length + 1; // This will show the cloned first ticket
+      }
+      return prev + 1;
+    });
+  };
+
+  const prevTicket = () => {
+    if (isTransitioning) return;
+    
+    setCurrentTicketIndex((prev) => {
+      if (prev === 1) {
+        // When reaching the first real ticket, animate to the cloned last ticket
+        setIsTransitioning(true);
+        // After animation completes, instantly jump to the real last ticket
+        setTimeout(() => {
+          setCurrentTicketIndex(events.length);
+          setIsTransitioning(false);
+        }, 500);
+        return 0; // This will show the cloned last ticket
+      }
+      return prev - 1;
+    });
+  };
+
+  // Get the actual ticket index for dots (0-based)
+  const getActualIndex = () => {
+    if (currentTicketIndex === 0) return events.length - 1; // Cloned last ticket
+    if (currentTicketIndex === events.length + 1) return 0; // Cloned first ticket
+    return currentTicketIndex - 1; // Real tickets
+  };
+
   return (
-    <div className="bg-[#FAF8F6] min-h-screen font-sans">
+    <div className="bg-[#FAF8F6] min-h-screen font-sans overflow-x-hidden" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Scroll Progress Indicator */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
         <div 
@@ -620,7 +721,7 @@ const HomePage: React.FC = () => {
       <LiveTicker />
       
       {/* Hero Section */}
-      <section className="relative w-full h-[380px] md:h-[480px] lg:h-[560px] flex items-center justify-center overflow-hidden">
+      <section className="relative w-full min-h-[420px] md:h-[480px] lg:h-[560px] flex items-center justify-center overflow-hidden max-w-full">
         <img
           src="/concert-hero.png"
           alt="Concert Crowd"
@@ -636,17 +737,17 @@ const HomePage: React.FC = () => {
             target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80';
           }}
         />
-        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-4 pb-8 bg-black/40">
-          <h1 className="text-hero font-display text-white text-center mb-3 drop-shadow">
+        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-4 py-8 bg-black/40">
+          <h1 className="text-hero font-display text-white text-center mb-2 md:mb-3 drop-shadow">
             Get Sold-Out Tickets at Fair Prices
           </h1>
-          <p className="text-body-large text-white text-center mb-3 max-w-2xl drop-shadow">
+          <p className="text-body-large text-white text-center mb-2 md:mb-3 max-w-2xl drop-shadow">
             100% Verified & Secure • No Hidden Fees • Instant QR Codes
           </p>
-          <p className="text-body text-white text-center mb-6 max-w-2xl drop-shadow opacity-90 prose">
+          <p className="text-body text-white text-center mb-4 md:mb-6 max-w-2xl drop-shadow opacity-90 prose">
             India's most trusted platform for buying and selling event tickets with complete peace of mind.
           </p>
-          <form onSubmit={handleSearch} className="w-full max-w-md flex flex-col items-center bg-white rounded-full shadow-md px-4 py-2 mb-3">
+          <form onSubmit={handleSearch} className="w-full max-w-md flex flex-col items-center bg-white rounded-full shadow-md px-4 py-2 mb-2 md:mb-3">
             <div className="w-full flex items-center">
               <FaSearch className="text-[#D6A77A] text-lg mr-2" />
               <input
@@ -683,7 +784,7 @@ const HomePage: React.FC = () => {
               </div>
             )}
           </form>
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-3 items-center">
             <Link to="/events" className="px-6 py-2.5 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition-transform duration-150 hover:scale-105 active:scale-95 text-base">Browse Events</Link>
             <Link to="/sell-ticket" className="px-6 py-2.5 rounded-full font-bold bg-transparent border-2 border-white text-white shadow hover:bg-white hover:text-[#222] transition-all duration-150 hover:scale-105 active:scale-95 text-base flex items-center gap-2">
               <span>📤</span>
@@ -701,7 +802,9 @@ const HomePage: React.FC = () => {
         }`}
       >
         <h2 className="text-section-title font-display text-[#222] mb-6 text-center">Trending Tickets</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        
+        {/* Desktop: Grid Layout */}
+        <div className="hidden md:grid grid-cols-3 gap-6">
           {events.map((event, idx) => (
             <div 
               key={idx} 
@@ -779,6 +882,273 @@ const HomePage: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* Mobile: Carousel Layout */}
+        <div className="md:hidden relative w-full">
+          <div className="relative overflow-hidden rounded-2xl w-full">
+            <div 
+              className={`flex w-full ${isTransitioning ? '' : 'transition-transform duration-500 ease-in-out'}`}
+              style={{ 
+                transform: `translateX(-${currentTicketIndex * 100}%)`,
+                transition: isTransitioning ? 'none' : 'transform 500ms ease-in-out'
+              }}
+            >
+              {/* Clone of last ticket at the beginning for seamless loop */}
+              {events.slice(-1).map((event, idx) => (
+                <div 
+                  key={`clone-last-${idx}`} 
+                  className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
+                >
+                  {/* Badges */}
+                  <div className="w-full flex flex-wrap gap-2 mb-3">
+                    {event.badges.map((badge, badgeIdx) => (
+                      <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  {/* Image with overlay */}
+                  <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                    <img
+                      src={event.image}
+                      alt={`Event: ${event.name} in ${event.location}`}
+                      loading="lazy"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Event Details */}
+                  <div className="w-full text-center">
+                    <div className="text-card-title font-display text-[#222] mb-1">{event.name}</div>
+                    <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                      <span>{event.date} • {event.location}</span>
+                      <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                        {event.category}
+                      </span>
+                    </div>
+                    
+                    {/* Rating and Sold Count */}
+                    <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#D6A77A]">★</span>
+                        <span className="text-[#6B6B6B]">{event.rating}</span>
+                      </div>
+                      <div className="text-[#6B6B6B]">
+                        {event.soldCount} sold
+                      </div>
+                    </div>
+                    
+                    {/* Price Section */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <span className="text-3xl font-black text-[#D6A77A]">₹{event.price}</span>
+                        <span className="text-lg text-[#A9A9A9] line-through">₹{event.originalPrice}</span>
+                      </div>
+                      <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                        {Math.round(((event.originalPrice - event.price) / event.originalPrice) * 100)}% OFF
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <Link 
+                      to="/events" 
+                      className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] transition-all duration-300 active:scale-95 text-base flex items-center justify-center gap-2"
+                    >
+                      <span>🎟️</span>
+                      Buy Ticket
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {/* Original tickets */}
+              {events.map((event, idx) => (
+                <div 
+                  key={idx} 
+                  className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
+                >
+                  {/* Badges */}
+                  <div className="w-full flex flex-wrap gap-2 mb-3">
+                    {event.badges.map((badge, badgeIdx) => (
+                      <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  {/* Image with overlay */}
+                  <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                    <img
+                      src={event.image}
+                      alt={`Event: ${event.name} in ${event.location}`}
+                      loading="lazy"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Event Details */}
+                  <div className="w-full text-center">
+                    <div className="text-card-title font-display text-[#222] mb-1">{event.name}</div>
+                    <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                      <span>{event.date} • {event.location}</span>
+                      <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                        {event.category}
+                      </span>
+                    </div>
+                    
+                    {/* Rating and Sold Count */}
+                    <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#D6A77A]">★</span>
+                        <span className="text-[#6B6B6B]">{event.rating}</span>
+                      </div>
+                      <div className="text-[#6B6B6B]">
+                        {event.soldCount} sold
+                      </div>
+                    </div>
+                    
+                    {/* Price Section */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <span className="text-3xl font-black text-[#D6A77A]">₹{event.price}</span>
+                        <span className="text-lg text-[#A9A9A9] line-through">₹{event.originalPrice}</span>
+                      </div>
+                      <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                        {Math.round(((event.originalPrice - event.price) / event.originalPrice) * 100)}% OFF
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <Link 
+                      to="/events" 
+                      className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] transition-all duration-300 active:scale-95 text-base flex items-center justify-center gap-2"
+                    >
+                      <span>🎟️</span>
+                      Buy Ticket
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {/* Clone of first ticket at the end for seamless loop */}
+              {events.slice(0, 1).map((event, idx) => (
+                <div 
+                  key={`clone-first-${idx}`} 
+                  className="w-full flex-shrink-0 bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center"
+                >
+                  {/* Badges */}
+                  <div className="w-full flex flex-wrap gap-2 mb-3">
+                    {event.badges.map((badge, badgeIdx) => (
+                      <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  {/* Image with overlay */}
+                  <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                    <img
+                      src={event.image}
+                      alt={`Event: ${event.name} in ${event.location}`}
+                      loading="lazy"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Event Details */}
+                  <div className="w-full text-center">
+                    <div className="text-card-title font-display text-[#222] mb-1">{event.name}</div>
+                    <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                      <span>{event.date} • {event.location}</span>
+                      <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                        {event.category}
+                      </span>
+                    </div>
+                    
+                    {/* Rating and Sold Count */}
+                    <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#D6A77A]">★</span>
+                        <span className="text-[#6B6B6B]">{event.rating}</span>
+                      </div>
+                      <div className="text-[#6B6B6B]">
+                        {event.soldCount} sold
+                      </div>
+                    </div>
+                    
+                    {/* Price Section */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <span className="text-3xl font-black text-[#D6A77A]">₹{event.price}</span>
+                        <span className="text-lg text-[#A9A9A9] line-through">₹{event.originalPrice}</span>
+                      </div>
+                      <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                        {Math.round(((event.originalPrice - event.price) / event.originalPrice) * 100)}% OFF
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <Link 
+                      to="/events" 
+                      className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] transition-all duration-300 active:scale-95 text-base flex items-center justify-center gap-2"
+                    >
+                      <span>🎟️</span>
+                      Buy Ticket
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Carousel Navigation */}
+          <div className="flex items-center justify-between mt-6 w-full px-2">
+            <button
+              onClick={prevTicket}
+              className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#D6A77A] hover:bg-[#D6A77A] hover:text-white transition-all duration-300"
+              aria-label="Previous ticket"
+            >
+              <FaChevronLeft className="text-lg" />
+            </button>
+            
+            {/* Dots Indicator */}
+            <div className="flex gap-2">
+              {events.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentTicketIndex(idx + 1)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    idx === getActualIndex()
+                      ? 'bg-[#D6A77A] scale-125' 
+                      : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to ticket ${idx + 1}`}
+                />
+              ))}
+            </div>
+            
+            <button
+              onClick={nextTicket}
+              className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#D6A77A] hover:bg-[#D6A77A] hover:text-white transition-all duration-300"
+              aria-label="Next ticket"
+            >
+              <FaChevronRight className="text-lg" />
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* How It Works (Moved up from section 7) */}
@@ -798,7 +1168,7 @@ const HomePage: React.FC = () => {
           <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-gradient-to-r from-[#D6A77A]/5 to-[#FF6B35]/5 rounded-full blur-2xl"></div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 relative z-10 overflow-x-hidden">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg tracking-wide">
               <span className="animate-pulse">🛡️</span>
