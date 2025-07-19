@@ -2,45 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
 import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard } from "react-icons/fa";
+import { Event, Ticket } from '../types';
+import { eventsAPI } from '../services/api.ts';
 
-const events = [
-  {
-    name: 'Garba Night',
-    date: 'Sept 17',
-    location: 'Mumbai',
-    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
-    price: 999,
-    badges: ['🔥 Trending', '⏳ Only 4 left', '✅ Verified Seller'],
-    originalPrice: 1299,
-    category: 'Cultural',
-    rating: 4.8,
-    soldCount: 156
-  },
-  {
-    name: 'Music Festival',
-    date: 'Oct 5',
-    location: 'Bangalore',
-    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
-    price: 1499,
-    badges: ['🔥 Trending', '⏳ Only 2 left', '✅ Verified Seller'],
-    originalPrice: 1999,
-    category: 'Music',
-    rating: 4.9,
-    soldCount: 89
-  },
-  {
-    name: 'Comedy Club',
-    date: 'Oct 20',
-    location: 'Delhi',
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
-    price: 799,
-    badges: ['🔥 Trending', '⏳ Only 6 left', '✅ Verified Seller'],
-    originalPrice: 999,
-    category: 'Comedy',
-    rating: 4.7,
-    soldCount: 234
-  },
-];
+
 
 // Add social proof data
 const socialProofData = {
@@ -57,14 +22,7 @@ const trustBadges = [
   { icon: <FaUsers className="text-2xl" />, text: "Money-back Guarantee" }
 ];
 
-// Add live ticker data
-const liveTickerItems = [
-  "🎫 Priya just bought Taylor Swift tickets in Mumbai",
-  "⚽ IPL final tickets selling fast in Bangalore", 
-  "🎭 Comedy show tickets available in Delhi",
-  "🎸 Ed Sheeran concert tickets released in Chennai",
-  "🏏 Cricket match tickets selling in Kolkata"
-];
+
 
 const TestimonialCard: React.FC<{ name: string; city: string; rating: number; text: string; img?: string }> = ({
   name, city, rating, text, img
@@ -269,260 +227,151 @@ function HowItWorks() {
 
 // Safety Cards Component
 function SafetyCards() {
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-
-  const handleMouseEnter = (index: number) => {
-    setFlippedCards(prev => [...prev, index]);
-  };
-
-  const handleMouseLeave = (index: number) => {
-    setFlippedCards(prev => prev.filter(i => i !== index));
-  };
-
-  // Mobile support - toggle on touch
-  const handleTouch = (index: number) => {
-    setFlippedCards(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
-
-  // Keyboard navigation support
-  const handleKeyDown = (index: number, event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleTouch(index);
-    }
-  };
-
   const safetyFeatures = [
     {
-      icon: (
-        <svg width="32" height="32" fill="none" stroke="#D6A77A" strokeWidth="2" viewBox="0 0 24 24">
-          <path d="M12 22s8-4 8-10V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7c0 6 8 10 8 10z" />
-          <path d="M9 11l2 2 4-4" />
-        </svg>
-      ),
+      icon: "🛡️",
       title: "Verified Sellers",
-      description: "All sellers are thoroughly vetted to ensure authenticity and prevent fraud.",
-      backTitle: "Verification Process",
-      backItems: [
-        "Identity verification required",
-        "Background checks performed",
-        "Seller rating system",
-        "Document verification"
-      ],
-      gradient: "from-emerald-400 to-green-500",
-      accentColor: "text-emerald-500",
-      badge: "✅ Verified"
+      description: "All sellers are thoroughly vetted",
+      badge: "✅ Verified",
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      borderColor: "border-emerald-200"
     },
     {
-      icon: (
-        <svg width="32" height="32" fill="none" stroke="#D6A77A" strokeWidth="2" viewBox="0 0 24 24">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01M12 12h.01" />
-        </svg>
-      ),
+      icon: "🔐",
       title: "QR-Gated Access",
-      description: "Tickets are delivered as secure QR codes, eliminating counterfeit risks.",
-      backTitle: "QR Security Features",
-      backItems: [
-        "Unique QR codes per ticket",
-        "Real-time validation",
-        "Anti-counterfeit protection",
-        "One-time use codes"
-      ],
-      gradient: "from-blue-400 to-indigo-500",
-      accentColor: "text-blue-500",
-      badge: "🔐 Secure"
+      description: "Secure QR codes eliminate counterfeits",
+      badge: "🔒 Secure",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200"
     },
     {
-      icon: (
-        <svg width="32" height="32" fill="none" stroke="#D6A77A" strokeWidth="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
-      ),
-      title: "Delayed Ticket Release",
-      description: "Tickets are released closer to the event date for enhanced security.",
-      backTitle: "Timing Benefits",
-      backItems: [
-        "24-hour pre-event delivery",
-        "Prevents ticket scalping",
-        "Enhanced fraud prevention",
-        "Reduces transfer risks"
-      ],
-      gradient: "from-purple-400 to-pink-500",
-      accentColor: "text-purple-500",
-      badge: "⏰ Timed"
+      icon: "⏰",
+      title: "Delayed Release",
+      description: "Tickets released closer to event date",
+      badge: "⏱️ Timed",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200"
+    },
+    {
+      icon: "💰",
+      title: "Money-Back Guarantee",
+      description: "100% refund if not satisfied",
+      badge: "💯 Guaranteed",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      borderColor: "border-orange-200"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {safetyFeatures.map((feature, index) => (
-        <div 
-          key={index}
-          className="relative h-80 cursor-pointer group"
-          onMouseEnter={() => handleMouseEnter(index)}
-          onMouseLeave={() => handleMouseLeave(index)}
-          onTouchEnd={() => handleTouch(index)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          tabIndex={0}
-          role="button"
-          aria-label={`${feature.title} - ${flippedCards.includes(index) ? 'Showing details' : 'Click to see details'}`}
-          aria-expanded={flippedCards.includes(index)}
-        >
-          {/* Floating badge */}
-          <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-3 py-1 rounded-bl-3xl rounded-tr-3xl text-sm font-bold shadow-xl transform group-hover:scale-110 transition-transform duration-300 border-2 border-white">
-            {feature.badge}
-          </div>
-          <div 
-            className={`absolute w-full h-full transition-all duration-700 ease-in-out ${
-              flippedCards.includes(index) 
-                ? 'rotate-y-180 opacity-0' 
-                : 'rotate-y-0 opacity-100'
-            }`}
-            style={{
-              transform: flippedCards.includes(index) ? 'rotateY(180deg)' : 'rotateY(0deg)',
-              backfaceVisibility: 'hidden'
-            }}
-          >
-                        {/* Front Side */}
-            <div className="w-full h-full rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-[#D6A77A]/20 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2 relative overflow-hidden">
-              {/* Background gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
-              
-              <div className="relative z-10">
-                <div className="w-24 h-24 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-card-title font-display text-[#222] mb-4 group-hover:text-[#D6A77A] transition-colors duration-300">{feature.title}</h3>
-                <p className="text-body text-[#6B6B6B] mb-6 prose">
-                  {feature.description}
-                </p>
+    <section className="w-full py-16 bg-gradient-to-br from-white via-[#FAF8F6] to-[#F5E7D6] relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-[#FF6B35]/10 to-[#D6A77A]/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-tr from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-20 h-20 bg-gradient-to-r from-[#FF6B35]/5 to-[#D6A77A]/5 rounded-full blur-2xl"></div>
+      </div>
 
-              </div>
-            </div>
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF6B35] to-[#D6A77A] text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg tracking-wide">
+            <span className="animate-pulse">🛡️</span>
+            Multi-Layer Security
+            <span className="animate-pulse">🛡️</span>
           </div>
-          
-          <div 
-            className={`absolute w-full h-full transition-all duration-700 ease-in-out ${
-              flippedCards.includes(index) 
-                ? 'rotate-y-0 opacity-100' 
-                : 'rotate-y-180 opacity-0'
-            }`}
-            style={{
-              transform: flippedCards.includes(index) ? 'rotateY(0deg)' : 'rotateY(180deg)',
-              backfaceVisibility: 'hidden'
-            }}
-          >
-                        {/* Back Side */}
-            <div className={`w-full h-full rounded-3xl p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br ${feature.gradient} text-white shadow-xl relative overflow-hidden`}>
-              {/* Animated background pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-4 right-4 w-8 h-8 border-2 border-white rounded-full animate-ping"></div>
-              </div>
-              
-              <div className="relative z-10">
-                                  <h3 className="text-card-title font-display mb-6">{feature.backTitle}</h3>
-                <div className="space-y-4 text-left">
-                  {feature.backItems.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-center group/item">
-                      <span className="w-2 h-2 bg-white rounded-full mr-3 group-hover/item:scale-150 transition-transform duration-300"></span>
-                      <span className="group-hover/item:text-yellow-200 transition-colors duration-300">{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </div>
-          </div>
+          <h2 className="text-section-title font-display text-[#222] mb-4 bg-gradient-to-r from-[#222] via-[#FF6B35] to-[#D6A77A] bg-clip-text text-transparent">
+            Your Safety is Our Priority
+          </h2>
+          <p className="text-body-large text-[#6B6B6B] max-w-2xl mx-auto">
+            Multiple layers of security ensure your ticket buying experience is completely safe.
+          </p>
         </div>
-      ))}
-    </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {safetyFeatures.map((feature, index) => (
+            <div
+              key={index}
+              className="group relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out transform-gpu"
+            >
+              {/* Badge */}
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#FF6B35] to-[#D6A77A] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                {feature.badge}
+              </div>
+
+              {/* Icon */}
+              <div className={`w-16 h-16 rounded-full ${feature.bgColor} ${feature.borderColor} border-2 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <span className="text-2xl">{feature.icon}</span>
+              </div>
+
+              {/* Content */}
+              <h3 className={`text-xl font-bold text-[#222] mb-2 ${feature.color}`}>
+                {feature.title}
+              </h3>
+              <p className="text-sm text-[#6B6B6B] leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 // Add Live Ticker Component
-const LiveTicker: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % liveTickerItems.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-[#D6A77A] text-white py-1.5 px-4 overflow-hidden">
-      <div className="max-w-5xl mx-auto flex items-center justify-center">
-        <span className="text-xs font-medium animate-pulse mr-2">🔴 LIVE</span>
-        <span className="text-xs">{liveTickerItems[currentIndex]}</span>
-      </div>
-    </div>
-  );
-};
 
 // Add Social Proof Stats Component
 const SocialProofStats: React.FC = () => (
-  <section className="w-full py-6 bg-white border-b border-[#E5E5E5]">
-    <div className="max-w-5xl mx-auto px-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div className="flex flex-col items-center">
-          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
-            {socialProofData.userCount}
-          </div>
-          <div className="text-sm text-[#6B6B6B]">Satisfied Users</div>
+  <section className="w-full py-12 bg-white">
+    <div className="max-w-6xl mx-auto px-4">
+      {/* Main Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">50,000+</div>
+          <div className="text-sm text-[#6B6B6B] font-medium">Happy Users</div>
         </div>
-        <div className="flex flex-col items-center">
-          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
-            {socialProofData.ticketsSold}
-          </div>
-          <div className="text-sm text-[#6B6B6B]">Tickets Sold This Week</div>
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">1,247</div>
+          <div className="text-sm text-[#6B6B6B] font-medium">Tickets Sold</div>
         </div>
-        <div className="flex flex-col items-center">
-          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
-            {socialProofData.trustScore}
-          </div>
-          <div className="text-sm text-[#6B6B6B]">Trust Score</div>
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">99.8%</div>
+          <div className="text-sm text-[#6B6B6B] font-medium">Trust Score</div>
         </div>
-        <div className="flex flex-col items-center">
-          <div className="text-2xl md:text-3xl font-bold text-[#D6A77A] mb-1">
-            {socialProofData.supportHours}
-          </div>
-          <div className="text-sm text-[#6B6B6B]">Customer Support</div>
+        <div className="text-center">
+          <div className="text-3xl md:text-4xl font-bold text-[#D6A77A] mb-2">24/7</div>
+          <div className="text-sm text-[#6B6B6B] font-medium">Support</div>
         </div>
       </div>
-    </div>
-  </section>
-);
 
-// Add Trust Badges Component
-const TrustBadges: React.FC = () => (
-  <section className="w-full py-4 bg-[#FAF8F6]">
-    <div className="max-w-5xl mx-auto px-4">
-      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
-        {trustBadges.map((badge, index) => (
-          <div key={index} className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm">
-            <div className="text-[#D6A77A]">{badge.icon}</div>
-            <span className="text-sm font-medium text-[#6B6B6B]">{badge.text}</span>
-          </div>
-        ))}
+      {/* Trust Indicators */}
+      <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-8">
+        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
+          <span className="text-[#D6A77A]">🔒</span>
+          <span className="text-sm font-medium text-[#6B6B6B]">256-bit SSL</span>
+        </div>
+        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
+          <span className="text-[#D6A77A]">💳</span>
+          <span className="text-sm font-medium text-[#6B6B6B]">Secure Payments</span>
+        </div>
+        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
+          <span className="text-[#D6A77A]">✅</span>
+          <span className="text-sm font-medium text-[#6B6B6B]">Verified Tickets</span>
+        </div>
+        <div className="flex items-center gap-2 bg-[#FAF8F6] px-4 py-2 rounded-full">
+          <span className="text-[#D6A77A]">💰</span>
+          <span className="text-sm font-medium text-[#6B6B6B]">Money-back Guarantee</span>
+        </div>
       </div>
-    </div>
-  </section>
-);
 
-// Add Press Mentions Component
-const PressMentions: React.FC = () => (
-  <section className="w-full py-4 bg-white border-t border-[#E5E5E5]">
-    <div className="max-w-5xl mx-auto px-4">
+      {/* Press Mentions */}
       <div className="text-center">
-        <p className="text-sm text-[#A9A9A9] mb-2">Featured in</p>
-        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 opacity-60">
+        <p className="text-sm text-[#A9A9A9] mb-3">Featured in</p>
+        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 opacity-70">
           <span className="text-lg font-bold text-[#6B6B6B]">Economic Times</span>
           <span className="text-lg font-bold text-[#6B6B6B]">YourStory</span>
           <span className="text-lg font-bold text-[#6B6B6B]">TechCrunch India</span>
@@ -533,6 +382,55 @@ const PressMentions: React.FC = () => (
   </section>
 );
 
+
+
+// Helper function to transform Event data for display (moved outside component)
+const transformEventForDisplay = (event: Event) => {
+  // Handle events without tickets - use mock data for display
+  const availableTickets = event.tickets?.filter(t => t.status === 'AVAILABLE').length || 0;
+  const totalTickets = event.tickets?.length || 0;
+  const soldTickets = totalTickets - availableTickets;
+  
+  // Get the lowest price from available tickets, or use mock price if no tickets
+  const availableTicketPrices = event.tickets
+    ?.filter(t => t.status === 'AVAILABLE')
+    .map(t => t.price) || [];
+  const minPrice = availableTicketPrices.length > 0 ? Math.min(...availableTicketPrices) : 1500; // Default price if no tickets
+  
+  // Calculate a mock original price (20% higher for demo)
+  const originalPrice = Math.round(minPrice * 1.2);
+  
+  // Generate badges based on event data
+  const badges: string[] = [];
+  if (availableTickets <= 5 && availableTickets > 0) badges.push('⏳ Only ' + availableTickets + ' left');
+  if (soldTickets > 50) badges.push('🔥 Trending');
+  if (!event.tickets || event.tickets.length === 0) {
+    badges.push('📅 Coming Soon');
+  } else {
+    badges.push('✅ Verified Seller');
+  }
+  
+  // Format date
+  const eventDate = new Date(event.date);
+  const formattedDate = eventDate.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  
+  return {
+    ...event,
+    displayName: event.title,
+    displayDate: formattedDate,
+    displayLocation: event.venue,
+    displayPrice: minPrice,
+    displayOriginalPrice: originalPrice,
+    displaySoldCount: soldTickets,
+    displayRating: 4.5 + (Math.random() * 0.5), // Mock rating
+    displayBadges: badges,
+    displayImage: event.image || 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80'
+  };
+};
+
 const HomePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -540,6 +438,9 @@ const HomePage: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
@@ -603,6 +504,37 @@ const HomePage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await eventsAPI.getAll({ limit: 6 });
+        
+        if (response.success && response.data?.events) {
+          setEvents(response.data.events);
+        } else {
+          setEvents([]);
+        }
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setError('Failed to fetch events.');
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-16">Loading...</div>;
+  }
+
+  if (error) {
+    console.log('Showing error state, but continuing with empty events array');
+  }
+
   return (
     <div className="bg-[#FAF8F6] min-h-screen font-sans">
       {/* Scroll Progress Indicator */}
@@ -613,8 +545,7 @@ const HomePage: React.FC = () => {
         />
       </div>
       
-      {/* Live Ticker */}
-      <LiveTicker />
+
       
       {/* Hero Section */}
       <section className="relative w-full h-[380px] md:h-[480px] lg:h-[560px] flex items-center justify-center overflow-hidden">
@@ -698,166 +629,117 @@ const HomePage: React.FC = () => {
         }`}
       >
         <h2 className="text-section-title font-display text-[#222] mb-6 text-center">Trending Tickets</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {events.map((event, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu"
-              style={{
-                animationDelay: `${idx * 100}ms`,
-                animation: 'fadeInUp 0.6s ease-out forwards'
-              }}
+        {events.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🎫</div>
+            <h3 className="text-xl font-semibold text-[#6B6B6B] mb-2">No Events Available</h3>
+            <p className="text-[#A9A9A9] mb-6">Check back soon for exciting events!</p>
+            {error && (
+              <div className="text-sm text-red-500 mb-4">
+                Error: {error}
+              </div>
+            )}
+            <Link 
+              to="/events" 
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold bg-[#D6A77A] text-white shadow hover:bg-[#b98a5e] transition-colors"
             >
-              {/* Badges */}
-              <div className="w-full flex flex-wrap gap-2 mb-3">
-                {event.badges.map((badge, badgeIdx) => (
-                  <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
-                    {badge}
-                  </span>
-                ))}
-              </div>
-              
-              {/* Image with overlay */}
-              <div className="relative w-full mb-3 overflow-hidden rounded-xl">
-                <img
-                  src={event.image}
-                  alt={`Event: ${event.name} in ${event.location}`}
-                  loading="lazy"
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              {/* Event Details */}
-              <div className="w-full text-center">
-                <div className="text-card-title font-display text-[#222] mb-1 group-hover:text-[#D6A77A] transition-colors duration-300">{event.name}</div>
-                <div className="text-caption mb-2 flex items-center justify-center gap-2">
-                  <span>{event.date} • {event.location}</span>
-                  <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
-                    {event.category}
-                  </span>
+              <span>🔍</span>
+              Browse All Events
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {events.map((event, idx) => {
+              const displayEvent = transformEventForDisplay(event);
+              return (
+              <div 
+                key={event.id} 
+                className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer transform-gpu"
+                style={{
+                  animationDelay: `${idx * 100}ms`,
+                  animation: 'fadeInUp 0.6s ease-out forwards'
+                }}
+              >
+                {/* Badges */}
+                <div className="w-full flex flex-wrap gap-2 mb-3">
+                  {displayEvent.displayBadges.map((badge, badgeIdx) => (
+                    <span key={badgeIdx} className="px-2 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-[#D6A77A] to-[#b98a5e] text-white shadow-sm">
+                      {badge}
+                    </span>
+                  ))}
                 </div>
                 
-                {/* Rating and Sold Count */}
-                <div className="flex items-center justify-center gap-4 mb-3 text-sm">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[#D6A77A]">★</span>
-                    <span className="text-[#6B6B6B]">{event.rating}</span>
-                  </div>
-                  <div className="text-[#6B6B6B]">
-                    {event.soldCount} sold
-                  </div>
+                {/* Image with overlay */}
+                <div className="relative w-full mb-3 overflow-hidden rounded-xl">
+                  <img
+                    src={displayEvent.displayImage}
+                    alt={`Event: ${displayEvent.displayName} in ${displayEvent.displayLocation}`}
+                    loading="lazy"
+                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 
-                {/* Price Section */}
-                <div className="mb-3">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <span className="text-3xl font-black text-[#D6A77A] group-hover:text-[#FF6B35] transition-colors duration-300">₹{event.price}</span>
-                    <span className="text-lg text-[#A9A9A9] line-through">₹{event.originalPrice}</span>
+                {/* Event Details */}
+                <div className="w-full text-center">
+                  <div className="text-card-title font-display text-[#222] mb-1 group-hover:text-[#D6A77A] transition-colors duration-300">{displayEvent.displayName}</div>
+                  <div className="text-caption mb-2 flex items-center justify-center gap-2">
+                    <span>{displayEvent.displayDate} • {displayEvent.displayLocation}</span>
+                    <span className="px-2 py-1 bg-[#F5E7D6] text-[#D6A77A] text-xs rounded-full font-medium">
+                      {displayEvent.category}
+                    </span>
                   </div>
-                  <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
-                    {Math.round(((event.originalPrice - event.price) / event.originalPrice) * 100)}% OFF
+                  
+                  {/* Rating and Sold Count */}
+                  <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+                    <div className="flex items-center gap-1">
+                      <span className="text-[#D6A77A]">★</span>
+                      <span className="text-[#6B6B6B]">{displayEvent.displayRating.toFixed(1)}</span>
+                    </div>
+                    <div className="text-[#6B6B6B]">
+                      {displayEvent.displaySoldCount} sold
+                    </div>
                   </div>
+                  
+                  {/* Price Section */}
+                  <div className="mb-3">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <span className="text-3xl font-black text-[#D6A77A] group-hover:text-[#FF6B35] transition-colors duration-300">₹{displayEvent.displayPrice}</span>
+                      <span className="text-lg text-[#A9A9A9] line-through">₹{displayEvent.displayOriginalPrice}</span>
+                    </div>
+                    <div className="text-xs text-[#D6A77A] font-semibold bg-[#F5E7D6] px-2 py-1 rounded-full inline-block">
+                      {Math.round(((displayEvent.displayOriginalPrice - displayEvent.displayPrice) / displayEvent.displayOriginalPrice) * 100)}% OFF
+                    </div>
+                  </div>
+                  
+                  {/* CTA Button */}
+                  <Link 
+                    to={`/events/${event.id}`}
+                    className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-base group-hover:shadow-[0_10px_25px_rgba(255,107,53,0.4)] flex items-center justify-center gap-2"
+                  >
+                    <span>🎟️</span>
+                    Buy Ticket
+                  </Link>
                 </div>
-                
-                {/* CTA Button */}
-                <Link 
-                  to="/events" 
-                  className="w-full px-6 py-3 rounded-full font-bold bg-[#FF6B35] text-white shadow-lg hover:bg-[#E55A2B] hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-base group-hover:shadow-[0_10px_25px_rgba(255,107,53,0.4)] flex items-center justify-center gap-2"
-                >
-                  <span>🎟️</span>
-                  Buy Ticket
-                </Link>
               </div>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+          </div>
+        )}
       </section>
 
       {/* How It Works (Moved up from section 7) */}
       <HowItWorks />
 
       {/* Safety Section (Moved up from section 8) */}
-      <section 
-        id="safety-section"
-        className={`w-full py-16 bg-gradient-to-br from-white via-[#FAF8F6] to-white relative overflow-hidden transition-all duration-1000 ${
-          visibleSections.has('safety-section') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
-      >
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-tl from-[#FF6B35]/10 to-[#D6A77A]/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-gradient-to-r from-[#D6A77A]/5 to-[#FF6B35]/5 rounded-full blur-2xl"></div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg tracking-wide">
-              <span className="animate-pulse">🛡️</span>
-              Multi-Layer Security
-              <span className="animate-pulse">🛡️</span>
-            </div>
-            <h2 className="text-section-title font-display text-[#222] mb-4 bg-gradient-to-r from-[#222] via-[#D6A77A] to-[#FF6B35] bg-clip-text text-transparent">
-              Your Safety is Our Priority
-            </h2>
-            <p className="text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose">
-              We've built multiple layers of security. Hover or tap each card to see our detailed safety measures.
-            </p>
-          </div>
-          
-                    <SafetyCards />
-          
-          {/* Additional Security Info */}
-          <div className="mt-12 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] rounded-3xl p-8 text-white text-center relative overflow-hidden">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-6 left-6 w-12 h-12 border-2 border-white rounded-full animate-ping"></div>
-              <div className="absolute bottom-6 right-6 w-8 h-8 border-2 border-white rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 left-1/3 w-6 h-6 border-2 border-white rounded-full animate-bounce"></div>
-            </div>
-            
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-4">
-                <span className="text-2xl animate-pulse">🔒</span>
-                <span className="font-semibold tracking-wide">Bank-Level Security</span>
-                <span className="text-2xl animate-pulse">🔒</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-3 font-display">Enterprise-Grade Protection</h3>
-              <p className="text-body-large opacity-90 mb-6 max-w-2xl mx-auto prose">
-                We use the same security protocols as major banks to protect your data and transactions.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-lg">
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">256-bit SSL encryption</span>
-                </div>
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">PCI DSS compliant</span>
-                </div>
-                <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-colors duration-300">
-                  <span className="text-2xl">✅</span>
-                  <span className="font-semibold font-body">GDPR compliant</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SafetyCards />
 
       {/* Social Proof Stats */}
       <SocialProofStats />
-
-      {/* Trust Badges */}
-      <TrustBadges />
-
-      {/* Press Mentions */}
-      <PressMentions />
 
       {/* Testimonials */}
       <section className="w-full max-w-5xl mx-auto py-10 px-4">

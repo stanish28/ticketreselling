@@ -27,7 +27,10 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "http://localhost:3001"
+    ],
     methods: ["GET", "POST"]
   }
 });
@@ -48,6 +51,7 @@ app.use(helmet());
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://localhost:3001',
     'https://ticketreselling.vercel.app',
     'https://ticketreselling-d1mb24cys-stanish28s-projects.vercel.app',
     'https://*.vercel.app'

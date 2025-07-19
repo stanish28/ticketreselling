@@ -44,6 +44,15 @@ router.get('/', async (req, res) => {
         take: Number(limit),
         orderBy: { date: 'asc' },
         include: {
+          tickets: {
+            where: { status: 'AVAILABLE' },
+            include: {
+              seller: {
+                select: { id: true, name: true, email: true, role: true }
+              }
+            },
+            orderBy: { price: 'asc' }
+          },
           _count: {
             select: {
               tickets: {
