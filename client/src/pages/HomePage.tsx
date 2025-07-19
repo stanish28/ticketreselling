@@ -1,15 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
-import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard } from "react-icons/fa";
+import { FaSearch, FaLock, FaRegSmile } from "react-icons/fa";
 import { Event, Ticket } from '../types';
 import { eventsAPI } from '../services/api.ts';
-
-
-
-
-
-
 
 const TestimonialCard: React.FC<{ name: string; city: string; rating: number; text: string; img?: string }> = ({
   name, city, rating, text, img
@@ -36,150 +30,6 @@ const TestimonialCard: React.FC<{ name: string; city: string; rating: number; te
 );
 
 // --- Main Home Page ---
-
-// Floating Action Buttons Component
-const FloatingActionButtons = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  // Show scroll to top button when user scrolls down
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      setShowScrollTop(scrollTop > 300);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Scroll to top function
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  // Toggle FAB menu
-  const toggleFAB = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  // FAB menu items
-  const fabItems = [
-    {
-      icon: <FaPhone className="text-white text-lg" />,
-      label: 'Call Support',
-      color: 'bg-blue-500 hover:bg-blue-600',
-      action: () => window.open('tel:+919876543210')
-    },
-    {
-      icon: <FaWhatsapp className="text-white text-lg" />,
-      label: 'WhatsApp',
-      color: 'bg-green-500 hover:bg-green-600',
-      action: () => window.open('https://wa.me/919876543210')
-    },
-    {
-      icon: <FaEnvelope className="text-white text-lg" />,
-      label: 'Email Us',
-      color: 'bg-purple-500 hover:bg-purple-600',
-      action: () => window.open('mailto:support@laylow-india.com')
-    },
-    {
-      icon: <FaComments className="text-white text-lg" />,
-      label: 'Live Chat',
-      color: 'bg-orange-500 hover:bg-orange-600',
-      action: () => alert('Opening live chat...')
-    }
-  ];
-
-  return (
-    <div className="absolute top-4 right-4 z-50 flex flex-col items-end space-y-4">
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="group bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] hover:from-[#C89A6B] hover:to-[#E55A2B] text-white w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95"
-          aria-label="Scroll to top"
-        >
-          <FaArrowUp className="text-lg group-hover:animate-bounce" />
-        </button>
-      )}
-
-      {/* FAB Menu Items - appear when expanded */}
-      <div className={`flex flex-col items-end space-y-3 transition-all duration-300 ${isExpanded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4 pointer-events-none'}`}>
-        {fabItems.map((item, index) => (
-          <div key={index} className="flex items-center space-x-3 group">
-            {/* Label */}
-            <div className="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              {item.label}
-            </div>
-            {/* Button */}
-            <button
-              onClick={item.action}
-              className={`${item.color} w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95`}
-              style={{
-                animationDelay: `${index * 100}ms`,
-                animation: isExpanded ? 'fabSlideIn 0.3s ease-out forwards' : ''
-              }}
-              aria-label={item.label}
-            >
-              {item.icon}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Main FAB Button */}
-      <button
-        onClick={toggleFAB}
-        className="bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] hover:from-[#C89A6B] hover:to-[#E55A2B] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 active:scale-95 relative overflow-hidden"
-        aria-label={isExpanded ? "Close menu" : "Open menu"}
-        aria-expanded={isExpanded}
-      >
-        {/* Background pulse effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] rounded-full animate-ping opacity-20"></div>
-        
-        {/* Icon with rotation animation */}
-        <FaPlus 
-          className={`text-xl transition-transform duration-300 relative z-10 ${
-            isExpanded ? 'rotate-45' : 'rotate-0'
-          }`} 
-        />
-      </button>
-
-      {/* Backdrop for mobile - close FAB when tapped */}
-      {isExpanded && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-20 -z-10 md:hidden"
-          onClick={() => setIsExpanded(false)}
-        />
-      )}
-
-      {/* Custom CSS styles */}
-      <style>{`
-        @keyframes fabSlideIn {
-          from {
-            transform: translateX(20px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        /* Smooth transitions for mobile */
-        @media (max-width: 768px) {
-          .group:hover .opacity-0 {
-            opacity: 1;
-          }
-        }
-      `}</style>
-    </div>
-  );
-};
 
 function HowItWorks() {
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -511,6 +361,7 @@ const HomePage: React.FC = () => {
   const [searchError, setSearchError] = useState('');
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -521,6 +372,7 @@ const HomePage: React.FC = () => {
     let lastScrollTop = 0;
     let scrollVelocity = 0;
     let lastScrollTime = Date.now();
+    let scrollTimeout: NodeJS.Timeout | null = null;
     
     const handleScroll = () => {
       if (!ticking) {
@@ -545,12 +397,12 @@ const HomePage: React.FC = () => {
           setIsScrolling(true);
           
           // Clear previous timeout
-          if (scrollTimeoutRef.current) {
-            clearTimeout(scrollTimeoutRef.current);
+          if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
           }
           
           // Set timeout to detect when scrolling stops
-          scrollTimeoutRef.current = setTimeout(() => {
+          scrollTimeout = setTimeout(() => {
             setIsScrolling(false);
             scrollVelocity = 0;
           }, 150); // Adjust this value to control when scrolling is considered "stopped"
@@ -649,8 +501,8 @@ const HomePage: React.FC = () => {
       observer.disconnect();
       
       // Cleanup timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
       }
     };
   }, []);
@@ -825,9 +677,7 @@ const HomePage: React.FC = () => {
       {/* Trending Tickets section */}
       <section 
         id="trending-tickets" 
-        className={`relative w-full max-w-5xl mx-auto py-12 px-4 transition-all duration-1000 ${
-          visibleSections.has('trending-tickets') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
+        className="relative w-full max-w-5xl mx-auto py-12 px-4 transition-all duration-1000 opacity-100 translate-y-0"
       >
         <h2 className="text-section-title font-display text-[#222] mb-6 text-center">Trending Tickets</h2>
         {events.length === 0 ? (
