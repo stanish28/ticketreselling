@@ -29,7 +29,7 @@ import SellTicketPage from './pages/SellTicketPage.tsx';
 import UiTestPage from './pages/UiTestPage.tsx';
 import LegalPage from './pages/LegalPage.tsx';
 import FAQPage from './pages/FAQPage.tsx';
-import FeedbackButton from './components/common/FeedbackButton.tsx';
+
 
 function App() {
   return (
@@ -69,7 +69,6 @@ function App() {
       </main>
       <Footer />
       <MobileBottomNav />
-      <FeedbackButton variant="floating" />
     </>
   );
 }

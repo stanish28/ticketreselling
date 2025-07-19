@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import custom CSS for flip effect
 import { FaSearch, FaLock, FaRegSmile, FaUsers, FaTicketAlt, FaShieldAlt, FaCreditCard } from "react-icons/fa";
+import FeedbackButton from '../components/common/FeedbackButton.tsx';
 
 const events = [
   {
@@ -168,30 +169,31 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden">
+    <section className="w-full py-8 md:py-16 bg-gradient-to-br from-[#FAF8F6] via-white to-[#F5E7D6] relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-[#FF6B35]/10 to-[#D6A77A]/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/4 w-20 h-20 bg-gradient-to-r from-[#D6A77A]/5 to-[#FF6B35]/5 rounded-full blur-2xl"></div>
+        <div className="absolute -top-10 -right-10 w-20 h-20 md:w-40 md:h-40 bg-gradient-to-br from-[#D6A77A]/10 to-[#FF6B35]/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-10 -left-10 w-16 h-16 md:w-32 md:h-32 bg-gradient-to-tr from-[#FF6B35]/10 to-[#D6A77A]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/4 w-10 h-10 md:w-20 md:h-20 bg-gradient-to-r from-[#D6A77A]/5 to-[#FF6B35]/5 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 relative z-10">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg tracking-wide">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-1 md:gap-2 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-semibold mb-4 shadow-lg tracking-wide">
             <span className="animate-pulse">🚀</span>
-            Simple 3-Step Process
+            <span className="hidden sm:inline">Simple 3-Step Process</span>
+            <span className="sm:hidden">3 Steps</span>
             <span className="animate-pulse">🚀</span>
           </div>
-          <h2 className="text-section-title font-display text-[#222] mb-4 bg-gradient-to-r from-[#222] via-[#D6A77A] to-[#FF6B35] bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-section-title font-display text-[#222] mb-4 bg-gradient-to-r from-[#222] via-[#D6A77A] to-[#FF6B35] bg-clip-text text-transparent px-2 md:px-0">
             How LayLow-India Works
           </h2>
-          <p className="text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose">
+          <p className="text-sm md:text-body-large text-[#6B6B6B] max-w-3xl mx-auto prose px-2 md:px-0">
             Get your tickets in just three simple steps. Our platform makes buying and selling tickets effortless and secure.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
           {steps.map((step, index) => (
             <div
               key={index}
@@ -212,7 +214,7 @@ function HowItWorks() {
 
               {/* Flip Card Container */}
               <div 
-                className={`relative w-full h-[300px] group-hover:-translate-y-2 transition-all duration-300 ease-in-out transform perspective-1000`}
+                className={`relative w-full h-[250px] md:h-[300px] group-hover:-translate-y-2 transition-all duration-300 ease-in-out transform perspective-1000`}
                 style={{ 
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden'
@@ -232,8 +234,8 @@ function HowItWorks() {
                     Step {index + 1}
                   </div>
 
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <h3 className="text-3xl font-display font-bold">{step.title}</h3>
+                  <div className="flex flex-col items-center justify-center h-full text-center px-2">
+                    <h3 className="text-xl md:text-3xl font-display font-bold leading-tight">{step.title}</h3>
                   </div>
                 </div>
 
@@ -360,11 +362,11 @@ function SafetyCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
       {safetyFeatures.map((feature, index) => (
         <div 
           key={index}
-          className="relative h-80 cursor-pointer group"
+          className="relative h-72 md:h-80 cursor-pointer group"
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={() => handleMouseLeave(index)}
           onTouchEnd={() => handleTouch(index)}
@@ -390,16 +392,16 @@ function SafetyCards() {
             }}
           >
                         {/* Front Side */}
-            <div className="w-full h-full rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-[#D6A77A]/20 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2 relative overflow-hidden">
+            <div className="w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-center text-center border border-[#D6A77A]/20 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2 relative overflow-hidden">
               {/* Background gradient overlay */}
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
               
               <div className="relative z-10">
-                <div className="w-24 h-24 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 md:w-24 md:h-24 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-card-title font-display text-[#222] mb-4 group-hover:text-[#D6A77A] transition-colors duration-300">{feature.title}</h3>
-                <p className="text-body text-[#6B6B6B] mb-6 prose">
+                <h3 className="text-lg md:text-card-title font-display text-[#222] mb-3 md:mb-4 group-hover:text-[#D6A77A] transition-colors duration-300">{feature.title}</h3>
+                <p className="text-sm md:text-body text-[#6B6B6B] mb-4 md:mb-6 prose">
                   {feature.description}
                 </p>
 
@@ -419,19 +421,19 @@ function SafetyCards() {
             }}
           >
                         {/* Back Side */}
-            <div className={`w-full h-full rounded-3xl p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br ${feature.gradient} text-white shadow-xl relative overflow-hidden`}>
+            <div className={`w-full h-full rounded-3xl p-4 md:p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br ${feature.gradient} text-white shadow-xl relative overflow-hidden`}>
               {/* Animated background pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-4 right-4 w-8 h-8 border-2 border-white rounded-full animate-ping"></div>
               </div>
               
               <div className="relative z-10">
-                                  <h3 className="text-card-title font-display mb-6">{feature.backTitle}</h3>
-                <div className="space-y-4 text-left">
+                                  <h3 className="text-lg md:text-card-title font-display mb-4 md:mb-6">{feature.backTitle}</h3>
+                <div className="space-y-3 md:space-y-4 text-left">
                   {feature.backItems.map((item, itemIndex) => (
                     <div key={itemIndex} className="flex items-center group/item">
                       <span className="w-2 h-2 bg-white rounded-full mr-3 group-hover/item:scale-150 transition-transform duration-300"></span>
-                      <span className="group-hover/item:text-yellow-200 transition-colors duration-300">{item}</span>
+                      <span className="text-sm md:text-base group-hover/item:text-yellow-200 transition-colors duration-300">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -540,6 +542,7 @@ const HomePage: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isFabExpanded, setIsFabExpanded] = useState(false);
 
   // Handle scroll to top visibility and intersection observer
   useEffect(() => {
@@ -937,8 +940,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className="flex flex-col gap-3">
+      <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50">
+        {/* Desktop: Always show all buttons */}
+        <div className="hidden md:flex flex-col gap-3">
           <Link
             to="/sell-ticket"
             className="w-14 h-14 bg-[#FF6B35] text-white rounded-full shadow-xl hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
@@ -953,12 +957,56 @@ const HomePage: React.FC = () => {
           >
             <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
           </Link>
+                                             <FeedbackButton
+               variant="button"
+               className="!w-14 !h-14 !bg-[#4A90E2] !text-white !rounded-full !shadow-xl hover:!bg-[#357ABD] !transition-all !duration-300 hover:!scale-110 active:!scale-95 !flex !items-center !justify-center group !border-2 !border-white !p-0 !min-w-0"
+             >
+               <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📝</span>
+             </FeedbackButton>
+        </div>
+
+        {/* Mobile: Expandable FAB */}
+        <div className="md:hidden relative">
+          {/* Expanded buttons */}
+          <div className={`absolute bottom-16 right-0 flex flex-col-reverse gap-3 transition-all duration-500 ease-in-out ${isFabExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+            <Link
+              to="/sell-ticket"
+              className="w-14 h-14 bg-[#FF6B35] text-white rounded-full shadow-xl hover:bg-[#E55A2B] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
+              aria-label="Sell your ticket"
+            >
+              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📤</span>
+            </Link>
+            <Link
+              to="/events"
+              className="w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
+              aria-label="Browse events"
+            >
+              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🎟️</span>
+            </Link>
+            <FeedbackButton
+              variant="button"
+              className="!w-14 !h-14 !bg-[#4A90E2] !text-white !rounded-full !shadow-xl hover:!bg-[#357ABD] !transition-all !duration-300 hover:!scale-110 active:!scale-95 !flex !items-center !justify-center group !border-2 !border-white !p-0 !min-w-0"
+            >
+              <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📝</span>
+            </FeedbackButton>
+          </div>
+
+          {/* Main FAB button */}
           <button
-            onClick={() => window.open('mailto:feedback@laylow-india.com?subject=Feedback for LayLow-India', '_blank')}
-            className="w-14 h-14 bg-[#4A90E2] text-white rounded-full shadow-xl hover:bg-[#357ABD] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group border-2 border-white"
-            aria-label="Send feedback"
+            onClick={() => setIsFabExpanded(!isFabExpanded)}
+            className="w-14 h-14 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white relative z-10"
+            aria-label="Quick actions"
           >
-            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">💬</span>
+            <svg 
+              width="24" 
+              height="24" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              className={`transition-transform duration-300 ${isFabExpanded ? 'rotate-45' : 'rotate-0'}`}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
           </button>
         </div>
       </div>
@@ -967,10 +1015,10 @@ const HomePage: React.FC = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 w-14 h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white"
+          className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-50 w-12 h-12 md:w-14 md:h-14 bg-[#D6A77A] text-white rounded-full shadow-xl hover:bg-[#b98a5e] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center border-2 border-white"
           aria-label="Scroll to top"
         >
-          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="20" height="20" className="md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
           </svg>
         </button>
