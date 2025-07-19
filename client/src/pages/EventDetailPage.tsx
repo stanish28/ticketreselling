@@ -155,13 +155,16 @@ const EventDetailPage: React.FC = () => {
 
         {/* Tickets Section */}
         <div className="bg-[#F5F5DC] shadow-lg rounded-2xl border border-gray-200">
-          <div className="px-8 py-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-gray-900">Available Tickets</h2>
-              <div className="flex space-x-2">
+          <div className="px-4 sm:px-8 py-6 border-b border-gray-200">
+            {/* Mobile: Stacked layout */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Available Tickets</h2>
+              
+              {/* Filter Buttons - Responsive layout */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                 <button
                   onClick={() => setFilter('all')}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  className={`px-4 py-3 sm:py-2 rounded-xl text-sm font-bold transition-all ${
                     filter === 'all'
                       ? 'bg-[#FF6B35] text-white shadow-md'
                       : 'bg-white text-gray-700 border border-gray-300 hover:border-[#FF6B35]'
@@ -171,7 +174,7 @@ const EventDetailPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilter('direct')}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  className={`px-4 py-3 sm:py-2 rounded-xl text-sm font-bold transition-all ${
                     filter === 'direct'
                       ? 'bg-[#FF6B35] text-white shadow-md'
                       : 'bg-white text-gray-700 border border-gray-300 hover:border-[#FF6B35]'
@@ -181,7 +184,7 @@ const EventDetailPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilter('auction')}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  className={`px-4 py-3 sm:py-2 rounded-xl text-sm font-bold transition-all ${
                     filter === 'auction'
                       ? 'bg-[#FF6B35] text-white shadow-md'
                       : 'bg-white text-gray-700 border border-gray-300 hover:border-[#FF6B35]'
@@ -204,9 +207,9 @@ const EventDetailPage: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-8">
               {availableTickets.map((ticket) => (
-                <div key={ticket.id} className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                <div key={ticket.id} className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-4">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(ticket.status)}`}>{ticket.status}</span>
                     <div className="flex items-center space-x-2">

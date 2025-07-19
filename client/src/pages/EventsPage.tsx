@@ -167,9 +167,10 @@ const EventsPage: React.FC = () => {
 
 
         {/* Enhanced Search and Filter Section */}
-        <div className="bg-white rounded-3xl shadow-xl border border-[#E5E5E5] p-8 mb-8">
+        <div className="bg-white rounded-3xl shadow-xl border border-[#E5E5E5] p-4 sm:p-8 mb-8">
           {/* Quick Search Bar */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6">
+            {/* Search Input - Full width on mobile */}
             <div className="relative flex-1">
               <input
                 type="text"
@@ -182,18 +183,33 @@ const EventsPage: React.FC = () => {
               />
               <MagnifyingGlassIcon className="absolute left-4 top-4 h-6 w-6 text-[#6B6B6B]" />
             </div>
+            
+            {/* Filter Button - Hidden on mobile, visible on desktop */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white rounded-2xl font-semibold hover:shadow-lg transition-all"
+              className="hidden sm:flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white rounded-2xl font-semibold hover:shadow-lg transition-all"
             >
               <FunnelIcon className="w-5 h-5" />
               Filters
             </button>
+            
+            {/* Search Button - Full width on mobile, compact on desktop */}
             <button
               onClick={handleSearch}
-              className="px-8 py-4 bg-[#FF6B35] text-white rounded-2xl font-bold hover:bg-[#E55A2B] transition-all shadow-lg hover:shadow-xl"
+              className="w-full sm:w-auto px-8 py-4 bg-[#FF6B35] text-white rounded-2xl font-bold hover:bg-[#E55A2B] transition-all shadow-lg hover:shadow-xl"
             >
               Search
+            </button>
+          </div>
+          
+          {/* Mobile Filter Toggle - Only visible on mobile */}
+          <div className="sm:hidden mb-4">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#D6A77A] to-[#FF6B35] text-white rounded-2xl font-semibold hover:shadow-lg transition-all"
+            >
+              <FunnelIcon className="w-5 h-5" />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
           </div>
 
